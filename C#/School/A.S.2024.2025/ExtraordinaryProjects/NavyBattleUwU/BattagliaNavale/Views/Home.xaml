@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             xmlns:local="clr-namespace:BattagliaNavale"
+             xmlns:models="clr-namespace:BattagliaNavale.Models"
+             xmlns:views="clr-namespace:BattagliaNavale.Views"
+             x:Class="BattagliaNavale.Views.Home"
+             Title="Home">
+
+    <Grid>
+        <Image
+            Source="../Resources/Images/sfondo_mare.jpg"
+            Aspect="AspectFill"
+            />
+        <ScrollView>
+            <VerticalStackLayout
+                Margin="40, 5"
+                Spacing="20"
+                VerticalOptions="Start">
+                <Grid HorizontalOptions="Fill">
+                    <Grid
+                        HorizontalOptions="Start"
+                        VerticalOptions="Start">
+                        <ImageButton
+                            x:Name="btnProfilo"
+                            Source="../Resources/Images/immagine_profilo.jpg"
+                            HeightRequest="30"
+                            WidthRequest="30"
+                            Command="{Binding Source={RelativeSource AncestorType={x:Type views:Home}}, Path=OpenProfiloCommand}"
+                            ZIndex="2"
+                            />
+                        <Rectangle 
+                            HeightRequest="35"
+                            WidthRequest="35"
+                            Opacity="0.7"
+                            Background="White"
+                            Stroke="CadetBlue"
+                            StrokeThickness="2"
+                            RadiusX="5" RadiusY="5"
+                            />
+                    </Grid>
+                    <Grid
+                        HorizontalOptions="End"
+                        VerticalOptions="Start"
+                        >
+                        <ImageButton
+                            x:Name="btnMusica"
+                            Source="../Resources/Images/musica.png"
+                            HeightRequest="30"
+                            WidthRequest="30"
+                            Clicked="MusicaClicked"
+                            ZIndex="2"
+                            />
+                        <Rectangle 
+                            HeightRequest="35"
+                            WidthRequest="35"
+                            Opacity="0.7"
+                            Background="White"
+                            Stroke="CadetBlue"
+                            StrokeThickness="2"
+                            RadiusX="5" RadiusY="5"
+                            />
+                    </Grid>
+                </Grid>
+                <Image
+                    Source="../Resources/Images/battaglia_navale_img.png"
+                    Margin="5,20, 5, 60"
+                    />
+                <Button
+                    x:Name="btn_gioca"
+                    HeightRequest="60"
+                    BackgroundColor="#92D36E"
+                    BorderColor="#629C44"
+                    BorderWidth="2"
+                    Text="Gioca ora!"
+                    FontFamily="Poppins"
+                    FontSize="17"
+                    TextColor="#000000"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type views:Home}}, Path=OpenGiocoCommand}"
+                    />
+                <Button
+                    x:Name="btn_regolamento"
+                    HeightRequest="60"
+                    BackgroundColor="#91E4FB"
+                    BorderColor="#008DB1"
+                    BorderWidth="2"
+                    Text="Regolamento"
+                    FontFamily="Poppins"
+                    FontSize="17"
+                    TextColor="#000000"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type views:Home}}, Path=OpenRegolamentoCommand}"
+                    />
+                <Button
+                    x:Name="btn_esci"
+                    HeightRequest="60"
+                    BackgroundColor="#FF8A84"
+                    BorderColor="#FF5D55"
+                    BorderWidth="2"
+                    Text="Esci"
+                    FontFamily="Poppins"
+                    FontSize="17"
+                    TextColor="#000000"
+                    Clicked="EsciClicked"
+                    />
+            </VerticalStackLayout>
+        </ScrollView>
+        
+    </Grid>
+    
+</ContentPage>

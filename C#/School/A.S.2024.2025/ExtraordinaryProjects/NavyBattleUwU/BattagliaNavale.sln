@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BattagliaNavale", "BattagliaNavale\BattagliaNavale.csproj", "{DC5EC60A-098D-45C6-8631-D97EFC20BCAE}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Elementi di soluzione", "Elementi di soluzione", "{8269BD94-353E-43D5-A772-3A8568B1574E}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Downloads\Jack Sparrow.mp3 = ..\..\..\Downloads\Jack Sparrow.mp3
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DC5EC60A-098D-45C6-8631-D97EFC20BCAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC5EC60A-098D-45C6-8631-D97EFC20BCAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC5EC60A-098D-45C6-8631-D97EFC20BCAE}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{DC5EC60A-098D-45C6-8631-D97EFC20BCAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC5EC60A-098D-45C6-8631-D97EFC20BCAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC5EC60A-098D-45C6-8631-D97EFC20BCAE}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EC36C109-CCFC-4781-8042-2AA649CD7D1B}
+	EndGlobalSection
+EndGlobal

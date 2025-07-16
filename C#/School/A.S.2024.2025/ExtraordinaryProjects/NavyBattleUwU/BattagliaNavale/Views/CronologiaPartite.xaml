@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:models="clr-namespace:BattagliaNavale.Models"
+             xmlns:views="clr-namespace:BattagliaNavale.Views"
+             xmlns:vm="clr-namespace:BattagliaNavale.ViewModels"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             x:Class="BattagliaNavale.Views.CronologiaPartite"
+             Title="Profilo">
+    <ContentPage.Behaviors>
+        <toolkit:EventToCommandBehavior EventName="Appearing" 
+                                        Command="{Binding AppearingCommand}" 
+                                        />
+    </ContentPage.Behaviors>
+
+    <Grid>
+        <Image
+            Source="../Resources/Images/sfondo_mare.jpg"
+            Aspect="AspectFill" />
+
+        <ScrollView>
+            <VerticalStackLayout>
+                <Grid ColumnSpacing="15" Margin="20">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="13*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Rectangle 
+                        Fill="White" 
+                        Stroke="CadetBlue" 
+                        StrokeThickness="3" 
+                        RadiusX="10" RadiusY="10" 
+                        Opacity="0.7" 
+                        Grid.ColumnSpan="2"/>
+                    <Label
+                        x:Name="btnNome"
+                        Text="{Binding NomeUtente}"
+                        FontSize="20"
+                        Grid.Column="0"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        />
+                    <ImageButton
+                        VerticalOptions="Center"
+                        x:Name="btnModificaProfilo"
+                        Source="{mi:FontAwesomeSolid Icon=Pen, IconColor=Black}"
+                        Command="{Binding CambiaNomeCommand}"
+                        Margin="0,0,6,0"
+                        Grid.Column="1"
+                        />
+                    </Grid>
+
+                <CollectionView ItemsSource="{Binding ListaPartite}"
+                        EmptyView="Non hai ancora fatto nessuna partita"
+                        >
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="models:PartitaStatistiche">
+                            <Grid ColumnSpacing="15"
+                                Margin="20,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="8*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+                                
+                                <Rectangle 
+                                    Fill="White" 
+                                    Stroke="CadetBlue" 
+                                    StrokeThickness="3" 
+                                    RadiusX="10" RadiusY="10" 
+                                    Opacity="0.7" 
+                                    Grid.RowSpan="3"/>
+                                
+                                <VerticalStackLayout Spacing="10"
+                                                     Grid.RowSpan="3"
+                                                     VerticalOptions="Center"
+                                                     HorizontalOptions="Start"
+                                                     Margin="20"
+                                                     >
+                                    <VerticalStackLayout.GestureRecognizers>
+                                        <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type views:CronologiaPartite}}, Path=OpenPartitaCommand}"
+                                                              CommandParameter="{Binding Id}" 
+                                                              />
+                                    </VerticalStackLayout.GestureRecognizers>
+
+                                    <HorizontalStackLayout>
+                                        <Label Text="Partita n."
+                                       FontAttributes="Bold"
+                                       TextColor="CadetBlue"
+                                       />
+                                        <Label Text="{Binding Id}"
+                                       FontAttributes="Bold"
+                                       TextColor="CadetBlue"
+                                       />
+                                    </HorizontalStackLayout>
+
+                                    <HorizontalStackLayout>
+                                        <Label Text="La partita è stata vinta dal "
+                                       FontAttributes="Bold"
+                                       TextColor="Black"
+                                       />
+                                        <Label Text="{Binding RisultatoPartita}"
+                                       FontAttributes="Bold"
+                                       TextColor="Black"
+                                       />
+                                    </HorizontalStackLayout>
+                                
+                                    <HorizontalStackLayout>
+                                        <Label Text="La partita è durata "
+                                                FontAttributes="Bold"
+                                                TextColor="Black"
+                                                />
+                                        <Label Text="{Binding TempoPartitaTesto}"
+                                                FontAttributes="Bold"
+                                                TextColor="Black"
+                                                />
+                                        <Label Text=" minuti"
+                                                FontAttributes="Bold"
+                                                TextColor="Black"
+                                                />
+                                    </HorizontalStackLayout>
+                                </VerticalStackLayout>
+
+                                <Button 
+                                    ImageSource="{mi:FontAwesomeSolid Icon=Xmark, IconColor=Black}"
+                                    Command="{Binding Source={RelativeSource AncestorType={x:Type vm:CronologiaPartiteViewModel}}, Path=CancellaPartitaCommand}" 
+                                    CommandParameter="{Binding Id}"
+                                    BorderWidth="1.5"
+                                    BorderColor="#FF5D55"
+                                    BackgroundColor="#FF8A84"
+                                    Grid.Column="1"
+                                    Grid.Row="1"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="Center"
+                                    />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+                <Button
+                    VerticalOptions="End"
+                    x:Name="btnTornaAllaHome"
+                    HeightRequest="60"
+                    BorderWidth="2"
+                    BorderColor="#FF5D55"
+                    BackgroundColor="#FF8A84"
+                    TextColor="#000000"
+                    Margin="30,20"
+                    Text="Torna alla home"
+                    FontFamily="Poppins"
+                    FontSize="18"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type views:CronologiaPartite}}, Path=EsciCommand}"
+                    />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodels="clr-namespace:Dogan_Rush.ViewModels"
+             xmlns:models="clr-namespace:Dogan_Rush.Models"
+             x:Class="Dogan_Rush.View.GamePage"
+             x:DataType="viewmodels:GamePageViewModel"
+             BackgroundColor="Black">
+
+    <Grid RowDefinitions="*,*"
+          ColumnDefinitions="*">
+
+        <!-- Top Half with Background and Stats -->
+        <Grid Row="0">
+            <Image Source="{Binding CurrentPersonImage}"
+                   Aspect="AspectFill"
+                   Opacity="0.4"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Fill" />
+            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="Center"
+                         VerticalOptions="Start"
+                         Margin="10">
+                <Label Text="Errori:"
+                       TextColor="White"
+                       FontSize="20" />
+                <Label Text="{Binding Errors}"
+                       TextColor="Red"
+                       FontSize="20"
+                       Margin="5,0" />
+                <Label Text="Turno:"
+                       TextColor="White"
+                       FontSize="20"
+                       Margin="20,0,0,0" />
+                <Label Text="{Binding TurnCount}"
+                       TextColor="LightGreen"
+                       FontSize="20"
+                       Margin="5,0" />
+            </StackLayout>
+        </Grid>
+
+        <!-- Bottom Half -->
+        <Grid Row="1">
+            <Image Source="sfondo_partebassa.png"	
+            Aspect="AspectFill"
+            Opacity="0.4"
+            HorizontalOptions="Fill"
+            VerticalOptions="Fill" />
+
+            <!-- Buttons -->
+            <StackLayout Orientation="Horizontal"
+                         HorizontalOptions="Start"
+                         VerticalOptions="Start"
+                         Margin="10">
+                <Button Text="Correct"
+                    BackgroundColor="Green"
+                    Command="{Binding CorrectPressedCommand}" />
+
+                <Button Text="Incorrect"
+                    BackgroundColor="Red"
+                    Command="{Binding WrongPressedCommand}" />
+
+                <HorizontalStackLayout Spacing="5">
+                    <Label Text="Game Date:"
+                        TextColor="White"
+                        FontSize="15" />        
+                    <Label Text="{Binding GameManager.GameDate}"
+                        TextColor="White"
+                        FontSize="15" />
+                </HorizontalStackLayout>
+            </StackLayout>
+
+            <!-- Drawers -->
+            <StackLayout Orientation="Vertical"
+             HorizontalOptions="Start"
+             VerticalOptions="Center"
+             Margin="10,0"
+             Spacing="10">
+
+                <Button Text="🪪 ID"
+            Command="{Binding ToggleIDDrawerCommand}"
+            WidthRequest="100"
+            BackgroundColor="#444"
+            TextColor="White" />
+
+                <Button Text="🛂 VISA"
+            Command="{Binding ToggleVISADrawerCommand}"
+            WidthRequest="100"
+            BackgroundColor="#444"
+            TextColor="White" />
+
+            </StackLayout>
+
+            <!-- ID Drawer Popup -->
+            <Frame IsVisible="{Binding IsIDDrawerVisible}"
+                   BackgroundColor="#222"
+                   CornerRadius="10"
+                   Padding="10"
+                   Margin="120,0,0,100"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   WidthRequest="300">
+                <VerticalStackLayout Spacing="5">
+                    <HorizontalStackLayout>
+                        <Label Text="Name:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.Name}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Surname:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.Surname}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Birth Date:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.BirthDate}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="ID Code:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.IDcode}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Emission:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.EmissionDate}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Expiring:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.ExpiringDate}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Sex:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.SexDisplay}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Nationality:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentIDCard.Nationality}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+
+            <!-- VISA Drawer Popup -->
+            <Frame IsVisible="{Binding IsVISADrawerVisible}"
+                   BackgroundColor="#222"
+                   CornerRadius="10"
+                   Padding="10"
+                   Margin="120,100,0,0"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   WidthRequest="300">
+                <VerticalStackLayout Spacing="5">
+                    <HorizontalStackLayout>
+                        <Label Text="Name:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.Name}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Surname:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.Surname}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Birth Date:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.Birthdate}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="VISA Code:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.VISACode}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Emission:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.EmissionDate}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Expiration:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.ExpirationDate}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Sex:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.SexDisplay}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                    <HorizontalStackLayout>
+                        <Label Text="Country:" TextColor="Gray"/>
+                        <Label Text="{Binding CurrentVISACard.Country}" TextColor="White"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Frame>
+        </Grid>
+    </Grid>
+</ContentPage>

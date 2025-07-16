@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BattagliaNavale.Views.PosizionaNavi"
+             xmlns:vm="clr-namespace:BattagliaNavale.ViewModels"
+             Title="PosizionaNavi">
+
+    <Grid>
+        <Image
+            Source="../Resources/Images/sfondo_mare.jpg"
+            Aspect="AspectFill" />
+
+        <ScrollView HorizontalOptions="Center">
+            <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                <Image
+                Source="../Resources/Images/posiziona_navi_img.png"
+                HeightRequest="250"
+                WidthRequest="250"/>
+
+                <Grid x:Name="grigliaPosizionaNavi"
+                  WidthRequest="400" HeightRequest="400"
+                  HorizontalOptions="Center" VerticalOptions="Center">
+                    <Image x:Name="imgPrimaNave"
+                       Source="../Resources/Images/barca3.png"
+                       Grid.Row="{Binding PrimaNaveRow}"
+                       Grid.Column="{Binding PrimaNaveColumn}"
+                       Grid.RowSpan="{Binding PrimaNaveRowSpan}"
+                       Grid.ColumnSpan="{Binding PrimaNaveColumnSpan}"
+                       Scale="{Binding PrimaNaveScale}"
+                       Rotation="{Binding PrimaNaveRotation}"
+                       TranslationX="{Binding PrimaNaveTranslationX}"
+                       AnchorX="0.5"
+                       AnchorY="0.5"
+                       ZIndex="1"
+                       Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelezionaNaveCommand}">
+                                <TapGestureRecognizer.CommandParameter>
+                                    <x:Int32>0</x:Int32>
+                                </TapGestureRecognizer.CommandParameter>
+                            </TapGestureRecognizer>
+                        </Image.GestureRecognizers>
+                    </Image>
+
+                    <Image x:Name="imgSecondaNave"
+                       Source="../Resources/Images/barca1.png"
+                       Grid.Row="{Binding SecondaNaveRow}"
+                       Grid.Column="{Binding SecondaNaveColumn}"
+                       Grid.RowSpan="{Binding SecondaNaveRowSpan}"
+                       Grid.ColumnSpan="{Binding SecondaNaveColumnSpan}"
+                       Scale="{Binding SecondaNaveScale}"
+                       Rotation="{Binding SecondaNaveRotation}"
+                       TranslationX="{Binding SecondaNaveTranslationX}"
+                       AnchorX="0.5"
+                       AnchorY="0.5"
+                       ZIndex="1"
+                       Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelezionaNaveCommand}">
+                                <TapGestureRecognizer.CommandParameter>
+                                    <x:Int32>1</x:Int32>
+                                </TapGestureRecognizer.CommandParameter>
+                            </TapGestureRecognizer>
+                        </Image.GestureRecognizers>
+                    </Image>
+
+                    <Image x:Name="imgTerzaNave"
+                       Source="../Resources/Images/barca4.png"
+                       Grid.Row="{Binding TerzaNaveRow}"
+                       Grid.Column="{Binding TerzaNaveColumn}"
+                       Grid.RowSpan="{Binding TerzaNaveRowSpan}"
+                       Grid.ColumnSpan="{Binding TerzaNaveColumnSpan}"
+                       Scale="{Binding TerzaNaveScale}"
+                       Rotation="{Binding TerzaNaveRotation}"
+                       TranslationX="{Binding TerzaNaveTranslationX}"
+                       AnchorX="0.5"
+                       AnchorY="0.5"
+                       ZIndex="1"
+                       Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelezionaNaveCommand}">
+                                <TapGestureRecognizer.CommandParameter>
+                                    <x:Int32>2</x:Int32>
+                                </TapGestureRecognizer.CommandParameter>
+                            </TapGestureRecognizer>
+                        </Image.GestureRecognizers>
+                    </Image>
+
+                    <Image x:Name="imgQuartaNave"
+                       Source="../Resources/Images/barca2.png"
+                       Grid.Row="{Binding QuartaNaveRow}"
+                       Grid.Column="{Binding QuartaNaveColumn}"
+                       Grid.RowSpan="{Binding QuartaNaveRowSpan}"
+                       Grid.ColumnSpan="{Binding QuartaNaveColumnSpan}"
+                       Scale="{Binding QuartaNaveScale}"
+                       Rotation="{Binding QuartaNaveRotation}"
+                       TranslationX="{Binding QuartaNaveTranslationX}"
+                       AnchorX="0.5"
+                       AnchorY="0.5"
+                       ZIndex="1"
+                       Aspect="AspectFit" HorizontalOptions="Fill" VerticalOptions="Fill">
+                        <Image.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelezionaNaveCommand}">
+                                <TapGestureRecognizer.CommandParameter>
+                                    <x:Int32>3</x:Int32>
+                                </TapGestureRecognizer.CommandParameter>
+                            </TapGestureRecognizer>
+                        </Image.GestureRecognizers>
+                    </Image>
+                </Grid>
+
+                <HorizontalStackLayout Margin="0, 20" 
+                                   HorizontalOptions="Center" VerticalOptions="Center">
+                    <ImageButton x:Name="btnSu"
+                             WidthRequest="70"
+                             HeightRequest="70"
+                             Source="freccia.png"
+                             Command="{Binding SpostaNaveCommand}" />
+
+                    <ImageButton x:Name="btnGiu"
+                             WidthRequest="70"
+                             HeightRequest="70"
+                             Source="freccia.png" 
+                             Rotation="180"
+                             Command="{Binding SpostaNaveCommand}" />
+
+                    <ImageButton x:Name="btnSinistra"
+                             WidthRequest="70"
+                             HeightRequest="70"
+                             Source="freccia.png"
+                             Rotation="270"
+                             Command="{Binding SpostaNaveCommand}" />
+
+                    <ImageButton x:Name="btnDestra"
+                             WidthRequest="70"
+                             HeightRequest="70"
+                             Rotation="90"
+                             Source="freccia.png"
+                             Command="{Binding SpostaNaveCommand}" />
+
+                    <ImageButton x:Name="btnRuota"
+                             WidthRequest="70"
+                             HeightRequest="70"
+                             Source="freccia_ruota.png"
+                             Command="{Binding RuotaNaveCommand}" />
+                </HorizontalStackLayout>
+
+                <Button x:Name="btn_gioca"
+                    Margin="20"
+                    HeightRequest="60"
+                    BackgroundColor="#92D36E"
+                    BorderColor="#629C44"
+                    BorderWidth="2"
+                    Text="Gioca ora!"
+                    FontFamily="Poppins"
+                    FontSize="17"
+                    TextColor="#000000"
+                    Command="{Binding ConfermaPosizionamentoCommand}" />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

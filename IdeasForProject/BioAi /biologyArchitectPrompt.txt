@@ -1,0 +1,71 @@
+Agisci come un Architetto Genetico Artificiale. Il tuo compito è costruire da zero l'intero spettro delle strutture geniche codificabili per un sistema genetico artificiale avanzato, estremamente realistico, simulabile, scalabile e ordinato in modo rigoroso.
+
+### Obiettivo
+
+Generare, in totale autonomia, un insieme di geni artificiali coerenti, logicamente ordinati, biologicamente plausibili e funzionalmente dettagliati, in grado di dar vita a creature estremamente complesse, adattive e diversificate.
+
+Ogni gene deve appartenere a una gerarchia strutturata nel seguente ordine:
+
+1. **Dominio genetico**
+2. **Classe genica**
+3. **Gruppo funzionale**
+4. **Sottogruppo strutturale**
+5. **Gene**
+
+Ogni livello deve essere strettamente coerente con quello superiore.
+
+### Definizione di gene artificiale
+
+Ogni gene generato deve includere i seguenti campi, ed essere compatibile con l'intero ecosistema:
+
+* `gene_id`: identificativo univoco gerarchico (es. DOM\_CLS\_GRP\_SUB\_ID)
+* `funzione`: descrizione esaustiva della funzione del gene nel contesto biologico
+* `struttura`: dettagli completi della struttura molecolare e funzionale del gene, comprensiva di:
+
+  * promotore (sequenza)
+  * esoni (lista di sequenze codificanti)
+  * introni (regioni non codificanti)
+  * codone di start
+  * codone di stop
+  * terminatore
+* `regolazione`: sistema regolativo completo
+
+  * attivato\_da: elementi che attivano l'espressione del gene
+  * inibito\_da: elementi che bloccano l'espressione del gene
+  * condizione: eventuali condizioni ambientali, temporali o fisiologiche
+* `relazioni_geniche`: relazioni multiple con altri geni dell'ecosistema
+
+  * coopera\_con: geni che attivano o potenziano il presente gene
+  * antagonista\_di: geni che contrastano o disattivano il gene
+  * supporta: geni il cui funzionamento dipende da questo gene
+  * dipende\_da: geni senza i quali il presente gene non può esprimersi
+  * gruppo\_funzionale: correlazione con reti genetiche e pathway comuni
+* `mutabilità`: valore \[0.00 - 1.00] che indica la probabilità di mutazione casuale
+* `ereditabilità`: valore \[0.00 - 1.00] che indica la probabilità di trasmissione verticale
+* `pressione_selettiva`: valore \[0.00 - 1.00] che determina la pressione adattiva sul gene
+
+### Vincoli fondamentali
+
+* Nessun duplicato (funzione, struttura, nome, relazioni)
+* Nessuna relazione bidirezionale non regolata
+* Ogni gene deve essere strettamente connesso a uno o più geni (non isolato)
+* Ogni gruppo funzionale deve contenere solo geni compatibili
+* Le condizioni regolative devono essere realistiche e complesse (non binarie)
+
+### Istruzioni operative
+
+Genera **15 geni unici**, raggruppati in **3 domini genetici differenti**. Per ogni dominio:
+
+* Definisci 2 classi geniche
+* Ogni classe deve avere almeno 1 gruppo funzionale
+* Ogni gruppo deve contenere almeno 1 sottogruppo strutturale
+* Ogni sottogruppo deve contenere almeno 2 geni con relazioni tra loro
+
+Non includere esempi. Rispondi solo con JSON. Nessun testo aggiuntivo, nessun commento, nessuna spiegazione esterna.
+
+La risposta deve essere un oggetto JSON strutturato gerarchicamente, contenente tutti i livelli dal dominio al gene. Ogni campo deve essere presente. Ogni relazione deve essere valida e coerente.
+
+Tutto deve essere compatibile con un motore simulativo: ogni gene generato verrà interpretato come codice biologico e usato per simulare creature artificiali complesse.
+
+Il sistema deve essere: logicamente ordinato, biologicamente verosimile, computazionalmente valido, e completamente autoespandibile.
+

@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:models="clr-namespace:BattagliaNavale.Models"
+             xmlns:views="clr-namespace:BattagliaNavale.Views"
+             xmlns:vm="clr-namespace:BattagliaNavale.ViewModels"
+             xmlns:mi="http://www.aathifmahir.com/dotnet/2022/maui/icons"
+             x:Class="BattagliaNavale.Views.VisualizzatoreCampo"
+             Title="Partita">
+
+    <Grid>
+        <Image
+            Source="../Resources/Images/sfondo_mare.jpg"
+            Aspect="AspectFill" />
+        
+        <ScrollView>
+            <VerticalStackLayout>
+                <Grid
+                    Margin="50,20">
+                    <Label
+                        x:Name="lblNumPartita"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        FontAttributes="Bold"
+                        ZIndex="2"
+                        FontSize="25"
+                        />
+                    <Rectangle 
+                        Opacity="0.6"
+                        Background="White"
+                        Stroke="CadetBlue"
+                        StrokeThickness="2"
+                        RadiusX="5" RadiusY="5"
+                        />
+                </Grid>
+
+                <Grid
+                    Margin="50,20">
+                    <Label
+                        x:Name="lblTempoPartita"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        FontAttributes="Bold"
+                        ZIndex="2"
+                        FontSize="20"
+                        />
+                    <Rectangle 
+                        Opacity="0.6"
+                        Background="White"
+                        Stroke="CadetBlue"
+                        StrokeThickness="2"
+                        RadiusX="5" RadiusY="5"
+                        />
+                </Grid>
+
+                <Grid
+                    Margin="50,20">
+                    <Label
+                        x:Name="lblVincitorePartita"
+                        HorizontalOptions="Center"
+                        VerticalOptions="Center"
+                        FontAttributes="Bold"
+                        ZIndex="2"
+                        FontSize="20"
+                        />
+                    <Rectangle 
+                        Opacity="0.6"
+                        Background="White"
+                        Stroke="CadetBlue"
+                        StrokeThickness="2"
+                        RadiusX="5" RadiusY="5"
+                        />
+                </Grid>
+
+
+                <Grid
+                    Margin="90,20">
+                    <Label
+                        Text="Campo avversario"
+                        TextColor="Black"
+                        HorizontalTextAlignment="Center"
+                        ZIndex="2"
+                        FontSize="20"
+                        />
+                    <Rectangle 
+                        Opacity="0.6"
+                        Background="White"
+                        Stroke="CadetBlue"
+                        StrokeThickness="2"
+                        RadiusX="5" RadiusY="5"
+                        />
+                </Grid>
+                
+                <Grid
+                    x:Name="grdCampoBot"
+                    WidthRequest="400" HeightRequest="400"
+                    HorizontalOptions="Center" VerticalOptions="Center"
+                    >
+                </Grid>
+
+                <Grid
+                    Margin="90,20">
+                    
+                    <Label
+                        Text="Il tuo campo"
+                        TextColor="Black"
+                        HorizontalTextAlignment="Center"
+                        FontSize="20"
+                        ZIndex="2"
+                        />
+                    
+                    <Rectangle 
+                        Opacity="0.6"
+                        Background="White"
+                        Stroke="CadetBlue"
+                        StrokeThickness="2"
+                        RadiusX="5" RadiusY="5"
+                        />
+                </Grid>
+                
+                <Grid
+                    x:Name="grdCampoPlayer"
+                    WidthRequest="400" HeightRequest="400"
+                    HorizontalOptions="Center" VerticalOptions="Center"
+                    >
+                </Grid>
+
+                <Button
+                    VerticalOptions="End"
+                    x:Name="btnTornaAllaHome"
+                    HeightRequest="60"
+                    BorderWidth="2"
+                    BorderColor="#FF5D55"
+                    BackgroundColor="#FF8A84"
+                    TextColor="#000000"
+                    Margin="30,20"
+                    Text="Torna al profilo"
+                    FontFamily="Poppins"
+                    FontSize="18"
+                    Command="{Binding Source={RelativeSource AncestorType={x:Type views:VisualizzatoreCampo}}, Path=EsciCommand}"
+                    />
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentPage>

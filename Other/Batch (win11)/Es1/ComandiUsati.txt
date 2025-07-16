@@ -1,0 +1,26 @@
+mkdir Lab1
+cd Lab1
+mkdir Finanza
+mkdir Clienti
+mkdir Lavoro
+mkdir Archivio
+cd Lavoro
+mkdir Moduli
+mkdir Informazioni
+cd ..\..\..
+move cliente*.txt Esercizio1\lab1\Clienti
+copy Esercizio1\Lab1\Clienti\cliente*.txt Esercizio1\Lab1\Archivio
+cd Esercizio1
+cd Lab1
+cd Archivio
+move ..\..\..\auto.docx .
+ren auto.docx auto_old.docx
+mov auto_old.docx ..\Lavoro\Moduli
+type ..\Clienti\cliente1
+cd ..\Clienti
+del cliente*.txt
+move ..\..\..\banca.docx ..\Finanza
+ren ..\Finanza Casa
+
+
+
