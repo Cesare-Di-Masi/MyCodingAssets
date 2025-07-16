@@ -1,0 +1,9 @@
+
+# Configuration constants
+
+WINDOW_WIDTH = 1200
+WINDOW_HEIGHT = 900
+DEFAULT_SCAN_PATH = "data/scan.xml"
+DEFAULT_INTERFACE = "eth0"
+ORBIT_RADIUS_STEP = 250
+NODE_RADIUS = 8
