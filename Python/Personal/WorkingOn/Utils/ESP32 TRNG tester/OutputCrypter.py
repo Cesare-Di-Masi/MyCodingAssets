@@ -6,17 +6,21 @@ import base64
 import time
 import zlib
 from Cryptodome.Cipher import AES
-from Cryptodome.Util.Padding import pad
+from Cryptodome.Util.Padding import pad, unpad
+from Cryptodome.Random import get_random_bytes
+import os
 
 # ========== CONFIGURAZIONE ==========
-SERIAL_PORT = "/dev/ttyUSB0"  # Modifica secondo necessità (es. COM3 su Windows)
+SERIAL_PORT = "/dev/ttyUSB0"  # Porta seriale del tuo ESP32
 BAUDRATE = 115200
 WHITENING_KEY = 0x5A5A5A5A
 SALT = b'esp32_salt_value'
 AES_BLOCK_SIZE = 16
-MASTER_KEY = hashlib.sha256("TEST".encode()).digest()  # Placeholder. Leggilo da file in prod.
 
-# ========== FUNZIONI BASE ==========
+MASTER_KEY_FILE = "master_key.sec"
+MASTER_KEY_PASSWORD = "StrongPasswordHere"  # Cambiare in produzione!
+
+# ========== FUNZIONI CRITTOGRAFICHE ==========
 
 def whitening(raw_value: int, whitening_key: int) -> int:
     return raw_value ^ whitening_key
@@ -42,53 +46,94 @@ def mix_with_time(value: int) -> int:
     current_millis = int(time.time() * 1000)
     return (value ^ (current_millis & 0xFFFFFFFF)) & 0xFFFFFFFF
 
-def aes_encrypt(data: bytes, key: bytes) -> bytes:
-    cipher = AES.new(key, AES.MODE_ECB)
-    return cipher.encrypt(pad(data, AES_BLOCK_SIZE))
+def aes_gcm_encrypt(data: bytes, key: bytes) -> bytes:
+    cipher = AES.new(key, AES.MODE_GCM)
+    ciphertext, tag = cipher.encrypt_and_digest(data)
+    return cipher.nonce + tag + ciphertext
 
-# ========== FUNZIONE PRINCIPALE ==========
+def aes_gcm_decrypt(enc_data: bytes, key: bytes) -> bytes:
+    nonce = enc_data[:12]
+    tag = enc_data[12:28]
+    ciphertext = enc_data[28:]
+    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+    return cipher.decrypt_and_verify(ciphertext, tag)
+
+# ========== FUNZIONI PER LA MASTER KEY ==========
+
+def save_master_key(master_key: bytes, password: str):
+    key = hashlib.sha256(password.encode()).digest()
+    cipher = AES.new(key, AES.MODE_GCM)
+    ciphertext, tag = cipher.encrypt_and_digest(master_key)
+    with open(MASTER_KEY_FILE, "wb") as f:
+        f.write(cipher.nonce)
+        f.write(tag)
+        f.write(ciphertext)
+
+def load_master_key(password: str) -> bytes | None:
+    if not os.path.exists(MASTER_KEY_FILE):
+        return None
+    with open(MASTER_KEY_FILE, "rb") as f:
+        nonce = f.read(12)
+        tag = f.read(16)
+        ciphertext = f.read()
+    key = hashlib.sha256(password.encode()).digest()
+    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
+    return cipher.decrypt_and_verify(ciphertext, tag)
+
+# ========== FUNZIONI TRNG ==========
 
 def request_random_from_esp32(ser) -> int:
-    ser.write(b"r")  # Invia comando per richiedere valore
+    ser.write(b"r")  # Comando per ricevere TRNG
     data = ser.read(8)  # 4 byte TRNG + 4 byte CRC32
     if len(data) != 8:
-        raise ValueError("Errore nella ricezione dei dati")
+        raise ValueError("Errore nella ricezione del TRNG")
 
     rnd, crc = struct.unpack("<II", data)
-    # Verifica CRC32 (little-endian come sull’ESP32)
-    computed_crc = 0xFFFFFFFF
-    computed_crc = struct.unpack("<I", struct.pack("<I", zlib.crc32(struct.pack("<I", rnd), computed_crc)))[0]
-    
+    computed_crc = zlib.crc32(struct.pack("<I", rnd)) & 0xFFFFFFFF
+
     if crc != computed_crc:
-        raise ValueError("CRC mismatch")
+        raise ValueError(f"CRC mismatch: ricevuto {crc:08X}, calcolato {computed_crc:08X}")
 
     return rnd
 
-def generate_secure_output_from_esp32():
+def generate_master_key_from_esp32(password: str) -> bytes:
     ser = serial.Serial(SERIAL_PORT, BAUDRATE, timeout=1)
-    time.sleep(2)  # Per inizializzazione seriale
+    time.sleep(2)  # Attesa inizializzazione ESP32
 
-    raw = request_random_from_esp32(ser)
-    ser.close()
+    try:
+        raw = request_random_from_esp32(ser)
+    finally:
+        ser.close()
 
     whitened = whitening(raw, WHITENING_KEY)
     hashed = sha256_hash(whitened)
+
     entropy_pool = bytearray(32)
     entropy_pool = update_entropy_pool(entropy_pool, hashed)
+
     derived_key = hkdf_extract_expand(entropy_pool, SALT)
     mixed = mix_with_time(whitened)
     final_bytes = struct.pack(">I", mixed)
-    encrypted = aes_encrypt(final_bytes, MASTER_KEY)
-    encoded_output = base64.b64encode(encrypted).decode('utf-8')
+    encrypted = aes_gcm_encrypt(final_bytes, derived_key)
 
-    print("[DEBUG] TRNG:          0x%08X" % raw)
-    print("[DEBUG] Whitened:      0x%08X" % whitened)
-    print("[DEBUG] Mixed:         0x%08X" % mixed)
-    print("[DEBUG] Encrypted HEX: ", encrypted.hex())
-    print("[OUTPUT] Base64:       ", encoded_output)
+    master_key = derived_key[:32]
+    save_master_key(master_key, password)
 
-    return encoded_output
+    print(f"[DEBUG] TRNG:     0x{raw:08X}")
+    print(f"[DEBUG] Whitened: 0x{whitened:08X}")
+    print(f"[DEBUG] Mixed:    0x{mixed:08X}")
+    print(f"[DEBUG] Master Key salvata (hex): {master_key.hex()}")
+
+    return master_key
 
 # ========== MAIN ==========
+
 if __name__ == "__main__":
-    generate_secure_output_from_esp32()
+    mk = load_master_key(MASTER_KEY_PASSWORD)
+    if mk is None:
+        print("Master Key non trovata. Generazione da ESP32 in corso...")
+        mk = generate_master_key_from_esp32(MASTER_KEY_PASSWORD)
+    else:
+        print("Master Key caricata da file.")
+
+    print(f"[INFO] Master Key finale (hex): {mk.hex()}")
