@@ -1,0 +1,68 @@
+@startuml
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+
+class CharacterManager {
+  - characters: List<CharacterUnit>
+  + StartAll(): void
+  + StopAll(): void
+  + GetCharacter(i: int): CharacterUnit
+}
+
+class CharacterUnit {
+  - currentChar: char
+  - encryptionLevels: List<EncryptionLayer>
+  - timerIntervalMin: int
+  - timerIntervalMax: int
+  - cancellationToken: CancellationToken
+  + StartAsync(): Task
+  + Stop(): void
+  + GenerateNewChar(): void
+  + EncryptChar(): string
+  + DecryptChar(cipherText: string): string
+}
+
+class EncryptionLayer {
+  - key: byte[]
+  - keyLength: int
+  + Encrypt(plainText: string): string
+  + Decrypt(cipherText: string): string
+  + GenerateKey(keyLength: int): void
+}
+
+class CryptoKeyManager {
+  - keyLength: int
+  - complexityLevel: int
+  + GenerateKey(): byte[]
+  + ValidateKey(key: byte[]): bool
+  + SetKeyLength(length: int): void
+  + SetComplexity(level: int): void
+}
+
+class TRNGSource {
+  + GenerateRandomBytes(length: int): byte[]
+}
+
+class MasterKeyGenerator {
+  - masterKey: byte[]
+  + GenerateMasterKey(): void
+  + GetMasterKey(): byte[]
+}
+
+class KeyDerivationFunction {
+  + DeriveKey(masterKey: byte[], salt: byte[], length: int): byte[]
+}
+
+class SubKeyManager {
+  + GetEncryptionKey(level: int): byte[]
+}
+
+TRNGSource --> MasterKeyGenerator : "genera"
+MasterKeyGenerator --> KeyDerivationFunction : "fornisce masterKey"
+KeyDerivationFunction --> SubKeyManager : "genera sub-keys"
+SubKeyManager --> EncryptionLayer : "fornisce chiavi"
+CryptoKeyManager --> SubKeyManager : "gestisce"
+CharacterUnit --> EncryptionLayer : "usa multipli livelli"
+CharacterManager --> CharacterUnit : "gestisce più unità"
+
+@enduml

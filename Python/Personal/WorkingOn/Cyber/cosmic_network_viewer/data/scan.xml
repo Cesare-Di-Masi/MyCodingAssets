@@ -1,0 +1,9 @@
+<nmaprun>
+  <host><address addr="192.168.1.1"/><hostnames><hostname name="router"/></hostnames></host>
+  <host><address addr="192.168.1.2"/><hostnames><hostname name="deviceA"/></hostnames></host>
+  <host><address addr="192.168.1.3"/><hostnames><hostname name="deviceB"/></hostnames></host>
+  <host><address addr="192.168.1.4"/><hostnames><hostname name="printer1"/></hostnames></host>
+  <host><address addr="192.168.1.5"/><hostnames><hostname name="camera1"/></hostnames></host>
+  <host><address addr="192.168.1.254"/><hostnames><hostname name="blackhole"/></hostnames></host>
+  <host><address addr="192.168.1.240"/><hostnames><hostname name="nebula"/></hostnames></host>
+</nmaprun>
