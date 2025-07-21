@@ -48,6 +48,6 @@ if __name__ == "__main__":
     treeJson = analizza_cartella(percorso_cartella)
 
     with open(args.output, "w", encoding="utf-8") as f:
-        json.dump(struttura, f, indent=2, ensure_ascii=False)
+        json.dump(treeJson, f, indent=2, ensure_ascii=False)
 
     print(f"Analisi completata. Output salvato in '{args.output}'")

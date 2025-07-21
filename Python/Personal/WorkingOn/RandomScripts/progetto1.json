@@ -1,0 +1,18 @@
+{
+  "trainer": {
+    "configs": {
+      "safe_rl_config.yaml": "file",
+      "resource_limiter.py": "file"
+    },
+    "env_wrappers": {
+      "resource_limiter.py": "file"
+    },
+    "algorithms": {
+      "cpo_safe_rl.py": "file",
+      "cvpo_safe_rl.py": "file"
+    },
+    "trainer.py": "file",
+    "monitor.py": "file",
+    "README.md": "file"
+  }
+}

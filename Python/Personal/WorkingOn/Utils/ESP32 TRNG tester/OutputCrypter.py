@@ -49,14 +49,15 @@ def mix_with_time(value: int) -> int:
 def aes_gcm_encrypt(data: bytes, key: bytes) -> bytes:
     cipher = AES.new(key, AES.MODE_GCM)
     ciphertext, tag = cipher.encrypt_and_digest(data)
-    return cipher.nonce + tag + ciphertext
+    return bytes(cipher.nonce) + bytes(tag) + bytes(ciphertext)
 
 def aes_gcm_decrypt(enc_data: bytes, key: bytes) -> bytes:
     nonce = enc_data[:12]
     tag = enc_data[12:28]
     ciphertext = enc_data[28:]
-    cipher = AES.new(key, AES.MODE_GCM, nonce=nonce)
-    return cipher.decrypt_and_verify(ciphertext, tag)
+    cipher = AES.new(key, AES.MODE_GCM, nonce=bytes(nonce))
+    return cipher.decrypt_and_verify(bytes(ciphertext), bytes(tag))
+
 
 # ========== FUNZIONI PER LA MASTER KEY ==========
 
