@@ -1,0 +1,10 @@
+agent_type: genetic_defender
+genome:
+  key_rotation_rate: 0.6
+
+max_cpu: 0.8
+max_ram_mb: 4096
+max_gpu: 0.5
+
+log_dir: runs/genetic_defender
+model_path: saved_models/genetic_defender_final.pth

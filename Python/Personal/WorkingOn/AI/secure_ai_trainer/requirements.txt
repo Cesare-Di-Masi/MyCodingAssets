@@ -1,0 +1,22 @@
+# RL e Safe RL
+omnisafe>=0.4.0
+
+# Gym (environments base)
+gymnasium==0.29.1
+shimmy>=1.3.0  # Supporto per compatibilità retro
+gymnasium[classic-control]
+
+# Monitoraggio e logging
+tensorboard
+matplotlib
+psutil
+
+# PyTorch
+torch>=2.0.0
+
+# Crittografia
+pycryptodome
+cryptography
+
+# Parsing e utilità
+pyyaml
