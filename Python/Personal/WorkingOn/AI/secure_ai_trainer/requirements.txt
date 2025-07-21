@@ -1,22 +1,29 @@
-# RL e Safe RL
-omnisafe>=0.4.0
-
-# Gym (environments base)
+# Reinforcement Learning
+gym==0.26.2
+stable-baselines3[extra]==2.2.1
 gymnasium==0.29.1
-shimmy>=1.3.0  # Supporto per compatibilità retro
-gymnasium[classic-control]
+ale-py==0.11.2
+autorom==0.6.1
 
-# Monitoraggio e logging
-tensorboard
-matplotlib
-psutil
+# Box2D compatibile
+box2d-py==2.3.5
 
-# PyTorch
-torch>=2.0.0
+# Deep Learning
+torch==2.7.1
+torchvision==0.21.0
+torchaudio==2.7.1
 
-# Crittografia
-pycryptodome
-cryptography
+# Logging
+tensorboard==2.15.1
+rich==13.7.1
 
-# Parsing e utilità
-pyyaml
+# Utils
+pygame==2.5.2
+numpy==1.26.4
+scipy==1.13.1
+pandas==2.2.2
+matplotlib==3.8.4
+seaborn==0.13.2
+tqdm==4.66.4
+PyYAML==6.0.1
+cryptography==42.0.7

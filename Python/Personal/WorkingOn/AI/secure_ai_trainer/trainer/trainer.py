@@ -4,7 +4,9 @@ import resource
 import random
 import time
 import os
+import sys
 import torch
+import logging
 
 from env_wrappers.resource_limiter import ResourceLimiter
 from agents.cipher_rl import create_genetic_defender
@@ -13,160 +15,223 @@ from evolution.mutation import mutate_population
 from evolution.crossover import crossover_population
 from evolution.genome import Genome
 
+# Setup logging configurazione globale, file + console
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='[%(asctime)s] %(levelname)s: %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout),
+        logging.FileHandler("trainer.log", mode='w')
+    ]
+)
+logger = logging.getLogger(__name__)
+
 def load_config(path: str) -> dict:
     """
-    Carica la configurazione YAML da file.
-    - path: percorso al file YAML.
-    Ritorna: dizionario configurazione.
+    Carica e valida la configurazione YAML.
+    Solleva FileNotFoundError o yaml.YAMLError su errore.
     """
-    with open(path, "r") as f:
-        return yaml.safe_load(f)
+    if not os.path.isfile(path):
+        logger.error(f"File di configurazione non trovato: {path}")
+        raise FileNotFoundError(f"Config file '{path}' missing.")
+
+    try:
+        with open(path, "r") as f:
+            cfg = yaml.safe_load(f)
+    except yaml.YAMLError as e:
+        logger.error(f"Errore parsing YAML: {e}")
+        raise
+
+    # Validazioni base
+    required_keys = ["env_name", "max_cpu", "max_ram_mb", "log_dir", "checkpoint_dir"]
+    for key in required_keys:
+        if key not in cfg:
+            logger.error(f"Configurazione mancante chiave obbligatoria: {key}")
+            raise KeyError(f"Missing config key: {key}")
+
+    return cfg
 
 def limit_resources(max_cpu: float, max_ram_mb: int):
     """
-    Imposta limiti soft di utilizzo CPU e RAM per il processo.
-    - max_cpu: frazione CPU utilizzabile (es. 0.8)
-    - max_ram_mb: limite RAM in megabyte
-    
-    Limite CPU è impostato in secondi su RLIMIT_CPU (soft/hard uguale).
-    Limite RAM è impostato su RLIMIT_AS (address space).
-    
-    ATTENZIONE: RLIMIT_AS può non funzionare correttamente su tutti i sistemi
-    e può bloccare processi in modi non immediatamente evidenti.
+    Imposta limiti soft a CPU (in frazione) e RAM (MB).
+    Logga errori ma non interrompe se fallisce (compatibilità SO).
     """
-    max_cpu_seconds = int(max_cpu * 60)  # Limite CPU in secondi totali (es. 48 sec per 0.8)
-    resource.setrlimit(resource.RLIMIT_CPU, (max_cpu_seconds, max_cpu_seconds))
-    max_ram_bytes = max_ram_mb * 1024 * 1024
-    resource.setrlimit(resource.RLIMIT_AS, (max_ram_bytes, max_ram_bytes))
+    try:
+        max_cpu_seconds = int(max_cpu * 60)
+        resource.setrlimit(resource.RLIMIT_CPU, (max_cpu_seconds, max_cpu_seconds))
+        max_ram_bytes = max_ram_mb * 1024 * 1024
+        resource.setrlimit(resource.RLIMIT_AS, (max_ram_bytes, max_ram_bytes))
+        logger.info(f"Limiti risorse applicati: CPU={max_cpu}s, RAM={max_ram_mb}MB")
+    except Exception as e:
+        logger.warning(f"Imposizione limiti risorse fallita: {e}")
 
 def setup_environment(cfg: dict) -> gym.Env:
     """
-    Crea ambiente Gym e applica i wrapper base.
-    Per ora applica solo ResourceLimiter.
-    TODO: estendere con wrapper cifratura e malware.
-    
-    Ritorna ambiente wrapperato.
+    Crea ambiente e applica wrapper.
+    Gestisce errori di gym.make.
     """
-    env = gym.make(cfg["env_name"])
-    env = ResourceLimiter(env, cfg["max_cpu"], cfg["max_ram_mb"])
+    try:
+        env = gym.make(cfg["env_name"])
+    except Exception as e:
+        logger.error(f"Errore creazione ambiente Gym '{cfg['env_name']}': {e}")
+        raise
+
+    # Applica wrappers
+    try:
+        env = ResourceLimiter(env, cfg["max_cpu"], cfg["max_ram_mb"])
+    except Exception as e:
+        logger.error(f"Errore applicazione ResourceLimiter: {e}")
+        raise
+
+    logger.info(f"Ambiente '{cfg['env_name']}' creato e wrapper applicato.")
     return env
 
 def evaluate_agent(agent, env, episodes=5) -> float:
     """
-    Valuta un agente eseguendo più episodi.
-    - agent: oggetto agente con metodo .step() (deve simulare passo)
-    - env: ambiente Gym (utilizzato per reset)
-    - episodes: numero di episodi per media
-    
-    Ritorna: reward medio per episodio.
-    
-    NOTE:
-    - L'agente deve implementare `.step()` che simula un passo.
-    - Qui non si passa action vera, ma l'architettura deve essere adattata.
-    - Reward None o mancante è considerato zero.
+    Valuta un agente in media su più episodi.
+    Gestisce eccezioni per garantire stabilità.
     """
-    total_reward = 0
-    for _ in range(episodes):
-        obs = env.reset()
-        done = False
-        while not done:
-            obs, reward, done, _ = agent.step()
-            total_reward += reward if reward is not None else 0
+    total_reward = 0.0
+    try:
+        for ep in range(episodes):
+            obs = env.reset()
+            done = False
+            while not done:
+                obs, reward, done, _ = agent.step()
+                if reward is None:
+                    reward = 0
+                total_reward += reward
+    except Exception as e:
+        logger.error(f"Errore durante valutazione agente: {e}")
+        # Se fallisce la valutazione, assegna punteggio minimo
+        return float('-inf')
     return total_reward / episodes
 
 def select_top_agents(population, scores, top_k):
     """
-    Seleziona i top-k agenti in base ai punteggi.
-    Ordina decrescente e ritorna i migliori.
+    Seleziona i migliori top_k agenti basandosi su score.
+    Controlla coerenza liste.
     """
+    if len(population) != len(scores):
+        logger.error("Mismatch lunghezza population e scores in select_top_agents")
+        raise ValueError("Population and scores length mismatch")
+
     scored = list(zip(population, scores))
     scored.sort(key=lambda x: x[1], reverse=True)
     selected = [agent for agent, score in scored[:top_k]]
+
+    if not selected:
+        logger.warning("Nessun agente selezionato nel top_k, verifica la selezione")
+
     return selected
 
 def train_loop(cfg, monitor):
     """
-    Ciclo principale di addestramento ed evoluzione.
-    - cfg: configurazione caricata
-    - monitor: oggetto Monitor per logging
-    
-    - Crea ambiente
-    - Inizializza popolazione agenti genetici
-    - Per ogni generazione:
-        - Valuta tutti gli agenti
-        - Registra metriche su monitor
-        - Seleziona top agenti
-        - Riproduce nuova popolazione tramite crossover e mutazione
-        - Salva checkpoint popolazione
+    Ciclo evolutivo con logging, validazioni e gestione errori.
     """
     env = setup_environment(cfg)
     population_size = cfg.get("population_size", 10)
     generations = cfg.get("generations", 20)
     mutation_rate = cfg.get("genome", {}).get("mutation_rate", 0.2)
-    top_k = max(2, population_size // 5)  # almeno 2 top agenti
+    top_k = max(2, population_size // 5)
 
-    # Inizializza popolazione agenti genetici con genomi dalla configurazione
+    logger.info(f"Inizializzazione popolazione ({population_size} agenti)...")
     population = []
-    for _ in range(population_size):
-        genome = Genome(cfg.get("genome", {"key_rotation_rate": 0.5}))
+    for idx in range(population_size):
+        genome_cfg = cfg.get("genome", {"key_rotation_rate": 0.5})
+        genome = Genome(genome_cfg)
         agent = create_genetic_defender(env, genome.genes)
         population.append(agent)
 
     for gen in range(generations):
-        print(f"Generation {gen + 1}/{generations}")
+        logger.info(f"Generazione {gen + 1}/{generations}")
 
-        # Valutazione
-        scores = [evaluate_agent(agent, env) for agent in population]
-
-        # Logging e stampa risultati
-        for i, score in enumerate(scores):
-            print(f" Agent {i} score: {score:.2f}")
+        # Valutazione popolazione
+        scores = []
+        for i, agent in enumerate(population):
+            score = evaluate_agent(agent, env)
+            scores.append(score)
             monitor.log(gen * population_size + i, score, cost=0)
+            logger.debug(f"Agente {i} punteggio: {score}")
 
-        # Selezione migliori agenti
-        top_agents = select_top_agents(population, scores, top_k)
+        # Selezione top agenti
+        try:
+            top_agents = select_top_agents(population, scores, top_k)
+        except Exception as e:
+            logger.error(f"Errore selezione top agenti: {e}")
+            break
 
-        # Creazione nuova popolazione per prossima generazione
+        # Generazione nuova popolazione tramite crossover e mutazione
         new_population = []
         while len(new_population) < population_size:
             parent1 = random.choice(top_agents)
             parent2 = random.choice(top_agents)
-            # Crossover e mutazione genomi
-            child_genome = parent1.genome.crossover(parent2.genome)
-            child_genome.mutate(mutation_rate)
-            # Crea nuovo agente da genoma figlio
-            child_agent = create_genetic_defender(env, child_genome.genes)
-            new_population.append(child_agent)
+
+            try:
+                child_genome = parent1.genome.crossover(parent2.genome)
+                child_genome.mutate(mutation_rate)
+                child_agent = create_genetic_defender(env, child_genome.genes)
+                new_population.append(child_agent)
+            except Exception as e:
+                logger.error(f"Errore creazione figlio genetico: {e}")
 
         population = new_population
 
-        # Salvataggio checkpoint
-        save_path = os.path.join(cfg["checkpoint_dir"], f"gen_{gen+1}.pth")
-        save_population(population, save_path)
+        # Salvataggio checkpoint con controllo IO
+        save_dir = cfg.get("checkpoint_dir", "checkpoints")
+        if not os.path.isdir(save_dir):
+            try:
+                os.makedirs(save_dir)
+            except Exception as e:
+                logger.error(f"Impossibile creare cartella checkpoint: {e}")
+
+        save_path = os.path.join(save_dir, f"gen_{gen+1}.pth")
+        try:
+            save_population(population, save_path)
+            logger.info(f"Checkpoint salvato: {save_path}")
+        except Exception as e:
+            logger.error(f"Errore salvataggio checkpoint: {e}")
 
 def save_population(population, path):
     """
-    Salva la popolazione corrente serializzando i genomi in file con torch.
-    - population: lista agenti (ogni agente deve avere .genome.genes)
-    - path: percorso file di salvataggio
+    Salva genomi in file torch.
+    Assicura che gli agenti abbiano attributo genome.genes.
     """
-    genomes = [agent.genome.genes for agent in population]
+    genomes = []
+    for agent in population:
+        try:
+            genomes.append(agent.genome.genes)
+        except AttributeError as e:
+            logger.error(f"Agente senza genome.genes: {e}")
+            genomes.append({})  # Placeholder vuoto
+
     torch.save(genomes, path)
 
 def main():
-    """
-    Funzione entrypoint del trainer.
-    Carica configurazione, limita risorse, crea monitor e avvia il training loop.
-    """
-    cfg = load_config("configs/safe_rl_config.yaml")
+    try:
+        cfg = load_config("configs/safe_rl_config.yaml")
+    except Exception as e:
+        logger.critical(f"Impossibile caricare configurazione: {e}")
+        sys.exit(1)
 
-    # Crea cartella checkpoint se non esiste
-    os.makedirs(cfg.get("checkpoint_dir", "checkpoints"), exist_ok=True)
+    try:
+        limit_resources(cfg["max_cpu"], cfg["max_ram_mb"])
+    except Exception:
+        # Già gestito dentro limit_resources, continua comunque
+        pass
 
-    limit_resources(cfg["max_cpu"], cfg["max_ram_mb"])
+    try:
+        os.makedirs(cfg.get("checkpoint_dir", "checkpoints"), exist_ok=True)
+    except Exception as e:
+        logger.error(f"Errore creazione directory checkpoint: {e}")
 
     monitor = Monitor(cfg["log_dir"])
-    train_loop(cfg, monitor)
+
+    try:
+        train_loop(cfg, monitor)
+    except Exception as e:
+        logger.critical(f"Errore nel ciclo di training: {e}")
+        sys.exit(1)
 
 if __name__ == "__main__":
     main()
