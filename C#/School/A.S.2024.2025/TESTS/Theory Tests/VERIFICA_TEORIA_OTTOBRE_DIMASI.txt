@@ -1,0 +1,224 @@
+PUNTI _________ / 30 VOTO ________
+RISPONDI ALLE SEGUENTI DOMANDE
+Quali sono le qualità indispensabili che dobbiamo raggiungere per ogni software che generiamo? Elencale e descrivile.
+punti 4
+[scrivi qui la tua risposta]
+
+Modularità: Il nostro software deve essere diviso in moduli in modo si presenta la necessità di aggiungere altri componenti del progetto, possa essere compiuto senza alcun problema.
+
+testabilità: Il nostro software deve essere facilmente testato dai Test che creiamo noi o un altro sviluppatore senza alcun problema. 
+
+efficiente: Il nostro software deve avere un buon compromesso tra tempo e risorse in modo tale che i suoi compiti avvengano nel modo più ottimizzato possibile.
+
+Robustezza: Il nostro software deve essere resistente alla presenza di errori in modo tale che i metodi non ricevano dati non corretti. Per esempio la presenza di un numero negativo quando è necessario un dato positivo.
+
+
+
+
+Scegli uno tra i principi di creazione del software che abbiamo visto, descrivilo e scrivi un esempio in codice C# opportunamente commentato in modo che si capisca la sua implementazione e la sua utilità.
+punti 4 (definizione del principio 1.5, codice con commenti opportuni 2.5)
+[scrivi qui la tua risposta]
+
+SoC: Separation of Concern.
+
+ogni metodo dovrebbe avere sempre e solo un compito. Questo aumenta la robustezza e la modularità del software.
+
+public Class Calcolatrice
+{
+	//questa è una classe che non necessità di costruttore definito (costruttore di default)
+	
+	
+	//definisco un metodo Somma (PascalCase) che si aspetta 2 interi
+	public int Somma(int n1,  int n2)
+{
+return n1+n2; //in C# è necessario utilizzare il ;
+//dati i due interi li sommo e li restituisco
+	}
+
+	//faccio lo stesso per i seguenti metodi
+	public int Sottrazione(int n1, int n2)
+{
+return n1-n2;
+}
+
+public int Moltiplicazione(int n1, int n2)
+{
+return n1*n2;
+}
+	//è necessario il double per le divisioni altrimenti potrebbe restituire un risultato errato
+	public double Divisione(int n1, int n2)
+	{
+		return n1/n2;
+}
+	
+}
+// in questo codice (molto semplice) ogni metodo è diviso in modo tale da non complicare il codice come nel seguente caso:
+
+public Class Calcolatrice
+{
+	public double Calcola(int n1, int n2, int tipoDiCalcolo)
+{
+	if( tipoDiCalcolo<1 || tipoDiCalcolo>4)
+{throw new ArgumentOutOfRangeException (calcolo selezionato non esiste. da 1 a 4);}
+
+/*successivamente al controllo di correttezza controlliamo quale calcolo è stato selezionato */
+
+if(tipoDiCalcolo==1)
+	return n1+n2;
+else if (tipoDiCalcolo==2)
+	return n1-n2;
+else if (tipoDiCalcolo==3)
+	return n1*n2;
+else
+	return n1/n2;
+
+/*In questo caso, al posto di dividere i calcoli in metodi diversi, abbiamo unito tutti i calcoli in un solo metodo creando così un codice meno comprensibile e meno resistente agli errori./
+
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+ Spiega il principio della OOP denominato Incapsulamento. Fornisci a supporto della spiegazione un esempio in codice C#
+punti 6 (definizione incapsulamento 3, codice con commenti opportuni 3)
+[scrivi qui la tua risposta]
+
+Il principio dell’incapsulamento consiste nel chiudere il codice all’esterno ad eccezione di alcuni metodi definiti, che permettono l’uso dei metodi all’interno della “capsula” dall’esterno, che può essere richiesto dall’utente o un altro oggetto.
+
+public Class Lampadina
+{	
+/*creo un dato di tipo booleano privato (under case) quindi, non può essere visualizzato  all’esterno di questa classe*/
+	private bool _isOn;
+	
+	//costruttore che si aspetta lo stato della lampadina (isOn)
+	public Lampadina(bool isOn)
+{
+	_isOn = isOn;
+}
+/*in questo momento lo stato della lampadina non può essere modificato o visualizzato dall’esterno, adesso creiamo 2 metodi che permettano di fare ciò.*/
+
+public void Click()
+{
+	_isOn = !_isOn
+/*modifichiamo lo stato della lampadina rendendolo il suo opposto (true -> false e viceversa)
+con questo metodo diamo la possibilità all’esterno di modificare lo stato della lampadina attraverso un metodo da noi scelto*/
+}
+
+public bool StatoLampadina()
+{
+	return _isOn
+//in questo metodo restituiamo lo stato della lampadina all'esterno della classe in modo tale che possa essere visualizzato
+}
+
+}
+
+
+
+Quali sono i compiti di un costruttore? Cosa si intende per costruttore di default?  Fornisci un esempio di classe scritto in C# in cui sia presente l’overload dei costruttori, poi scrivi un Main nel quale vengono creati gli oggetti della classe definita utilizzando tutti i costruttori presenti
+punti 7 (definizione costruttore e costruttore di default 3, esempio overload 2, codice main 2)
+[scrivi qui la tua risposta]
+
+il costruttore ha il compito di creare un oggetto, dati dei parametri, e non restituisce alcun tipo di dato, nemmeno void. 
+Per costruttore di default si intende quel costruttore che può essere richiamato solo quando non viene definito alcun costruttore all’interno della classe, il costruttore di default non ha alcun parametro. Si potrebbe richiamare una specie di costruttore di default creando un costruttore senza alcun tipo di parametro.
+Il metodo di overload è quello di richiamare uno stesso metodo con lo stesso nome ma con parametri differenti (statico) in maniera tale che non occupi lo stesso indirizzo di memoria.
+
+public class Confronto
+{
+	public int N1{get; private set;}
+public int N2{get; private set;}
+
+	//definisco il costruttore, quindi non posso più chiamata il costruttore di default
+	public Confronto(int n1)
+{
+	N1=n1;
+}
+ //con l’uso di :this io vado a chiamare un costruttore che mi passa il dato n1 senza doverlo definire di nuovo
+public Confronto(int n2, int n1):this(n1)	{
+		N2 = n2;
+}
+
+
+	public Confronto() 
+	//questo è un costruttore che non si aspetta parametri quindi si potrebbe definire come il costruttore di default
+
+}
+
+public Main ([toString])
+{
+	Confronto c1 = new Confronto(1);
+	Confronto c2 = new Confronto(1, 2);
+Confronto c3 = new Confronto(); 
+	
+
+}
+
+
+
+Cos’è una proprietà? Quali sono i compiti di un set? 
+Dopo aver risposto alla domanda fornisci un esempio di classe con una proprietà di sola lettura e l’uso della proprietà all’interno della classe. Dopo aver definito la classe Definisci un Main che crea un oggetto della classe e su di esso richiama il get della proprietà. 
+punti 6 (definizione di proprietà e di set 3, codice con commenti opportuni 3)
+[scrivi qui la tua risposta]
+
+una proprietà è un metodo che ci permette di racchiudere un dato al suo interno (incapsulamento) e viene definito in questo modo: public-tipo del dato-nome che inizia con la maiuscola, senza parentesi tonde es.
+public int Numero{}
+
+i compiti del set sono quello di modificare il dato all’interno della proprietà controllando la correttezza. 
+
+public Class Macchinetta()
+{	//creo un dato privato che non può essere visualizzato all’esterno della classe
+	private int _costo;
+	//creo la proprietà di sola lettura Costo che permette di visualizzare all’esterno della classe il costo
+	public int Costo
+{
+	get{return costo;} 
+}
+	
+	public Macchinette(costo)
+{
+ _costo = costo;
+}
+
+public bool Paga(int pagamento)
+{
+	if(pagamento>=Costo)
+		return true;
+	return false;
+}
+
+public Main ([toString])
+{
+	
+	Macchinetta m = new Macchinetta(50);
+	console.WriteLine(“m.Costo”);
+	
+}
+
+
+
+}
+
+
+
+
+
+Quali sono le differenze tra un linguaggio di programmazione compilato ed uno interpretato?
+punti 3 (definizione di linguaggio compilato 1.5, definizione di linguaggio interpretato 1.5)
+[scrivi qui la tua risposta]
+
+le differenza tra un linguaggio di programmazione compilato e uno interpretato sono:
+La velocità, Un linguaggio interpretato è molto più veloce di un linguaggio compilato poiché il compilatore richiede molto più tempo per tradurre il codice in linguaggio macchina.
+
+
+
+
+
+
+

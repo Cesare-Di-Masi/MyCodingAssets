@@ -1,0 +1,297 @@
+RISPONDI ALLE SEGUENTI DOMANDE
+Matrici e Array Jagged 
+definisci le due strutture dati e la loro gestione in memoria 	[PUNTI _____ / 1]
+
+
+qual’è la complessità computazionale della ricerca di un elemento all’interno di una matrice? perchè? 						[PUNTI _____ / 1]
+
+
+definisci il codice C# per istanziare una matrice di 3 righe e 5 colonne che possa contenere oggetti di tipo Studente o null 			[PUNTI _____ / 1]
+
+a
+Le Matrici e gli Array jagged sono due tipi di struttura dati bidimensionali che ci permettono di contenere all’interno di un oggetto di tipo array altri array divisi in colonne e in righe.
+
+Le Matrici quando vengono istanziate necessitano le dimensioni sia delle colonne e sia delle righe. Tutti gli array all’interno della matrice potranno avere solamente la dimensione delle righe quindi non si potranno avere array con dimensioni diverse. Le Matrici inoltre, hanno una dimensione fissa quindi non permettono l’aggiunta o la rimozione di una riga. Le matrici in memoria vengono memorizzate come una serie di array uno di seguito all’altro per cui l’indirizzamento è diretto.
+
+Gli array jagged, invece, possono avere array di dimensioni diverse al loro interno ed è quindi possibile aggiungere o rimuovere array (questo però nel caso di Liste di Liste).
+I jagged array in memoria si mostrano come degli array staccati e indipendenti, infatti, L’indirizzamento risulta indiretto dato che nell’indice i del array jagged trovo l’indirizzo di memoria di quell'array in particolare.
+
+b
+La complessità computazionale nel cercare un elemento in una matrice è 0(N*M) dove N sta per il numero di righe e M il numero di colonne. Questo perché nel cercare un elemento devo scorrere riga per riga ( o colonna per colonna) e nel peggiore dei casi scorrerò l’intera matrice.
+
+c
+Student?[,] matrice = new Student?[3,5]
+
+
+
+Dato il seguente codice:
+Una classe giocatore che rappresenta i giocatori del torneo. 
+Per semplicità consideriamo validi i parametri senza necessità di fare controlli, consideriamo inoltre il numero del giocatore come un numero che rappresenta il giocatore nel torneo. 
+Il numero sarà un valore incrementale assegnato a partire dal numero 0 ad ogni giocatore del torneo
+
+public class Giocatore
+{
+    public int Numero { get; private set; }
+    public string Nome { get; set; }
+    public DateTime DataIscrizione { get; set; }
+    public int PunteggioMassimo { get; set; }
+
+    public Giocatore(string nome, DateTime dataIscrizione, int punteggioMassimo, int numero)
+    {
+        Numero = numero;
+        Nome = nome;
+        DataIscrizione = dataIscrizione;
+        PunteggioMassimo = punteggioMassimo;
+    }
+}
+
+Una classe partita che rappresenta una partita del torneo tra due giocatori.
+Per semplicità consideriamo validi i parametri senza necessità di fare controlli.
+public class Partita
+{
+    public Giocatore Giocatore1 { get; }
+    public Giocatore Giocatore2 { get; }
+    public Giocatore? Vincitore { get; } 
+
+    public Partita(Giocatore giocatore1, Giocatore giocatore2, Giocatore? vincitore)
+    {
+        Giocatore1 = giocatore1;
+        Giocatore2 = giocatore2;
+        Vincitore = vincitore;
+    }
+}
+
+Una classe Torneo che contiene l’elenco dei giocatori partecipanti ed i risultati ottenuti da ogni giocatore nel torneo
+Per semplicità consideriamo validi i parametri senza necessità di fare controlli, consideriamo inoltre che inizializzaRisultati() sia un metodo che istanzia risultatiGiocatori in modo che ci sia una posizione per ogni giocatore (il giocatore con Numero 0 alla posizione 0, e così via) ed inizialmente ci sia per ogni giocatore un array in grado di contenere maxPartite partite (il numero massimo di partite che un giocatore può giocare nel torneo)
+public class Torneo
+{
+    private Giocatore[] giocatori;
+    private Partita[][] risultatiGiocatori;
+
+    public Torneo(Giocatore[] g, int maxPartite)
+    {
+        giocatori = g;
+        inizializzaRisultati(maxPartite);
+    }
+}
+
+Ricopiare le classi che necessitano di modifiche ed apportare le modificarle in modo che sia possibile invocare un metodo su un oggetto Torneo che:
+riceve una partita e la memorizza all’interno di risultatiGiocatori (ricorda che se la partita è giocata da G1 e G2 entrambi hanno giocato la partita ed ottenuto un risultato) 
+[PUNTI _____ / 2]
+riceve un giocatore e calcola quante partite ha giocato o una exception nel caso in cui il giocatore non sia presente
+[PUNTI _____ / 1]
+
+riceve un giocatore e calcola quante vittorie ha ottenuto
+[PUNTI _____ / 1]
+
+riceve un giocatore e calcola quante sconfitte ha ottenuto
+[PUNTI _____ / 1]
+
+sapendo che tutti i giocatori giocano almeno X partite (per semplicità non facciamo controlli su X e ipotizziamo che sia accettabile) restituisce la matrice dei risultati ottenuti nelle prima 4 partite inserendo 1 se il giocatore ha vinto, -1 se ha perso, 0 se la partita ha raggiunto la parità
+esempio:
+La matrice qui sotto rappresenterebbe i risultati nel caso in cui nel torneo ci siano 3 giocatori. Per esempio il primo giocatore ha perso la prima partita, pareggiato la seconda e vinto la terza e la quarta. I risultati inseriti derivano dalle partite giocate
+
+
+0
+1
+2
+3
+0
+-1
+0
+1
+1
+1
+0
+1
+1
+-1
+2
+0
+-1
+1
+0
+
+
+[PUNTI _____ / 2]
+
+definire un metodo per ogni richiesta
+
+public class Giocatore
+{
+    private int _partiteGiocate = 0;
+	
+    public int Numero { get; private set; }
+    public string Nome { get; set; }
+    public DateTime DataIscrizione { get; set; }
+    public int PunteggioMassimo { get; set; }
+    private List<int> _risultatiPartite = new List<int>;
+    public int PartiteGiocatore{get{return _partiteGiocate;}}
+   
+    public List<int> RisultatiPartite{get{return _risultatiPartite;}}
+    
+
+    public Giocatore(string nome, DateTime dataIscrizione, int punteggioMassimo, int numero)
+    {
+        Numero = numero;
+        Nome = nome;
+        DataIscrizione = dataIscrizione;
+        PunteggioMassimo = punteggioMassimo;
+    }
+
+public void AggiungiPunteggio(int punteggio)
+{
+	_risultatiPartite.Add(punteggio);
+	_partiteGiocate++;
+}
+override bool Equals(object? obj)
+{
+	if(obj == null || !(obj is Giocatore))
+	return false;
+	
+	Giocatore giocatore = obj as Giocatore
+if(giocatore.Numero == Numero && giocatore.Nome==Nome && giocatore.DataIscrizione == DataIscrizione && giocatore.PunteggioMassimo == PunteggioMassimo)
+return true;
+return false;	
+
+}
+
+}
+
+public class Partita
+{
+    public Giocatore Giocatore1 { get; }
+    public Giocatore Giocatore2 { get; }
+    public Giocatore? Vincitore { get; } 
+
+    public Partita(Giocatore giocatore1, Giocatore giocatore2, Giocatore? vincitore)
+    {
+        Giocatore1 = giocatore1;
+        Giocatore2 = giocatore2;
+        Vincitore = vincitore;
+      }
+}
+
+public class Torneo
+{
+    private Giocatore[] giocatori;
+    private Partita[][] risultatiGiocatori;
+    private int[] _partiteGiocate;
+
+    public Torneo(Giocatore[] g, int maxPartite)
+    {
+        giocatori = g;
+        _partiteGiocate = new int[g.Length];
+        inizializzaRisultati(maxPartite);
+    }
+
+public void AggiungiPartita(Partita partita)
+{
+	if(partita.Vincitore == null)
+	{
+		int giocatore1 = partita.Giocatore1.Numero;
+int giocatore2 = partita.Giocatore2.Numero;
+risultatiGiocatore[giocatore1][_partiteGiocate[giocatore1]] = partita;
+risultatiGiocatore[giocatore2][_partiteGiocate[giocatore2]]=partita;
+_partiteGiocate[giocatore1]++;
+_partiteGiocate[giocatore2]++;
+
+
+PosizionaPunteggi(giocatore1,giocatore2,true)
+	}else 
+{
+if(partita.Vincitore == partita.Giocatore1)
+{
+		int vincitore = partita.Giocatore1;
+		int perdente = partita.Giocatore2;
+}else
+{
+int vincitore = partita.Giocatore2;
+		int perdente = partita.Giocatore1;
+
+}
+		risultatiGiocatore[vincitore][_partiteGiocate[vincitore]] = partita;
+		_partiteGiocate[vincitore]++;
+risultatiGiocatore[perdente][_partiteGiocate[perdente]]=partita;
+_partiteGiocate[perdente]++;
+posizionaPunteggi(vincitore,perdente,false)
+
+}
+}
+
+private void PosizionaPunteggi(int vincitore, int perdente, bool pareggio)
+{
+	if(pareggio==true)
+	{
+		g[vincitore].AggiungiPunteggio(0);
+g[perdente].AggiungiPunteggio(0);
+}else
+{
+g[vincitore].AggiungiPunteggio(1);
+g[perdente].AggiungiPunteggio(-1);
+
+}
+}
+
+public int PartiteDaGiocatore(Giocatore giocatore)
+{
+	if(giocatore.Numero<0 || giocatore.Numero>giocatori.Length-1)
+	throw new argumentOutOfRangeException(“il giocatore non esiste”);
+
+	return giocatori[giocatore.Numero].PartiteGiocate;
+
+} 
+
+public int PartiteVinteDaGiocatore(Giocatore giocatore)
+{
+	if(giocatore.Numero<0 || giocatore.Numero>giocatori.Length-1)
+	throw new argumentOutOfRangeException(“il giocatore non esiste”);
+
+	int counter = 0;
+
+	for(int i = 0; i<giocatori[giocatore.Numero].PartiteGiocate)
+	{
+		if(giocatori[giocatore.Numero].RisultatiPartite[i] == 1)
+		counter ++;
+}
+return counter;
+}
+public int PartitePerseDaGiocatore(Giocatore giocatore)
+{
+	if(giocatore.Numero<0 || giocatore.Numero>giocatori.Length-1)
+	throw new argumentOutOfRangeException(“il giocatore non esiste”);
+
+	int counter = 0;
+
+	for(int i = 0; i<giocatori[giocatore.Numero].PartiteGiocate)
+	{
+		if(giocatori[giocatore.Numero].RisultatiPartite[i]  == -1)
+		counter ++;
+}
+return counter;
+}
+
+public int[,] PunteggiPartiteGiocatori(int partite)
+{
+	int[,] punteggi = new int[partite,giocatori.Length]
+
+for(int i=0; i<giocatori.Length;i++)
+{
+	for(j=0; j<partite;j++)
+	{
+		punteggi[j,i] = giocatori[i].RisultatiPartite[partite];
+}
+}	
+return punteggi;
+
+}
+
+
+}
+
+
+}
+
+
+
+

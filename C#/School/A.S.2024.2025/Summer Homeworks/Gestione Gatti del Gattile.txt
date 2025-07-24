@@ -1,0 +1,45 @@
+Esercizio 1: Gestione Gatti del Gattile - Progetto WPF
+Obiettivo: Creare un'applicazione desktop WPF che gestisca le informazioni sui gatti di un gattile, rispettando rigorosamente i principi della Programmazione Orientata agli Oggetti (OOP), inclusi incapsulamento, polimorfismo e astrazione.
+Descrizione del Problema:
+Si richiede lo sviluppo di un'applicazione per la gestione completa dei gatti presenti in un gattile. L'applicazione dovrà permettere di:registrare nuovi gatti, visualizzare quelli presenti, gestire le adozioni e tenere traccia delle adozioni fallite.
+Requisiti Funzionali:
+Gatto:
+Ogni gatto deve avere un codice identificativo univoco generato al momento dell'iscrizione. Questo codice sarà composto da:
+Un numero random di 5 cifre.
+La prima lettera del mese di registrazione.
+L'anno della data di registrazione.
+Tre lettere casuali.
+Le informazioni da memorizzare per ogni gatto sono: nome, razza, sesso, data di arrivo al gattile, data di uscita dal gattile (nullable se il gatto è ancora in gattile), data di nascita (nullable se sconosciuta), descrizione.
+Adozioni:
+Per ogni adozione si deve sapere il gatto coinvolto, la data di adozione, i dati dell’adottante (nome, cognome, indirizzo e telefono).
+Memorizzazione Dati:
+Tutti i dati dei gatti devono essere memorizzati in un file (di testo o JSON) a vostra scelta.
+Le adozioni devono essere memorizzate in un file (di testo o JSON) 
+I file devono essere aggiornati automaticamente ogni volta che viene inserito un nuovo gatto o gestita una nuova adozione.
+Interfaccia Utente (WPF): L'applicazione deve essere strutturata con più finestre per una migliore organizzazione e user experience.
+Finestra Principale:
+Visualizzazione del numero totale di gatti attualmente presenti nel gattile.
+Bottone o Menu per aprire una nuova finestra che mostri tutti i gatti attualmente in gattile. 
+Deve essere possibile, selezionando un gatto tra quelli presenti, visualizzare le sue informazioni complete in un'area dedicata.
+Bottone o Menu per aprire una nuova finestra dedicata all'inserimento di un nuovo gatto.
+Bottone o Menu per aprire una nuova finestra che visualizzi l'elenco di tutte le adozioni registrate.
+Bottone o Menu per aprire una nuova finestra per l'inserimento di una nuova adozione.
+Bottone o Menu per aprire una nuova finestra per la gestione di un'adozione fallita. 
+In caso di restituzione del gatto al gattile è necessario aggiornare i dati:
+La data di uscita dal gattile del gatto dovrà essere opportunamente aggiornata (impostata a null).
+Nella descrizione del gatto dovrà essere inserita una frase del tipo: "Adozione fallita: inizio xx/xx/xxxx termine yy/yy/yyyy".
+Requisiti di Progettazione (OOP):
+Dovrete identificare le classi necessarie per modellare il dominio del problema (es. Gatto, Adozione, Adottante, ecc.) e strutturare il codice in modo modulare e manutenibile. 
+Prestate particolare attenzione ai seguenti aspetti:
+Classi:
+Gatto: Rappresenta un singolo gatto. Dovrà contenere tutte le proprietà descritte nei requisiti funzionali e metodi per la gestione del proprio stato (es. aggiornamento data di uscita, aggiunta descrizione per adozione fallita). Il codice identificativo dovrà essere generato automaticamente da un metodo all'interno della classe Gatto o da una classe factory dedicata.
+Adozione: Rappresenta una singola adozione. Dovrà contenere le informazioni sull'adottante e sulla data di adozione.
+Adottante: Una classe separata per contenere i dati dell'adottante (nome, cognome, indirizzo, telefono).
+Gestione Dati (Persistence Layer):
+Implementare classi dedicate (es. GestoreGatti, GestoreAdozioni) che si occupino della lettura e scrittura dei dati dai file di testo, incapsulando la logica di parsing e serializzazione. Queste classi dovranno esporre metodi per aggiungere, leggere, aggiornare e cancellare i dati.
+Considerazioni importanti per la progettazione:
+Separazione delle Responsabilità (SRP): Ogni classe e ogni metodo devono avere una singola responsabilità ben definita.
+Principio Open/Closed (OCP): Le classi dovrebbero essere aperte all'estensione ma chiuse alla modifica.
+Dipendenza da Astrazioni: Favorire l'uso di interfacce o classi astratte per ridurre le dipendenze concrete.
+Gestione degli Errori: Prevedere la gestione di eccezioni per situazioni anomale (es. file non trovati, dati malformati).
+

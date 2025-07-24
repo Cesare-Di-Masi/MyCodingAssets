@@ -1,0 +1,299 @@
+
+
+RISPONDI ALLE SEGUENTI DOMANDE
+Override di Equals e ToString: Quando e perché è importante fare l'override dei metodi Equals e ToString in una classe?
+Fornisci un esempio di come implementare questi metodi per una classe da te definita e commenta opportunamente le scelte da te fatte
+[PUNTI ______ / 2.5]
+
+L'implementazione dei metodi override dei metodi Equals e ToString in una classe è importante per i seguenti motivi
+
+1 -> Il metodo Equals è necessario per controllare se 2 oggetti dello stesso tipo (per esempio di tipo Personaggio) abbiano i parametri uguali. Altrimenti il se facessimo obj1 == obj2 il controllo avverrebbe solamente a livello dell’indirizzo di memoria nell’heap e quindi non si andrebbero a confrontare i parametri.
+
+2->Il metodo ToString permette di scrivere direttamente a schermo le informazioni che noi vorremmo restituire all’utente senza che ci sia il bisogno di scrivere sul main:
+Console.Println(obj1.parametro).
+
+Es:
+
+Nel seguente esempio avremo una classe di tipo Mostro con una serie di parametri come nome del mostro, punti vita, potenza di attacco, ecc. 
+
+In questo esempio non avremo alcun metodo al di fuori di Equals e ToString anche se in futuro si potrebbero implementare
+
+
+public class Monster
+{
+
+	private string  _name;
+	private int  _currentHealthPoints,_maxHealthPoints, _attackPower;
+
+
+
+	public string Name
+{
+get{return _name;}
+}
+
+public int MaxHealthPoints
+{
+	get{return _maxHealthPoints;}
+}
+	
+	public int CurrentsHealthPoints
+	{
+		get{return _currentHealthPoints;}	
+	}
+
+public int AttackPower
+{
+ 	get{return  _attackPower;}
+}
+
+	public Monster(string name, int healthPoints, int attackPower)
+	{
+		if(String.isWhiteOrNull(name))
+	throw new ArgumentNullException(“illegal name”);
+		if(healthPoints<1)
+			throw new ArgumentOutOfRangeException(“illegal health”);
+
+		_name = name;
+		_maxHealthPoints = healthPoints;
+		_currentHealthPoints = healthPoints
+		_attackPower = attackPower
+}
+
+//To string come richiesto
+public override ToString()
+{	
+ return $“{_name}  HP:{_currentHealthPoints}/{_maxHealthPoints} Attack: {_attackPower}”;
+}
+
+public override Equals(obj? object)
+{
+	if(object==null || !(object is Monster))
+		return false;
+
+	Monster other = object as Monster;
+
+if( _name == other.Name && _currentHealthPoints == other._CurrentHealthPoints && _maxHealthPoints == other.MaxHealthPoints && _attackPower == other.AttackPower)
+ return true;
+return false;
+
+}
+
+
+
+
+}
+//main nella pagina successiva
+
+static int Main()
+{	//creiamo i mostri su cui testare i metodi Equal e ToString
+	public Monster monster1 = new Monster(“Beholder”,100,50);
+	public Monster monster2 = new Monster(“Lich”,25,10);
+	public Monster monster3 = new Monster(“Beholder”,100,50);
+
+	Console.Println(monster1.Equals(monster2)); 
+//ritornerà falso dato che non sono uguali
+Console.Println(monster1.Equals(monster3));
+//ritornerà vero dato che hanno parametri uguali 
+
+Console.Println(monster1.ToString());
+//stamperà a testo:
+// Beholder HP:100/100 Attack:50
+
+
+}
+
+Strutture dati: Cosa sono le strutture dati e a cosa servono? Descrivi le differenze tra array e liste, fornendo esempi di quando sarebbe più appropriato utilizzare l'uno o l'altro.
+Ricerca sequenziale e binaria quali sono le differenze a livello implementativo e computazionale?
+[PUNTI ______ / 2.5]
+
+
+Le strutture dati sono un tipo di dato che permette di memorizzare un insieme di dati di qualsiasi tipo. Es. interi ma anche Oggetti e altre strutture di dati.
+
+Le strutture dati vengono memorizzati nello heap.
+
+Le principali strutture di dati sono:
+Array: struttura dati di tipo statico ovvero che non può cambiare dimensione durante l’esecuzione del codice.
+
+Liste: struttura dati di tipo dinamico poiché può modificare la sua dimensione durante l’esecuzione del codice.
+
+L’uso dell’array, rispetto alle liste, è più appropriato nei casi in cui conosciamo la dimensione che quest'ultimo deve avere e quindi dovrebbe rimanere tale e non modificare durante l’esecuzione del codice.
+
+Un possibile esempio è quello di uno studente che ha un numero fisso di materie con la media in ognuna di queste.
+
+public class Student()
+{
+	private double[] _average;
+
+	//puro esempio quindi non ho messo altri parametri o metodi
+	public Student(double[] average)
+	{
+	  	_averaget = average;
+}
+
+}
+
+L’uso delle liste invece è necessario quando non conosciamo la dimensione massima della struttura dati, e quindi quest'ultima potrebbe cambiare mano a mano che il codice viene eseguito.
+Un possibile esempio è quello di un qualsivoglia negozio con una lista di articoli acquistabili.
+La lista va a cambiare mano a mano che i clienti acquistano oggetti e il negozio effettua un restock
+
+Grazie all’uso dei metodi introdotti dalle liste Add() e Remove() possiamo aggiungere o rimuovere elementi alle liste in maniera semplice
+
+
+La ricerca sequenziale rispetto alla ricerca binaria è molto più semplice da implementare dato che scorre tutto l’array fino a quando non trova il numero richiesto.
+ il problema risulta su array di grandi dimensioni poiché nel caso in cui il numero non ci fosse o fosse proprio l’ultimo la sua complessità sarebbe 0[n] dove n è la dimensione dell’array.
+
+Invece la ricerca binaria al posto di scorrere tutto l’array va nel mezzo dell’array e poi controlla se il numero su cui si trova sia uguale al numero, se no controlla se il numero sia maggiore o minore del valore che sta cercando. Nel caso sia minore lui si sposterà nella metà successiva o precedente dell’array e il ciclo si ripete fino a quando lo trova o la fine e l’inizio dell’array non sono uguali (praticamente è come se lui rimuovesse la metà che non gli interessa dell’array e quindi spostiamo una fine e un inizio per muoverci tra le varie metà).
+
+Il problema è che richiede un array ordinato ma come complessità computazionale è molto meglio dato che nel caso peggiore richiederebbe solo log(N) operazioni.
+
+
+Stai sviluppando un sistema per un gioco di ruolo fantasy. 
+Ti viene fornita una classe Personaggio parzialmente implementata:
+
+//enumerativo per le possibili classi del personaggio
+public enum Class
+{
+Mage,
+Warden,
+Knight
+}
+
+
+public class Character:IComparable<Character>
+{
+	private string _name;
+	private Class _class;
+	private int _level, _maxHP, _currentHP;
+	
+  public string Name { get{return _name;} }
+  public Class Class { get{return _class;} }
+  public int Level { get; return _level; }
+  public int maxHP{get{return _maxHP;}}
+  public int currentHP { get return _currentHP }
+
+  publicCharacter(string name, Class class, int level, int hP)
+  {
+	if(String.IsWhiteOrNull(name))
+	throw new ArgumentNullException(“illegal character Name”);
+
+	if(level<0)
+	throw new ArgumentOutOfRangeException(“illegal level));
+//controlliamo che L’HP messo come parametro non superi la vita massima della  	classe
+if(hp<1 ||hp>100 && class == Knight || hp>200 && class== Warden || hp>500 && class==Mage)
+throw new ArgumentOutOfRangeException(“illegal class HP);
+
+if(class == Knight)
+_maxHP = 100;
+else if(class == Warden)
+_maxHP = 200;
+else
+_maxHP = 500;
+
+_name = name;
+_class = class;
+_level = level;
+_currentHP = hp;
+
+
+   }
+	
+//il personaggio subisce danno 	
+public void tookDamage(int damage)
+	{
+		if(damage < 1)
+		throw new ArgumentOutOfRangeException(“illegal took damage”);
+		
+		if( damage> _currentHP)
+			_currentHP = 0;
+		else
+			_currentHP -= damage;
+	}
+	//il personaggio viene curato
+	public void Healed(int heal)
+	{
+if(damage < 1)
+	throw new ArgumentOutOfRangeException(“illegal heal”);
+		
+		if(heal+currentHP > _maxHP)
+			_currentHP = _maxHP;
+		else
+			_currentHP += heal;
+
+	}
+  }
+//metodo per il sort
+public int Compare(obj? object)
+{
+	if(object == null)
+		return -1;
+Character other = obj as Character;	
+
+	if(other.Level < _level)
+	return 1;
+else if(other.Level == level)
+{
+	if(other.CurrentHP < _currentHP)
+	return 1;
+	else if(other.CurrentHP== _currentHP)
+	return 0;
+}
+return -1;	
+}
+}
+
+public class Army()
+{
+	private List<Character> _characterList;
+
+	public List<Character> CharacterList
+	{
+		get{return _characterList;}
+	}
+
+	public Army(List<Character> characterList)
+	{
+		_characterList = characterList;
+	}
+
+	public void SortArmy()
+	{
+		_chatacterList.Sort();
+	}
+	//metodo che restituisce una lista di personaggi con tutta la vita
+	public List<Character> CharactersWithFullHP()
+	{
+		List<Character> list = new List<Character>;
+	
+		for(int i=0; i<_charactersList.Count; i++)
+{	//controlla che la vita del personaggio che ha sia la massima in base alla    classe
+			if(_characterList[i].Class == Knight && _characterList[i].HP == 100)
+				list.Add(_characterList[i]);
+			else if(_characterList[i].Class == Warden && _characterList[i].HP == 200)
+				list.Add(_characterList[i]);
+if(_characterList[i].Class ==Mage && _characterList[i].HP == 500)
+				list.Add(_characterList[i]);
+		}
+		return list;
+	}
+
+	public void AddCharacter(Character character)
+	{
+		_characterList.Add(character);
+}
+
+public void removeCharacter(Character character)
+{
+	_characterList.Remove(character);
+}
+
+}
+
+
+Implementa le seguenti funzionalità inserendo nella classe o in altre classi da te create tutto quello che è necessario:
+Creazione di un Esercito appartenente ad un giocatore. L’esercito è composto da una serie di personaggi. L’esercito ad ogni aggiunta di un personaggio li riordina in base al livello, a parità di livello vengono ordinati in base ai punti ferita minori.
+Gestione dei punti ferita per un personaggio. Implementa funzioni per aumentare e diminuire i punti ferita di un personaggio, assicurandoti che non possano scendere sotto zero o superare un valore massimo che dipende dalla tipologia di personaggio. 
+Esistono 3 tipologie di personaggi: Maghi con massimo pari a 500, Guardiani con massimo pari a 200, Cavalieri con massimo pari a 100.
+Restituzione di una lista dei personaggi che hanno raggiunto il massimo di punti ferita. Tenere la lista sempre aggiornata.
+
+

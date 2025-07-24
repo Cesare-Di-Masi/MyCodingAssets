@@ -1,0 +1,73 @@
+Esercizio 1
+Creare un progetto WPF che rispetti i principi della OOP che risolva il seguente problema.
+Il progetto deve essere salvato nella cartella di rete con il nome LAB_REC_APRILE_CONGOME_NOME.zip (inserire al posto di COGNOME e NOME i vostri dati)
+
+Si deve gestire un totem per la prenotazione delle visite alle attrazioni di una città.
+Ogni attrazione ha un codice identificativo alfanumerico, un nome, una descrizione, un indirizzo (via, civico, cap), un costo (se l’attrazione è gratuita il suo costo sarà 0.0)
+Esempio:
+R01; Rocca Malatestiana; Fortezza storica con un museo, tour guidati, concerti estivi all'aperto e vista sul tramonto; Via Ca’ degli Ordelaffi, 8, 47521; 0.0
+I dati di tutte le attrazioni sono memorizzati in un con valori separati dal carattere ;   
+
+I turisti visualizzano nel totem i nominativi delle attrazioni e cliccando su ognuna di esse possono visualizzarne la descrizione ed il costo all’interno di una finestra popup. 
+
+Attraverso un bottone PRENOTA il turista può prenotare la sua visita ad una attrazione. 
+La prenotazione è valida per tutta la giornata selezionata. 
+Il totem non gestisce le vendite dei biglietti ma solo le prenotazioni, quindi il pagamento sarà effettuato al momento della visita
+
+Ogni prenotazione si riferisce ad una sola attrazione, ha una data di validità e contiene il nominativo del turista che ha prenotato la visita.
+Le prenotazioni devono essere salvate in un file delle prenotazioni  la cui struttura sarà:
+data prenotazione; codice attrazione prenotata; costo attrazione, nominativo turista
+es:
+10-10-2024; R01; 0.0; Mario Rossi
+
+Il totem prevede la presenza di un bottone SUGGERIMENTO che suggerisce l’attrazione da visitare.
+L’attrazione da visitare suggerita sarà quella che al momento della richiesta risulta essere la meno prenotata per la giornata selezionata
+
+Il totem prevede un bottone REPORT, che permette di estrapolare il report delle prenotazioni di una determinata giornata, in particolare viene generato un report, che poi verrà salvato su un file, in cui viene riportato per ogni attrazione il numero di prenotazioni previste per la giornata e l’incasso presunto (ovvero la somma derivante da  tutti i biglietti prenotati). 
+Il file dovrà avere come nome: report-gg-mm-aaaa dove gg-mm-aaaa deve essere sostituito con giorno, mese e anno della data di cui si è richiesto il report.
+
+
+Esercizio 2
+- creare una classe Session che permetta di memorizzare il tempo realizzato in una sessione di allenamento alla maratona (memorizza il tempo con tre valori distinti per ore, minuti e secondi).
+Deve essere possibile verificare se un oggetto Sessione si riferisce ad un allenamento intensivo (un allenamento è intensivo se la durata supera le 4 ore)
+
+
+
+- creare una classe Athlete che permetta di definire un atleta. Ogni atleta è caratterizzato dal suo tempo migliore in un allenamento intensivo e dal suo tempo migliore in un allenamento standard
+Deve essere possibile restituire la definire la durata in minuti degli allenamenti dell’atleta
+(3 punti)
+
+- nel main
+creare 2 atleti
+verificare quale dei due risulta avere il miglior tempo negli allenamenti intensivi
+verificare se il primo atleta impiega un tempo maggiore nel tempo dell'allenamento standard 
+verificare se i due atleti hanno gli stessi tempi negli allenamenti
+
+
+
+
+Definire proprietà ed eventuali ulteriori metodi necessari per la gestione del programma e delle richieste del main 
+(ricorda che il main non deve contenere la parte di logica del programma).
+
+Creare e definire i casi di test (un file per ogni classe) 
+
+Esercizio 3
+REALIZZARE UN PROGETTO WPF IN GRADO DI RISOLVERE LE SEGUENTI RICHIESTE PER LA GESTIONE DI UNA SALA DA BALLO
+
+CREARE UNA INTERFACCIA GRAFICA CHE PERMETTA DI: 
+RIEMPIRE UNA LISTA DI MASSIMO 50 BALLERINI
+VISUALIZZARE L’ELENCO DEI BALLERINI
+VISUALIZZARE GLI INCASSI DI TUTTE LE ISCRIZIONI
+ELIMINARE UN BALLERINO SELEZIONATO
+VISUALIZZARE IL NUMERO DI BALLERINI TOTALI
+VISUALIZZARE IL NUMERO DI BALLERINI MASCHI
+VISUALIZZARE IL NUMERO DI BALLERINI CON ETà COMPRESA TRA 20 E 35 ANNI
+
+
+PER OGNI BALLERINO SI VUOLE MEMORIZZARE:
+CODICE (UNICO ALL’INTERNO DELLA SALA DA BALLO)
+NOME
+COGNOME
+SESSO
+ANNO DI NASCITA
+PREZZO QUOTA (OGNI BALLERINO PAGA UNA QUOTA DI ISCRIZIONE) 

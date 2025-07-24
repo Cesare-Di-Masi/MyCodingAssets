@@ -1,0 +1,243 @@
+RISPONDI ALLE SEGUENTI DOMANDE
+Spiega il concetto di information hiding.
+Fornisci un esempio significativo in C# (aggiungi al codice eventuali commenti necessari ad inquadrare il codice di esempio all’interno di un progetto più ampio)
+	
+Il concetto di information hiding è quello di nascondere tutti i dati e/o metodi che l’utente o altre parti del codice non devono accedere in modo tale da diminuire la possibilità di riscontrare errori.
+L’accesso alle informazioni deve essere possibile solo tramite alcuni metodi definiti
+
+L'idea della seguente classe è quella di essere una semplificata gestione dei dati di un utente ai quali possa accedervi solo attraverso alcuni metodi definiti con l’uso di una password definita da un parametro al quale l’utente può accedervi.
+public class ID
+{	
+	private string _name, _surname;
+private int _age;
+private DateTime _birthday
+private string _password;
+
+public void setPassword(string newPassword)
+{
+	if(String.IsWhiteOrNull(newPassword))
+	throw new ArgumentOutOfRangeException(“illegal new password”);
+
+	if(String.IsWhiteOrNull(newPassword))
+	{
+		_password = newPassword;
+	}
+}
+	
+	public ID(string name, string surname, int age, DateTime birthday)
+	{
+		_name = name;
+		_surname= surname;
+_age = age
+		_birthday = birthday;
+}
+
+public string getNameAndSurname(string usedPassword)
+{
+if(usedPassword==password)
+return name+surname;
+	return “illegal password”
+
+}
+
+public string getAge(string usedPassword)
+{
+	
+	if(usedPassword == _password)
+		return $”{ _age}”;
+	return”wrong password”;
+	
+}
+
+public string getBirthday(string usedPassword)
+{
+	
+	if(usedPassword == _password)
+		return $”{_birthday}”;
+	return”wrong password”;
+	
+}
+
+
+}
+	
+[punti _____/ 2.5 ]
+
+
+Quali sono i compiti di un costruttore e cos’è il costruttore di default?  
+Fornisci un esempio significativo, scritto in C#, di una classe in cui venga utilizzato l’overload dei parametri applicato ai costruttori. Inserisci anche le chiamate in modo da chiarire il funzionamento.
+
+Il costruttore ha il compito di creare una istanza di una classe detto oggetto. Il costruttore non ritorna nulla, nemmeno Void. Il costruttore di default appartiene a quelle classi a cui non è stato definito un costruttore, la caratteristica del costruttore di default è quella di non ricevere parametri e una volta definito un qualsiasi costruttore non si potrà più accedere al costruttore di default a meno che non si definisca un costruttore che non richieda alcun parametro.
+
+Es.
+
+public class Student
+{
+	private string _name, _class;
+	private int[] marks;
+	
+	public string Name
+	{
+get
+{
+	return  _name;
+}
+private set
+{
+	//controllo che il nome non sia vuoto o null (nessun testo)
+	if(String.isWhiteOrBlank(value)==true)
+	{throw new argumentNullException(“illegal name”);}
+	_name = value;
+}
+}
+
+public int[] Marks
+{
+	get
+{
+	return _marks;
+}
+private set
+{
+	for(int i = 0; i < _marks.Length; i++)
+	{
+		if(_marks[i]<1 || _marks[i]> 10)
+		throw new ArgumentOutOfRangeException(“illegal marks”);
+}
+}
+}
+
+public string Class
+{
+	get
+{
+	return  _class;
+}
+private set
+{
+	//controllo che la stringa classe non sia vuoto o null (nessun testo)
+	if(String.isWhiteOrBlank(value)==true)
+	{throw new argumentNullException(“illegal class“);}
+	_class = value;
+}
+
+}
+
+	//definito il seguente costruttore non si potrà più accedere al costruttore di default
+	public Student(string name, int[] marks)
+	{
+		Name = name;
+		_marks = marks;
+	}
+
+	//overload
+	public Student(string Name, int[] Marks, string class ):this(Name,Marks)
+	{
+		Class = class
+}
+	
+}
+[punti _____/ 2.5 ]
+
+
+
+Descrivi la struttura dati di tipo array.
+
+l’Array è una struttura di dati di tipo statico, cioè che una volta definita la dimensione dell’array questa non potrà essere modificata. L’array è un oggetto, quindi nello stack non troveremo  dati all’interno dell’array ma il suo indirizzo. Infatti dato che l’Array è un oggetto di dimensione varia lo troveremo nello heap. I dati nell’Array sono memorizzati uno in seguito all’altro ed è infatti per questo che l’Array non può essere modificato, perchè lo spazio in memoria a lui dedicato è quello. Quando andiamo a creare un Array senza definire i dati al suo interno la memoria verrà comunque occupata da valori che possono cambiare in base al tipo dell’array: 0 per gli interi, null per oggetti, ecc. Una informazione necessaria da sapere è quella che se la dimensione dell’Array è 10, i suoi indici quali sono i puntatori per la memoria non andranno da 1 a 10, ma da 0 a 9.
+
+esempio di creazione di un array 
+
+int[] numeri = new  int[9] {1,2,3,4,5,6,7,8,9}
+//creo un array di tipo interi 
+//utilizzare il new dato che ricordiamo che l’Array è comunque un oggetto della classe Array
+//lo spazio tra le parentesi quadre è la dimensione dell’array. In questo caso 9
+// lo spazio tra le parentesi vado a definire i dati al suo interno (opzionale).
+
+gli array possono anche essere liste di oggetti come nell’esempio qui sotto
+Student[] registro = new Studenti[4] {s1,s2,s3,s4}
+
+ 
+	
+[punti _____/ 1 ]
+
+
+Fornisci inoltre l’implementazione in C# di una classe Negozio che contiene:
+un metodo che, preso come parametro un intero che rappresenta la dimensione di un array, istanzia un array di oggetti di tipo Prodotto(vedi la definizione della classe Prodotto fornita qui sotto)
+un metodo che restituisce quanti prodotto del negozio hanno un prezzo superiore al prezzo medio
+	Inserire nella classe tutti metodi/attributi/proprietà che si ritengono utili e/o necessari. 
+Se non diversamente specificato potete utilizzare dati random.
+
+public class Prodotto{
+        private double _prezzo;
+        public double Prezzo
+        {
+            get { return _prezzo; }
+            set {
+                if(value < 0)throw new ArgumentOutOfRangeException("prezzo non accettabile");                
+                _prezzo= value;
+            }
+        }        
+        public Prodotto( double prezzo) 
+        {
+            Prezzo = prezzo;
+        }
+       public override bool Equals(object? obj)
+        {
+            if(obj == null || !(obj is Prodotto)) return false;
+            Prodotto prodotto= (Prodotto)obj;
+            return prodotto.Prezzo==Prezzo;
+        }
+}
+Store da qui 
+
+
+public class Store
+{
+
+	public int[] ProductList
+	{
+		get; private set;
+}
+	
+	public Store(int nProducts)
+	{
+if(nProduct <1){throw new ArgumentOutOfRangeException(“Illegal number”)}
+		Prodotto[] productList = new Prodotto[nProducts];
+		Random rand = new Random;
+		
+		for(int i = 0; i<productList.Lenght; i++)
+		{
+			productList[i] = new Prodotto(rand.Next(1,100)); 
+}
+ProductList = productList
+	}
+
+	public int Average()
+	{
+		int average=0;
+		for(int i=0; i < ProductList.Lenght; i++)
+		{
+			average+= ProductList[i];
+}
+return average/ProductList.Lenght;
+}
+
+	public int HowManyBiggerThanAverage()
+	{	
+		int average = Average();
+	 	int counter = 0;
+		for(int i=0; i<ProductList.Lenght; i++)
+		{
+			if(ProductList[i] > average)
+				counter++;
+}
+return counter;
+}
+	
+}
+
+
+[punti _____/ 4 ]
+
+
+
