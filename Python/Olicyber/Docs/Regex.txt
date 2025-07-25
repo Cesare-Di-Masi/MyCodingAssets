@@ -1,0 +1,177 @@
+✅ Manuale Completo delle Componenti di una Regex (Regular Expression)
+1. Ancore (Anchors)
+
+Definiscono posizione nella stringa, non il contenuto.
+Sintassi	Significato	Esempio
+^	Inizio stringa	^abc → "abc..."
+$	Fine stringa	abc$ → "...abc"
+\b	Inizio/fine di parola (word boundary)	\bcat\b
+\B	Non-boundary	\Bcat\B
+2. Caratteri letterali (Literal characters)
+
+Matchano esattamente ciò che scrivi, senza simboli speciali.
+
+    a, Z, 9 → matchano a, Z, 9
+
+    Caratteri speciali vanno escapati con \
+
+3. Meta-caratteri (Meta-characters)
+
+Hanno significati speciali. Se li vuoi usare come testo, devi escaparli con \.
+Carattere	Significato
+.	Qualsiasi carattere tranne newline
+^, $	Ancore (inizio/fine)
+*, +, ?	Quantificatori
+(), [], {}	Gruppi, classi, ripetizioni
+`	`
+\	Escape
+4. Classi di caratteri (Character classes)
+4.1 Base
+Sintassi	Matcha	Esempio
+\d	Cifre [0-9]	\d\d → "42"
+\D	Non cifre [^0-9]	
+\w	Alfanumerico + _	[a-zA-Z0-9_]
+\W	Tutto tranne \w	
+\s	Spazi: spazio, tab, newline	
+\S	Non spazi	
+4.2 Custom
+
+    [abc] → uno tra a, b, c
+
+    [a-z] → una lettera minuscola
+
+    [^abc] → qualsiasi tranne a, b, c
+
+    [a-zA-Z0-9_] → un carattere alfanumerico o underscore
+
+5. Quantificatori (Quantifiers)
+
+Definiscono quante volte un elemento deve comparire.
+Sintassi	Significato	Esempio
+a*	0 o più a	"", "a", "aaa"
+a+	1 o più a	"a", "aa"
+a?	0 o 1 a	"", "a"
+a{3}	Esattamente 3 a	"aaa"
+a{2,}	Almeno 2 a	"aa", "aaaa"
+a{2,4}	Da 2 a 4 a	"aa", "aaa"
+Attenzione: Quantificatori greedy vs lazy
+
+    Greedy: .* → prende il più possibile
+
+    Lazy: .*? → prende il meno possibile
+
+6. Gruppi (Groups) e Capturing
+6.1 Gruppi classici
+
+    (abc) → gruppo che matcha esattamente "abc"
+
+    Serve anche per applicare quantificatori: (ab)+
+
+6.2 Non capturing group
+
+    (?:abc) → gruppo non capturante, usato per performance o struttura
+
+6.3 Named groups
+
+    (?P<name>abc) → gruppo nominato "name" (Python style)
+
+    (?<name>abc) → in altri engine
+
+7. Lookahead e Lookbehind (Assertivi)
+
+Verificano contesto senza consumare caratteri.
+7.1 Lookahead (avanti)
+Sintassi	Significato
+X(?=Y)	Matcha X solo se seguito da Y
+X(?!Y)	Matcha X solo se non seguito da Y
+7.2 Lookbehind (indietro)
+Sintassi	Significato
+(?<=Y)X	Matcha X solo se preceduto da Y
+(?<!Y)X	Matcha X solo se non preceduto da Y
+8. Alternanza (Alternation)
+
+    abc|def → matcha abc o def
+
+    Funziona come OR logico
+
+    Può essere limitato con gruppi:
+    gr(a|e)y → matcha gray o grey
+
+9. Escape sequence e caratteri speciali
+Sequenza	Significato
+\\	Backslash
+\.	Punto letterale
+\t	Tabulazione
+\n	Newline
+\x41	Carattere ASCII esadecimale (A)
+\u03A9	Unicode (Ω)
+10. Flags / Modificatori globali
+
+A seconda del linguaggio o tool, puoi modificare il comportamento globale della regex.
+Flag	Effetto	Dove
+i	Case-insensitive	/abc/i
+g	Global (match multipli)	/abc/g
+m	Multiline (ancore su ogni riga)	/^abc$/m
+s	Dot-all (. matcha anche newline)	/abc./s
+x	Ignore whitespace (verbose mode)	(Python: re.X)
+11. Backreference (riferimenti a gruppi)
+
+Usati per matchare lo stesso contenuto già catturato:
+
+    (.+)\1 → matcha due stringhe identiche consecutive
+
+    In Python: \1, \2, ecc.
+
+    Named group: (?P=name)
+
+12. Commenti (verbose mode)
+
+In Python o in alcuni engine (re.VERBOSE o /x), puoi scrivere:
+
+pattern = r"""
+^             # inizio
+[a-z]{3}      # 3 lettere minuscole
+\d{2,4}       # da 2 a 4 cifre
+$             # fine
+"""
+
+✅ Esempio completo con tutto
+
+Regex:
+
+^(?P<prefix>[A-Z]{2})-(\d{4})_(\w+)\.(?=txt|log)$
+
+Analisi dettagliata (per costruzione della stringa)
+Posizione	Descrizione	Regex	Requisito	Esempio scelto
+Inizio	Inizio stringa	^	Obbligatorio	-
+1	2 lettere maiuscole (group "prefix")	(?P<prefix>[A-Z]{2})	Due maiuscole	AB
+2	Trattino	-	Letterale	-
+3	4 cifre (anonimo group)	(\d{4})	Quattro numeri consecutivi	2025
+4	Underscore	_	Letterale	_
+5	Qualsiasi parola con lettere/numeri/_	(\w+)	Almeno un carattere alfanumerico	Report1
+6	Punto letterale	\.	Obbligatorio	.
+7	Lookahead (ma non matcha)	`(?=txt	log)`	La stringa deve finire con txt o log, ma il file extension non viene incluso nel match
+Fine	Fine stringa	$	Obbligatorio	-
+
+
+✅ Stringa di esempio valida:
+
+AB-2025_Report1.txt
+
+Motivazione:
+
+    AB → 2 lettere maiuscole
+
+    - → presente
+
+    2025 → 4 cifre
+
+    _ → presente
+
+    Report1 → \w+ = valido
+
+    . → punto letterale
+
+    txt → è presente, quindi soddisfa il (?=txt|log) (ma non viene incluso nel match vero e proprio)
+
+    Termina qui → $

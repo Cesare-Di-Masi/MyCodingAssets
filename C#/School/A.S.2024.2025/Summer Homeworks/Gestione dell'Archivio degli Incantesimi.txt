@@ -22,5 +22,15 @@ EXTRA:
 Rarità degli incantesemi
 Descrizione degli incantesimi
 Livello di proibizione dell'incantesimo (Aperto,Bandito,ecc.)
-L'incantatore deve fare parte di quella specifica scuola
+L'incantatore deve fare parte di quella specifica scuola??
+Matrice per l'intero archivio ->
+Archivio -> [Scuole di magia] -> [Incantesimi]
 
+Parametri   per l'ID:
+Deve prendere tutti i parametri dell'incantesimo e uttilizzarli per poi creare l'Id.
+L'ID deve ricondurre a quel singolo incantesimo.
+
+Idee per la creazione dell'ID:
+-Scuola di magia + nome scopritore + data di scoperta/creazione + nome incantesimo + criptaggio
+esempio:
+Scuola di magia: Evocazione + nome scopritore: Mario Rossi + data di scoperta/creazione: 10-10-2024 + nome incantesimo: Incantesimo di Combustione + criptaggio: 12345
