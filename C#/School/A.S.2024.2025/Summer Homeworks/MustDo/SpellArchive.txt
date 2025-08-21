@@ -7,6 +7,8 @@ Ogni incantesimo ha un Codice Runico Arcane (CRA) identificativo generato al mom
 Ogni incantesimo è caratterizzato da: nome, creatore/scopritore, data di scoperta/creazione, scuola di magia, disponibilità per la consultazione (può essere ristretta), e livello di pericolo magico (da 1 a 10). 
 Un incantesimo può appartenere a più scuole di magia (es. Evocazione e Divinazione); in caso di più scuole, queste devono essere inserite tutte e mantenute in ordine alfabetico.
 
+Archivio -> [Scuole di magia] -> [Incantesimi]
+
 I dati di tutti gli incantesimi sono memorizzati in un file (a vostra scelta la tipologia di file da utilizzare, ad esempio JSON o di Testo).
 
 Dovete gestire un programma composto da più finestre o pagine che permetta di:
@@ -19,12 +21,10 @@ Visulizza Incantesimi per Scuola
 
 EXTRA:
 
-Rarità degli incantesemi
+Rarità degli incantesimi
 Descrizione degli incantesimi
 Livello di proibizione dell'incantesimo (Aperto,Bandito,ecc.)
 L'incantatore deve fare parte di quella specifica scuola??
-Matrice per l'intero archivio ->
-Archivio -> [Scuole di magia] -> [Incantesimi]
 
 Parametri   per l'ID:
 Deve prendere tutti i parametri dell'incantesimo e uttilizzarli per poi creare l'Id.

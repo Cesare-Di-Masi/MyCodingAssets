@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpellArchive", "SpellArchive\SpellArchive.csproj", "{D3599F8F-0496-4F11-8711-3DF62B4A93AD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpellArchiveLib", "SpellArchiveLib\SpellArchiveLib.csproj", "{5BCC9DBB-15F9-4064-BE50-913CBCCCAC7D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D3599F8F-0496-4F11-8711-3DF62B4A93AD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3599F8F-0496-4F11-8711-3DF62B4A93AD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3599F8F-0496-4F11-8711-3DF62B4A93AD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3599F8F-0496-4F11-8711-3DF62B4A93AD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BCC9DBB-15F9-4064-BE50-913CBCCCAC7D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BCC9DBB-15F9-4064-BE50-913CBCCCAC7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BCC9DBB-15F9-4064-BE50-913CBCCCAC7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BCC9DBB-15F9-4064-BE50-913CBCCCAC7D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA576C2B-20D8-4537-A274-905D6159EEE5}
+	EndGlobalSection
+EndGlobal

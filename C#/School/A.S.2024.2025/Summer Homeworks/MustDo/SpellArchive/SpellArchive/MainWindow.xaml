@@ -1,0 +1,32 @@
+﻿<Window x:Class="SpellArchiveApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Archivio Incantesimi" Height="400" Width="600">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Numero incantesimi rari -->
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock Text="Totale incantesimi rari:" VerticalAlignment="Center" />
+            <TextBlock x:Name="TxtRareCount" FontWeight="Bold" Margin="5,0,0,0" />
+        </StackPanel>
+
+        <!-- Ricerca CRA -->
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10">
+            <TextBox x:Name="TxtCRA" Width="200" Text="Inserisci CRA" />
+            <Button x:Name="BtnFindCRA" Content="Cerca Incantesimo" Margin="5,0,0,0" />
+        </StackPanel>
+
+        <!-- Menu azioni -->
+        <StackPanel Grid.Row="2" VerticalAlignment="Top">
+            <Button x:Name="BtnOpenAddModify" Content="Aggiungi/Modifica Incantesimo" Margin="0,5,0,0" />
+            <Button x:Name="BtnOpenSchools" Content="Cerca e Aggiungi Scuola" Margin="0,5,0,0" />
+            <Button x:Name="BtnOpenBySchool" Content="Visualizza Incantesimi per Scuola" Margin="0,5,0,0" />
+        </StackPanel>
+    </Grid>
+</Window>
