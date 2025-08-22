@@ -1,12 +1,24 @@
-﻿using System.Windows;
-using SpellArchiveLib;
+﻿using SpellArchiveLib;
+using System.Text;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
 
 namespace SpellArchive
 {
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
     public partial class MainWindow : Window
     {
         private Archive _archive;
-
+        private int forbCounter = 0; //numero di magie proibite (mia versione  di rare)
         public MainWindow(Archive archive)
         {
             InitializeComponent();
@@ -16,9 +28,13 @@ namespace SpellArchive
 
         private void UpdateRareCount()
         {
-            // "Raro" devi deciderlo tu, qui metto esempio con Accessibility.Rare
-            int rareCount = _archive.FindSpellsByAccessibility(Accessibility.Rare).Count;
-            TxtRareCount.Text = rareCount.ToString();
+            for(int i = 0; i < _archive.SpellArchive.Count; i++)
+            {
+                if(_archive.SpellArchive[i] != null && _archive.SpellArchive[i]?.Accessibility == Accessibility.Forbidden)
+                {
+                    forbCounter++;
+                }
+            }
         }
 
         private void BtnFindCRA_Click(object sender, RoutedEventArgs e)
@@ -57,5 +73,7 @@ namespace SpellArchive
             var win = new SpellsBySchoolWindow(_archive);
             win.ShowDialog();
         }
+
+
     }
 }
