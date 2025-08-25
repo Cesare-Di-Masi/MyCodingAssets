@@ -1,0 +1,40 @@
+﻿<Window x:Class="CatteryManager.CatsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CatteryManager"
+        mc:Ignorable="d"
+       Title="Cattery - Cats" Height="400" Width="600">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock Text="Cats in Cattery" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+            <ListBox x:Name="lstCats" DisplayMemberPath="Name" Height="200" SelectionChanged="LstCats_SelectionChanged"/>
+
+            <GroupBox Header="Cat Details" Margin="0,10,0,0">
+                <StackPanel Margin="5">
+                    <TextBlock Text="Name:" FontWeight="Bold"/>
+                    <TextBlock x:Name="txtName"/>
+
+                    <TextBlock Text="Breed:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock x:Name="txtBreed"/>
+
+                    <TextBlock Text="Gender:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock x:Name="txtGender"/>
+
+                    <TextBlock Text="Arrival Date:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock x:Name="txtArrival"/>
+
+                    <TextBlock Text="Departure Date:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock x:Name="txtDeparture"/>
+
+                    <TextBlock Text="Birth Date:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock x:Name="txtBirth"/>
+
+                    <TextBlock Text="Description:" FontWeight="Bold" Margin="0,5,0,0"/>
+                    <TextBlock x:Name="txtDescription" TextWrapping="Wrap"/>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </Grid>
+</Window>

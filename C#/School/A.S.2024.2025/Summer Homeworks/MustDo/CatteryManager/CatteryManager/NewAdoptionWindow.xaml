@@ -1,0 +1,34 @@
+﻿<Window x:Class="CatteryManager.NewAdoptionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CatteryManager"
+        mc:Ignorable="d"
+        Title="Cattery - Add New Adoption" Height="500" Width="400">
+    <Grid Margin="10">
+        <StackPanel>
+            <TextBlock Text="Register New Adoption" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+
+            <TextBlock Text="Select Cat:"/>
+            <ComboBox x:Name="cmbCats" DisplayMemberPath="Name" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Adopter Name:"/>
+            <TextBox x:Name="txtAdopterName" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Adopter Surname:"/>
+            <TextBox x:Name="txtAdopterSurname" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Address:"/>
+            <TextBox x:Name="txtAddress" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Phone:"/>
+            <TextBox x:Name="txtPhone" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Adoption Date:"/>
+            <DatePicker x:Name="dpAdoptionDate" Margin="0,0,0,10" SelectedDate="{x:Static sys:DateTime.Now}" xmlns:sys="clr-namespace:System;assembly=mscorlib"/>
+
+            <Button Content="Register Adoption" Width="150" HorizontalAlignment="Center" Click="BtnRegisterAdoption_Click"/>
+        </StackPanel>
+    </Grid>
+</Window>

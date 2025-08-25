@@ -1,0 +1,24 @@
+﻿<Window x:Class="CatteryManager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CatteryManager"
+        mc:Ignorable="d"
+        Title="Gattile - Home" Height="400" Width="600">
+    <Grid Margin="10">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Top" >
+            <TextBlock Text="Gattile - Home" FontSize="24" FontWeight="Bold" Margin="0,0,0,20" HorizontalAlignment="Center"/>
+            <TextBlock Text="Gatti attualmente presenti:" FontSize="16"/>
+            <TextBlock x:Name="txtTotalCats" Text="0" FontSize="16" FontWeight="Bold" Margin="0,0,0,20"/>
+
+            <WrapPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Top" >
+                <Button Content="Visualizza Gatti" Width="200" Margin="0,5" Click="ButtonViewCats_Click" />
+                <Button Content="Nuovo Gatto" Width="200" Margin="0,5" Click="ButtonNewCat_Click" />
+                <Button Content="Visualizza Adozioni" Width="200" Margin="0,5" Click="ButtonViewAdoptions_Click" />
+                <Button Content="Nuova Adozione" Width="200" Margin="0,5" Click="ButtonNewAdoption_Click" />
+                <Button Content="Gestione Adozione Fallita" Width="200" Margin="0,5" Click="ButtonFailedAdoption_Click" />
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</Window>
