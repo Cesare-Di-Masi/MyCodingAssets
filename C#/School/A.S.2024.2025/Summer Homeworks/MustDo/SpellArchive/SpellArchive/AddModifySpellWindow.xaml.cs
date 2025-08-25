@@ -1,17 +1,5 @@
 ﻿using SpellArchiveLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SpellArchive
 {
@@ -23,6 +11,12 @@ namespace SpellArchive
         private Archive _archive;
         private Spell? _spell;
 
+        private List<Wizard> wizards = new List<Wizard>()
+            {
+                new Wizard("Merlin","Ambrosius", new DateOnly(1000,1,1), 10){ WizardSchool = SpellsSchool.Astromancy },
+                new Wizard("Gandalf","Grey", new DateOnly(1200,1,1), 9){ WizardSchool = SpellsSchool.Evocation }
+            };
+
         public AddModifySpellWindow(Archive archive, Spell? spellToEdit)
         {
             InitializeComponent();
@@ -30,8 +24,8 @@ namespace SpellArchive
             _spell = spellToEdit;
 
             // Popola i combobox
-            CmbAccessibility.ItemsSource = Enum.GetValues(typeof(Accessibility));
-            CmbWizard.ItemsSource = GetDummyWizards(); // Qui userai i tuoi wizard reali
+            CmbAccessibility.ItemsSource = Enum.GetValues(typeof(AccessLevel));
+            CmbWizard.ItemsSource = wizards; // Qui userai i tuoi wizard reali
             LstSchools.ItemsSource = Enum.GetValues(typeof(SpellsSchool));
 
             if (_spell != null)
@@ -63,7 +57,7 @@ namespace SpellArchive
                 string description = TxtDescription.Text.Trim();
                 Wizard wizard = (Wizard)CmbWizard.SelectedItem;
                 DateOnly creationDate = DateOnly.FromDateTime(DpCreationDate.SelectedDate ?? DateTime.Now);
-                Accessibility acc = (Accessibility)CmbAccessibility.SelectedItem;
+                AccessLevel acc = (AccessLevel)CmbAccessibility.SelectedItem;
                 int danger = (int)SldDanger.Value;
                 List<SpellsSchool> schools = new List<SpellsSchool>();
                 foreach (var s in LstSchools.SelectedItems)
@@ -80,7 +74,8 @@ namespace SpellArchive
                     _archive.ModifySpell(_spell, updated);
                 }
 
-                this.DialogResult = true;
+                MainWindow a = new MainWindow(_archive);
+                a.Show();
                 this.Close();
             }
             catch (Exception ex)
@@ -91,17 +86,22 @@ namespace SpellArchive
 
         private void BtnCancel_Click(object sender, RoutedEventArgs e)
         {
+            var win = new MainWindow(_archive);
+            win.Show();
             this.Close();
         }
 
         // Dummy per test: crea 2 maghi finti
         private List<Wizard> GetDummyWizards()
         {
-            return new List<Wizard>
+            /*List<String> wizardNames = new List<String>();
+
+            for(int i = 0; i < wizards.Count; i++)
             {
-                new Wizard("Merlin","Ambrosius", new DateOnly(1000,1,1), 10){ WizardSchool = SpellsSchool.Arcane },
-                new Wizard("Gandalf","Grey", new DateOnly(1200,1,1), 9){ WizardSchool = SpellsSchool.Elemental }
-            };
+                wizardNames.Add(wizards[i].ToString());
+            }
+            return wizardNames;*/
+            return wizards;
         }
     }
 }

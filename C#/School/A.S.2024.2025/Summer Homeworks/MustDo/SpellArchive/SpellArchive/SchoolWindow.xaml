@@ -1,5 +1,5 @@
 ﻿<Window x:Class="SpellArchive.SchoolWindow"
-                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Gestione Scuole di Magia" Height="400" Width="500">
 
@@ -14,6 +14,6 @@
 
         <TextBlock Text="Aggiungi Nuova Scuola:" />
         <TextBox x:Name="TxtNewSchool" Width="200" />
-        <Button x:Name="BtnAddSchool" Content="Aggiungi Scuola" Width="150" Margin="0,5,0,0" />
+        <Button x:Name="BtnAddSchool" Content="Aggiungi Scuola" Width="150" Margin="0,5,0,0" Click="BtnAddSchool_Click" />
     </StackPanel>
 </Window>

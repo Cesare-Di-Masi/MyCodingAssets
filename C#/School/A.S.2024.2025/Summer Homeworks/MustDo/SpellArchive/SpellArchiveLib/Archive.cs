@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SpellArchiveLib
+﻿namespace SpellArchiveLib
 {
     public class Archive
     {
@@ -88,7 +82,7 @@ namespace SpellArchiveLib
             return searched;
         }
 
-        public List<Spell?> FindSpellsByAccessibility(Accessibility accessibility)
+        public List<Spell?> FindSpellsByAccessibility(AccessLevel accessibility)
         {
             if (accessibility == null)
             {

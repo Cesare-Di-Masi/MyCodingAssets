@@ -1,17 +1,5 @@
 ﻿using SpellArchiveLib;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace SpellArchive
 {
@@ -44,6 +32,5 @@ namespace SpellArchive
             MessageBox.Show("Le scuole sono enum, quindi non puoi aggiungerne dinamicamente a runtime.\n" +
                 "Se vuoi farlo, devi trasformare SpellsSchool in una classe persistente.", "Nota");
         }
-
     }
 }

@@ -28,8 +28,8 @@
             <ListBox x:Name="LstSchools" SelectionMode="Multiple" Height="100" Width="300" />
 
             <StackPanel Orientation="Horizontal" Margin="0,20,0,0">
-                <Button x:Name="BtnSave" Content="Salva" Width="100" />
-                <Button x:Name="BtnCancel" Content="Annulla" Width="100" Margin="10,0,0,0" />
+                <Button x:Name="BtnSave" Content="Salva" Width="100" Click="BtnSave_Click" />
+                <Button x:Name="BtnCancel" Content="Annulla" Width="100" Margin="10,0,0,0" Click="BtnCancel_Click" />
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

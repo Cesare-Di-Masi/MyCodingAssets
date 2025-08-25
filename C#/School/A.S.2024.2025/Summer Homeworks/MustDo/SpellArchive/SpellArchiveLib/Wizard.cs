@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SpellArchiveLib
+﻿namespace SpellArchiveLib
 {
     public class Wizard
     {
@@ -107,11 +101,11 @@ namespace SpellArchiveLib
             {
                 throw new ArgumentException($"Spell {spell.Name} has a danger level of {spell.DangerLevel}, which exceeds the wizard's level of {_level}.");
             }
-            if (spell.Accessibility == Accessibility.Forbidden)
+            if (spell.Accessibility == AccessLevel.Forbidden)
             {
                 throw new ArgumentException($"Spell {spell.Name} is forbidden and cannot be added to the wizard's spell list.");
             }
-            if (spell.Accessibility == Accessibility.Restricted && Level < 7)
+            if (spell.Accessibility == AccessLevel.Restricted && Level < 7)
             {
                 throw new ArgumentException($"Spell {spell.Name} is restricted and requires a wizard level of at least 7 to be added to the spell list.");
             }
@@ -170,6 +164,11 @@ namespace SpellArchiveLib
                 return true;
             }
             return false;
+        }
+
+        public override string ToString()
+        {
+            return $"{Name} {Surname}";
         }
     }
 }

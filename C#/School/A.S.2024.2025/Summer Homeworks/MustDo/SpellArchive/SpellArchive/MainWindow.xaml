@@ -19,14 +19,14 @@
         <!-- Ricerca CRA -->
         <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,10">
             <TextBox x:Name="TxtCRA" Width="200" Text="Inserisci CRA" />
-            <Button x:Name="BtnFindCRA" Content="Cerca Incantesimo" Margin="5,0,0,0" />
+            <Button x:Name="BtnFindCRA" Content="Cerca Incantesimo" Margin="5,0,0,0" Click="BtnFindCRA_Click" />
         </StackPanel>
 
         <!-- Menu azioni -->
         <StackPanel Grid.Row="2" VerticalAlignment="Top">
-            <Button x:Name="BtnOpenAddModify" Content="Aggiungi/Modifica Incantesimo" Margin="0,5,0,0" />
-            <Button x:Name="BtnOpenSchools" Content="Cerca e Aggiungi Scuola" Margin="0,5,0,0" />
-            <Button x:Name="BtnOpenBySchool" Content="Visualizza Incantesimi per Scuola" Margin="0,5,0,0" />
+            <Button x:Name="BtnOpenAddModify" Content="Aggiungi/Modifica Incantesimo" Margin="0,5,0,0" Click="BtnOpenAddModify_Click" />
+            <Button x:Name="BtnOpenSchools" Content="Cerca e Aggiungi Scuola" Margin="0,5,0,0" Click="BtnOpenSchools_Click" />
+            <Button x:Name="BtnOpenBySchool" Content="Visualizza Incantesimi per Scuola" Margin="0,5,0,0" Click="BtnOpenBySchool_Click" />
         </StackPanel>
     </Grid>
 </Window>

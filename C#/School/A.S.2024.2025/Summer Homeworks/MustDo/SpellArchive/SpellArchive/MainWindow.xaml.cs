@@ -1,14 +1,5 @@
 ﻿using SpellArchiveLib;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace SpellArchive
 {
@@ -19,6 +10,18 @@ namespace SpellArchive
     {
         private Archive _archive;
         private int forbCounter = 0; //numero di magie proibite (mia versione  di rare)
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            _archive = Serializer.GetFile();
+            if (_archive == null)
+            {
+                _archive = new Archive();
+            }
+            UpdateRareCount();
+        }
+
         public MainWindow(Archive archive)
         {
             InitializeComponent();
@@ -28,9 +31,9 @@ namespace SpellArchive
 
         private void UpdateRareCount()
         {
-            for(int i = 0; i < _archive.SpellArchive.Count; i++)
+            for (int i = 0; i < _archive.SpellArchive.Count; i++)
             {
-                if(_archive.SpellArchive[i] != null && _archive.SpellArchive[i]?.Accessibility == Accessibility.Forbidden)
+                if (_archive.SpellArchive[i] != null && _archive.SpellArchive[i]?.Accessibility == AccessLevel.Forbidden)
                 {
                     forbCounter++;
                 }
@@ -58,22 +61,22 @@ namespace SpellArchive
         private void BtnOpenAddModify_Click(object sender, RoutedEventArgs e)
         {
             var win = new AddModifySpellWindow(_archive, null);
-            win.ShowDialog();
-            UpdateRareCount();
+            win.Show();
+            this.Close();
         }
 
         private void BtnOpenSchools_Click(object sender, RoutedEventArgs e)
         {
             var win = new SchoolWindow();
-            win.ShowDialog();
+            win.Show();
+            this.Close();
         }
 
         private void BtnOpenBySchool_Click(object sender, RoutedEventArgs e)
         {
-            var win = new SpellsBySchoolWindow(_archive);
-            win.ShowDialog();
+            var win = new SpellBySchoolWindow(_archive);
+            win.Show();
+            this.Close();
         }
-
-
     }
 }

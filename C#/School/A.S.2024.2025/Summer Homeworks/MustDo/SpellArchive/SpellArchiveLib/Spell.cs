@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SpellArchiveLib
+﻿namespace SpellArchiveLib
 {
     public class Spell
     {
         private string _name, _description;
         private Wizard _wizard;
         private DateOnly _creationDate;
-        private Accessibility _accessibility;
+        private AccessLevel _accessibility;
         private List<SpellsSchool> _spellSchool;
         private int _dangerLevel;
 
@@ -102,7 +96,7 @@ namespace SpellArchiveLib
             }
         }
 
-        public Accessibility Accessibility
+        public AccessLevel Accessibility
         {
             get
             {
@@ -110,7 +104,7 @@ namespace SpellArchiveLib
             }
             set
             {
-                if (!Enum.IsDefined(typeof(Accessibility), value))
+                if (!Enum.IsDefined(typeof(AccessLevel), value))
                 {
                     throw new ArgumentException("Invalid accessibility value.");
                 }
@@ -179,7 +173,7 @@ namespace SpellArchiveLib
             }
         }
 
-        public Spell(string name, string description, Wizard wizard, DateOnly creationDate, Accessibility accessibility, int dangerLevel, List<SpellsSchool> spellSchool)
+        public Spell(string name, string description, Wizard wizard, DateOnly creationDate, AccessLevel accessibility, int dangerLevel, List<SpellsSchool> spellSchool)
         {
             Name = name;
             Description = description;
@@ -224,7 +218,7 @@ namespace SpellArchiveLib
             generateCRA(); // Regenerate CRA after modifying the creation date
         }
 
-        public void ModifyAccessibility(Accessibility newAccessibility)
+        public void ModifyAccessibility(AccessLevel newAccessibility)
         {
             Accessibility = newAccessibility;
         }
