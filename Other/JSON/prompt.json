@@ -1,0 +1,55 @@
+{
+  "character": {
+    "name": "Dread_X",
+    "species": "human boy",
+    "appearance": {
+      "skin_color": "white",
+      "eyes": {
+        "shape": "sharp, glowing",
+        "color": "red",
+        "expression": "neutral"
+      },
+      "hair": {
+        "style": "messy, layered",
+        "color": "white with red,  yellow and purple hair",
+        "extra": "White mask with folly red details"
+      },
+      "teeth": "mouth closed",
+      "hands": "normal",
+      "legs": "black trousers",
+      "accessories": [
+        "folly red scarf",
+        "utility belt with pouches",
+        "layered jacket with multiple pockets"
+      ]
+    },
+    "outfits": [
+      {
+        "theme": "battle attire",
+        "description": "dark tactical clothing, armor-like vest, glowing magical scrolls wrapping around the body, glowing symbols in red-orange light"
+      },
+      {
+        "theme": "casual attire",
+        "description": "striped oversized jacket, crop top, high-waist pants, casual boots, mask on the top left of his face not on eyes"
+      }
+    ],
+    "powers": [
+      "dark magic with glowing runes",
+      "summons floating red-orange scrolls with arcane symbols",
+      "uses a double scythe for combat"
+    ],
+    "personality": "chaotic, cunning, charismatic, enjoys intimidating with a smile"
+  },
+  "art_style": {
+    "influence": "anime-inspired, sharp contrast",
+    "lighting": "neon red-pink glow, high saturation",
+    "mood": "intense, supernatural, stylish",
+    "lineart": "clean and dynamic",
+    "color_palette": [
+      "deep black",
+      "dark red",
+      "bright orange",
+      "neon pink highlights"
+    ]
+  }
+}
