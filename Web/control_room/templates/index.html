@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Nyanbox Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #0d1117;
+      color: #e6edf3;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    header {
+      padding: 1rem;
+      background: #161b22;
+      font-size: 1.5rem;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid #30363d;
+    }
+    main {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+      padding: 1rem;
+      flex: 1;
+      overflow-y: auto;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+    }
+    .card h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.2rem;
+      border-bottom: 1px solid #30363d;
+      padding-bottom: 0.3rem;
+    }
+    .progress-container {
+      background: #21262d;
+      border-radius: 5px;
+      overflow: hidden;
+      margin: 0.5rem 0;
+    }
+    .progress-bar {
+      height: 20px;
+      background: linear-gradient(90deg, #39d353, #26a641);
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    button {
+      margin: 0.3rem 0;
+      padding: 0.6rem;
+      border: none;
+      border-radius: 5px;
+      background: #238636;
+      color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #2ea043;
+    }
+    .switch {
+      padding: 0.3rem 0.8rem;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .switch.on {
+      background: #238636;
+      color: white;
+    }
+    .switch.off {
+      background: #da3633;
+      color: white;
+    }
+    #log {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      flex: 1;
+      overflow-y: auto;
+      font-family: monospace;
+      font-size: 0.9rem;
+      padding: 0.5rem;
+      white-space: pre-wrap;
+    }
+    /* Toast notifiche */
+    #toast-container {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 9999;
+    }
+    .toast {
+      background: #238636;
+      color: white;
+      padding: 0.6rem 1rem;
+      margin-top: 0.5rem;
+      border-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.4);
+      animation: fadeInOut 4s forwards;
+    }
+    @keyframes fadeInOut {
+      0% {opacity: 0; transform: translateY(-10px);}
+      10% {opacity: 1; transform: translateY(0);}
+      90% {opacity: 1;}
+      100% {opacity: 0; transform: translateY(-10px);}
+    }
+  </style>
+</head>
+<body>
+  <header>Nyanbox Dashboard</header>
+  <main>
+    <!-- Vitals -->
+    <div class="card">
+      <h2>Vitals</h2>
+      <canvas id="vitalsChart" height="150"></canvas>
+    </div>
+
+    <!-- XP/Level -->
+    <div class="card">
+      <h2>XP & Level</h2>
+      <div><b>Utente:</b> <span id="actor-name">player1</span></div>
+      <div><b>Level:</b> <span id="level">0</span></div>
+      <div class="progress-container"><div class="progress-bar" id="xp-bar"></div></div>
+      <div><b>XP:</b> <span id="xp">0</span></div>
+    </div>
+
+    <!-- Moduli -->
+    <div class="card">
+      <h2>Moduli</h2>
+      <div id="modules">Caricamento...</div>
+    </div>
+
+    <!-- Azioni -->
+    <div class="card">
+      <h2>Azioni</h2>
+      <button onclick="triggerAction('wifi_scan')">WiFi Scan</button>
+      <button onclick="triggerAction('ble_scan')">BLE Scan</button>
+      <button onclick="triggerAction('channel_analyzer')">Channel Analyzer</button>
+    </div>
+
+    <!-- Log -->
+    <div class="card" style="grid-column: 1 / -1; height: 250px;">
+      <h2>Log</h2>
+      <div id="log"></div>
+    </div>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <script>
+    const API_KEY = "test123"; // cambia con la tua chiave
+    const ACTOR = "player1";
+
+    // Chart.js setup
+    const ctx = document.getElementById('vitalsChart').getContext('2d');
+    const vitalsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [],
+        datasets: [
+          { label: 'CPU %', borderColor: '#39d353', data: [], fill: false },
+          { label: 'RAM %', borderColor: '#da3633', data: [], fill: false }
+        ]
+      },
+      options: {
+        scales: {
+          y: { min: 0, max: 100, ticks: { color: '#e6edf3' } },
+          x: { ticks: { color: '#e6edf3' } }
+        },
+        plugins: { legend: { labels: { color: '#e6edf3' } } }
+      }
+    });
+
+    function showToast(msg, success=true) {
+      const toast = document.createElement("div");
+      toast.className = "toast";
+      toast.style.background = success ? "#238636" : "#da3633";
+      toast.innerText = msg;
+      document.getElementById("toast-container").appendChild(toast);
+      setTimeout(()=>toast.remove(),4000);
+    }
+
+    async function fetchVitals() {
+      const r = await fetch("/api/vitals");
+      const data = await r.json();
+      const now = new Date().toLocaleTimeString();
+      if (vitalsChart.data.labels.length > 20) {
+        vitalsChart.data.labels.shift();
+        vitalsChart.data.datasets[0].data.shift();
+        vitalsChart.data.datasets[1].data.shift();
+      }
+      vitalsChart.data.labels.push(now);
+      vitalsChart.data.datasets[0].data.push(data.cpu);
+      vitalsChart.data.datasets[1].data.push(data.memory);
+      vitalsChart.update();
+    }
+
+    async function fetchXP() {
+      const r = await fetch(`/api/nyan/xp/${ACTOR}`);
+      const data = await r.json();
+      document.getElementById("xp").innerText = data.xp;
+      document.getElementById("level").innerText = data.level;
+      const percent = (data.xp % 100) + "%";
+      document.getElementById("xp-bar").style.width = percent;
+    }
+
+    async function fetchModules() {
+      const r = await fetch("/api/modules");
+      const mods = await r.json();
+      let html = "";
+      mods.forEach(m => {
+        html += `<div>
+          ${m.name}: <span class="switch ${m.active ? "on" : "off"}" 
+          onclick="toggleModule('${m.name}')">${m.active ? "ON" : "OFF"}</span>
+        </div>`;
+      });
+      document.getElementById("modules").innerHTML = html;
+    }
+
+    async function toggleModule(name) {
+      const r = await fetch("/api/admin/module_toggle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_KEY
+        },
+        body: JSON.stringify({module: name})
+      });
+      if(r.ok) showToast(`Modulo ${name} toggled`);
+      else showToast(`Errore toggle ${name}`, false);
+      fetchModules();
+    }
+
+    async function triggerAction(action) {
+      const r = await fetch("/api/nyan/action", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-API-KEY": API_KEY
+        },
+        body: JSON.stringify({actor: ACTOR, action})
+      });
+      if(r.ok) showToast(`Azione ${action} eseguita`);
+      else showToast(`Errore azione ${action}`, false);
+      fetchXP();
+    }
+
+    function initStream() {
+      const evtSource = new EventSource("/stream");
+      evtSource.onmessage = function(e) {
+        const log = document.getElementById("log");
+        log.innerHTML += `<div>${e.data}</div>`;
+        log.scrollTop = log.scrollHeight;
+      };
+    }
+
+    // Aggiornamenti periodici
+    setInterval(fetchVitals, 3000);
+    setInterval(fetchXP, 5000);
+    setInterval(fetchModules, 8000);
+
+    // Avvio
+    fetchVitals();
+    fetchXP();
+    fetchModules();
+    initStream();
+  </script>
+</body>
+</html>
