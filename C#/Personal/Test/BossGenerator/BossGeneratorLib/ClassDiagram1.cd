@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="BossGeneratorLib.TrainRuler">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>TrainRuler.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Trainer" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BossGeneratorLib.Player">
+    <Position X="5" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>EAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>Player.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Armor" />
+      <Property Name="Skills" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BossGeneratorLib.StatusEffect">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>StatusEffect.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossGeneratorLib.Weapons">
+    <Position X="3.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Weapons.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossGeneratorLib.Armor">
+    <Position X="11.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Armor.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossGeneratorLib.BattleSystem">
+    <Position X="0.5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>BattleSystem.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Enviroment" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BossGeneratorLib.BossGenerator">
+    <Position X="10" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>BossGenerator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossGeneratorLib.Enviroment">
+    <Position X="5" Y="4.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enviroment.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossGeneratorLib.Trainer">
+    <Position X="0.5" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAQAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAQAAAAA=</HashCode>
+      <FileName>Trainer.cs</FileName>
+    </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Player" />
+      <Property Name="BattleSystem" />
+    </ShowAsAssociation>
+  </Class>
+  <Class Name="BossGeneratorLib.Mutator">
+    <Position X="11.75" Y="5.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Mutator.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossGeneratorLib.Skills">
+    <Position X="11.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Skills.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BossGeneratorLib.Boss">
+    <Position X="5" Y="3.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BgICJAAAAAACAgACAFBEQQEADEgQACAABACECCAEBRQ=</HashCode>
+      <FileName>Boss.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
