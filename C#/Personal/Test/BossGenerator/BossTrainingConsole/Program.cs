@@ -131,7 +131,7 @@ namespace BossTrainingConsole
             PrintInputPrompt();
             config.PopulationSize = GetIntParameter(
                 "Dimensione della popolazione iniziale",
-                10, 1000, 100, random);
+                10, 1000000000, 100, random);
 
             // EliteSize
             PrintOption("1", "Random (valore casuale)");
@@ -159,7 +159,7 @@ namespace BossTrainingConsole
             PrintInputPrompt();
             config.Generations = GetIntParameter(
                 "Numero massimo di generazioni",
-                1, 1000, 50, random);
+                1, 1000000000, 50, random);
 
             // MutationRate
             PrintOption("1", "Random (valore casuale)");
@@ -707,17 +707,17 @@ namespace BossTrainingConsole
         {
             return new Dictionary<string, (int Min, int Max)>
             {
-                ["Hp"] = (200, 800),
-                ["Mana"] = (50, 300),
-                ["Stamina"] = (50, 300),
-                ["Strength"] = (20, 80),
-                ["Intelligence"] = (20, 80),
-                ["Defence"] = (20, 80),
-                ["Speed"] = (20, 80),
-                ["Wisdom"] = (20, 80),
+                ["Hp"] = (200, 1000),
+                ["Mana"] = (50, 1000),
+                ["Stamina"] = (50, 1000),
+                ["Strength"] = (20, 100),
+                ["Intelligence"] = (20, 100),
+                ["Defence"] = (20, 100),
+                ["Speed"] = (20, 100),
+                ["Wisdom"] = (20, 100),
                 ["TrueDefence"] = (5, 30),
-                ["MaxEquipLoad"] = (30, 150),
-                ["ArsenalSize"] = (1, 4)
+                ["MaxEquipLoad"] = (150, 1000),
+                ["ArsenalSize"] = (1, 10)
             };
         }
 

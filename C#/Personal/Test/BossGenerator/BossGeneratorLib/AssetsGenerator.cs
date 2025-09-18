@@ -194,8 +194,11 @@ namespace BossGeneratorLib
             string[] bossClasses = { "Warrior", "Mage", "Rogue", "Paladin", "Necromancer", "Beastmaster" };
             string bossClass = bossClasses[random.Next(bossClasses.Length)];
 
+            // Genera un ID unico usando il timestamp
+            string uniqueId = $"Boss_{DateTime.Now:yyyyMMddHHmmssfff}_{random.Next(1000)}";
+
             var boss = new Boss(
-                $"Boss_{random.Next(1000)}", true,
+                uniqueId, true,
                 GetRandomValue(starterRules, random, "Hp"),
                 GetRandomValue(starterRules, random, "Mana"),
                 GetRandomValue(starterRules, random, "Stamina"),
@@ -209,29 +212,43 @@ namespace BossGeneratorLib
                 GetRandomValue(starterRules, random, "ArsenalSize"), 0,
                 new Dictionary<string, float?>(), new List<string?>(),
                 new List<string?>(), GenerateRandomAiPattern(starterRules, random),
-                new BossClass(), new List<Weapon?>(), new List<Skill?>());
+                new BossClass { ClassName = bossClass }, new List<Weapon?>(), new List<Skill?>());
 
-            // Generazione armi casuali
+            // Genera e aggiungi armi
             int numWeapons = random.Next(1, boss.ArsenalSize + 1);
             for (int i = 0; i < numWeapons; i++)
             {
-                var weapon = GenerateWeapon(starterRules, random, availableStatusEffects, boss);
                 try
                 {
-                    boss.AddWeapon(weapon);
+                    var weapon = GenerateWeapon(starterRules, random, availableStatusEffects, boss);
+                    while (boss.BossClass.IsWeaponAllowed(weapon.WeaponType) && boss.CurrentWeapons.Contains(weapon) && weapon.Weight + boss.CurrentEquipWeight > boss.MaxEquipLoad)
+                    {
+                        weapon = GenerateWeapon(starterRules, random, availableStatusEffects, boss);
+                    }
+                    if (boss.BossClass.IsWeaponAllowed(weapon.WeaponType))
+                        boss.AddWeapon(weapon);
                 }
-                catch (InvalidOperationException)
+                catch (Exception ex)
                 {
-                    // Se non può essere aggiunta, la ignoriamo
+                    // Se non può essere aggiunta, continua senza
+                    Console.WriteLine($"Impossibile aggiungere arma al boss {boss.ID}: {ex.Message}");
                 }
             }
 
-            // Generazione abilità casuali
+            // Genera e aggiungi abilità
             int numSkills = random.Next(1, 5);
             for (int i = 0; i < numSkills; i++)
             {
-                var skill = GenerateSkill(starterRules, random, availableStatusEffects, boss);
-                boss.AddSkill(skill);
+                try
+                {
+                    var skill = GenerateSkill(starterRules, random, availableStatusEffects, boss);
+                    boss.AddSkill(skill);
+                }
+                catch (Exception ex)
+                {
+                    // Se non può essere aggiunta, continua senza
+                    Console.WriteLine($"Impossibile aggiungere abilità al boss {boss.ID}: {ex.Message}");
+                }
             }
 
             return boss;

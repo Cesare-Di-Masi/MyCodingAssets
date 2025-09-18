@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML to XAML Converter for WPF</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .input-section, .output-section {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .textarea-container {
+            flex: 1;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: none;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+
+        .btn-secondary:hover {
+            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.4);
+        }
+
+        .options {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .option-group {
+            margin-bottom: 15px;
+        }
+
+        .option-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .option-group select,
+        .option-group input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .preview-section {
+            grid-column: 1 / -1;
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .preview-container {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background: #e74c3c;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .controls {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔄 HTML to XAML Converter</h1>
+            <p>Converti pagine web in controlli WPF mantenendo l'aspetto originale</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">
+                    <i class="fas fa-code"></i>
+                    HTML Input
+                </h2>
+                
+                <div class="options">
+                    <div class="option-group">
+                        <label for="layoutType">Tipo di Layout WPF:</label>
+                        <select id="layoutType">
+                            <option value="stackpanel">StackPanel</option>
+                            <option value="grid">Grid</option>
+                            <option value="dockpanel">DockPanel</option>
+                            <option value="wrap">WrapPanel</option>
+                        </select>
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="namespace">Namespace:</label>
+                        <input type="text" id="namespace" value="MyApp.Views" placeholder="Namespace WPF">
+                    </div>
+                    
+                    <div class="option-group">
+                        <label for="className">Nome Classe:</label>
+                        <input type="text" id="className" value="ConvertedPage" placeholder="Nome classe WPF">
+                    </div>
+                </div>
+
+                <div class="textarea-container">
+                    <textarea id="htmlInput" placeholder="Incolla qui il tuo codice HTML..."><!DOCTYPE html>
+<html>
+<head>
+    <title>La Mia Pagina</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .header { background: #007bff; color: white; padding: 20px; }
+        .content { padding: 20px; }
+        .button { background: #28a745; color: white; padding: 10px 20px; border: none; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Benvenuto!</h1>
+        <p>Questa è una pagina di esempio</p>
+    </div>
+    <div class="content">
+        <p>Questo è un paragrafo di testo.</p>
+        <button class="button">Cliccami</button>
+    </div>
+</body>
+</html></textarea>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" onclick="convertToXaml()">
+                        <i class="fas fa-magic"></i>
+                        Converti in XAML
+                    </button>
+                    <button class="btn btn-secondary" onclick="loadExample()">
+                        <i class="fas fa-file-import"></i>
+                        Carica Esempio
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearAll()">
+                        <i class="fas fa-trash"></i>
+                        Pulisci
+                    </button>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h2 class="section-title">
+                    <i class="fas fa-file-code"></i>
+                    XAML Output
+                </h2>
+
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="elementCount">0</div>
+                        <div class="stat-label">Elementi</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="lineCount">0</div>
+                        <div class="stat-label">Linee</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="conversionTime">0ms</div>
+                        <div class="stat-label">Tempo</div>
+                    </div>
+                </div>
+
+                <div class="textarea-container">
+                    <textarea id="xamlOutput" readonly placeholder="Il codice XAML apparirà qui..."></textarea>
+                </div>
+
+                <div class="controls">
+                    <button class="btn" onclick="copyXaml()">
+                        <i class="fas fa-copy"></i>
+                        Copia XAML
+                    </button>
+                    <button class="btn" onclick="downloadXaml()">
+                        <i class="fas fa-download"></i>
+                        Download .xaml
+                    </button>
+                    <button class="btn btn-secondary" onclick="generateCodeBehind()">
+                        <i class="fas fa-cogs"></i>
+                        Genera Code-Behind
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <h2 class="section-title">
+                <i class="fas fa-eye"></i>
+                Anteprima HTML
+            </h2>
+            <div class="preview-container" id="htmlPreview">
+                <!-- L'anteprima HTML apparirà qui -->
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Mappatura HTML a XAML
+        const htmlToXamlMap = {
+            'div': 'Border',
+            'span': 'TextBlock',
+            'p': 'TextBlock',
+            'h1': 'TextBlock',
+            'h2': 'TextBlock',
+            'h3': 'TextBlock',
+            'h4': 'TextBlock',
+            'h5': 'TextBlock',
+            'h6': 'TextBlock',
+            'a': 'TextBlock',
+            'button': 'Button',
+            'input': 'TextBox',
+            'img': 'Image',
+            'ul': 'ListBox',
+            'ol': 'ListBox',
+            'li': 'ListBoxItem',
+            'table': 'Grid',
+            'tr': 'Grid.RowDefinitions',
+            'td': 'TextBlock',
+            'select': 'ComboBox',
+            'option': 'ComboBoxItem',
+            'textarea': 'TextBox'
+        };
+
+        // Mappatura stili CSS a proprietà WPF
+        const cssToWpfMap = {
+            'color': 'Foreground',
+            'background-color': 'Background',
+            'background': 'Background',
+            'font-size': 'FontSize',
+            'font-family': 'FontFamily',
+            'font-weight': 'FontWeight',
+            'text-align': 'TextAlignment',
+            'width': 'Width',
+            'height': 'Height',
+            'margin': 'Margin',
+            'padding': 'Padding',
+            'border': 'BorderBrush',
+            'border-radius': 'CornerRadius'
+        };
+
+        function convertToXaml() {
+            const startTime = performance.now();
+            const htmlInput = document.getElementById('htmlInput').value;
+            const layoutType = document.getElementById('layoutType').value;
+            const namespace = document.getElementById('namespace').value;
+            const className = document.getElementById('className').value;
+
+            if (!htmlInput.trim()) {
+                showNotification('Inserisci del codice HTML da convertire', 'error');
+                return;
+            }
+
+            try {
+                // Mostra anteprima HTML
+                document.getElementById('htmlPreview').innerHTML = htmlInput;
+
+                // Converti HTML in XAML
+                const xaml = convertHtmlToXaml(htmlInput, layoutType, namespace, className);
+                
+                // Mostra risultato
+                document.getElementById('xamlOutput').value = xaml;
+                
+                // Aggiorna statistiche
+                const endTime = performance.now();
+                const conversionTime = Math.round(endTime - startTime);
+                updateStats(xaml, conversionTime);
+                
+                showNotification('Conversione completata con successo!');
+                
+            } catch (error) {
+                console.error('Errore nella conversione:', error);
+                showNotification('Errore durante la conversione: ' + error.message, 'error');
+            }
+        }
+
+        function convertHtmlToXaml(html, layoutType, namespace, className) {
+            // Crea un parser DOM
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const body = doc.body;
+
+            // Genera XAML
+            let xaml = `<UserControl x:Class="${namespace}.${className}"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    
+    <${layoutType}>`;
+
+            // Processa i figli del body
+            for (let child of body.children) {
+                xaml += processElement(child);
+            }
+
+            xaml += `
+    </${layoutType}>
+</UserControl>`;
+
+            return xaml;
+        }
+
+        function processElement(element) {
+            const tagName = element.tagName.toLowerCase();
+            const xamlTag = htmlToXamlMap[tagName] || 'ContentControl';
+            
+            let xaml = `\n        <${xamlTag}`;
+            
+            // Processa attributi
+            const attributes = processAttributes(element);
+            if (attributes) {
+                xaml += ' ' + attributes;
+            }
+            
+            // Processa stili inline
+            const styles = processStyles(element);
+            if (styles) {
+                xaml += ' ' + styles;
+            }
+            
+            // Processa contenuto
+            if (element.children.length > 0) {
+                xaml += '>';
+                for (let child of element.children) {
+                    xaml += processElement(child);
+                }
+                xaml += `\n        </${xamlTag}>`;
+            } else if (element.textContent.trim()) {
+                if (xamlTag === 'TextBlock' || xamlTag === 'Button') {
+                    xaml += `>${escapeXml(element.textContent.trim())}</${xamlTag}>`;
+                } else {
+                    xaml += `>\n            <TextBlock Text="${escapeXml(element.textContent.trim())}" />\n        </${xamlTag}>`;
+                }
+            } else {
+                xaml += ' />';
+            }
+            
+            return xaml;
+        }
+
+        function processAttributes(element) {
+            const attributes = [];
+            
+            // Gestisci attributi comuni
+            if (element.id) {
+                attributes.push(`x:Name="${element.id}"`);
+            }
+            
+            if (element.tagName.toLowerCase() === 'img' && element.src) {
+                attributes.push(`Source="${element.src}"`);
+            }
+            
+            if (element.tagName.toLowerCase() === 'a' && element.href) {
+                attributes.push(`NavigateUri="${element.href}"`);
+            }
+            
+            if (element.tagName.toLowerCase() === 'input' && element.type === 'submit') {
+                attributes.push(`Content="${element.value || 'Submit'}"`);
+            }
+            
+            return attributes.join(' ');
+        }
+
+        function processStyles(element) {
+            const styles = [];
+            const computedStyle = window.getComputedStyle(element);
+            
+            // Mappa stili CSS a proprietà WPF
+            for (let [cssProp, wpfProp] of Object.entries(cssToWpfMap)) {
+                const value = computedStyle.getPropertyValue(cssProp);
+                if (value && value !== 'none' && value !== 'auto') {
+                    let wpfValue = value;
+                    
+                    // Converti valori specifici
+                    if (cssProp === 'font-size') {
+                        wpfValue = convertFontSize(value);
+                    } else if (cssProp === 'font-weight') {
+                        wpfValue = convertFontWeight(value);
+                    } else if (cssProp === 'text-align') {
+                        wpfValue = convertTextAlign(value);
+                    } else if (cssProp === 'color' || cssProp === 'background-color') {
+                        wpfValue = convertColor(value);
+                    }
+                    
+                    styles.push(`${wpfProp}="${wpfValue}"`);
+                }
+            }
+            
+            return styles.join(' ');
+        }
+
+        function convertFontSize(cssSize) {
+            // Converti px a punti WPF
+            if (cssSize.endsWith('px')) {
+                const px = parseFloat(cssSize);
+                return Math.round(px * 0.75) + 'pt';
+            }
+            return cssSize;
+        }
+
+        function convertFontWeight(cssWeight) {
+            const weightMap = {
+                'normal': 'Normal',
+                'bold': 'Bold',
+                'bolder': 'Bold',
+                'lighter': 'Light',
+                '100': 'Thin',
+                '200': 'ExtraLight',
+                '300': 'Light',
+                '400': 'Normal',
+                '500': 'Medium',
+                '600': 'SemiBold',
+                '700': 'Bold',
+                '800': 'ExtraBold',
+                '900': 'Black'
+            };
+            return weightMap[cssWeight] || cssWeight;
+        }
+
+        function convertTextAlign(cssAlign) {
+            const alignMap = {
+                'left': 'Left',
+                'right': 'Right',
+                'center': 'Center',
+                'justify': 'Justify'
+            };
+            return alignMap[cssAlign] || cssAlign;
+        }
+
+        function convertColor(cssColor) {
+            // Converti colori CSS a formati WPF
+            if (cssColor.startsWith('#')) {
+                return cssColor;
+            }
+            if (cssColor.startsWith('rgb')) {
+                const match = cssColor.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/);
+                if (match) {
+                    const r = parseInt(match[1]).toString(16).padStart(2, '0');
+                    const g = parseInt(match[2]).toString(16).padStart(2, '0');
+                    const b = parseInt(match[3]).toString(16).padStart(2, '0');
+                    return `#${r}${g}${b}`;
+                }
+            }
+            return cssColor;
+        }
+
+        function escapeXml(text) {
+            return text.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&apos;');
+        }
+
+        function updateStats(xaml, conversionTime) {
+            const lines = xaml.split('\n').length;
+            const elements = (xaml.match(/<[a-zA-Z][^>]*>/g) || []).length;
+            
+            document.getElementById('elementCount').textContent = elements;
+            document.getElementById('lineCount').textContent = lines;
+            document.getElementById('conversionTime').textContent = conversionTime + 'ms';
+        }
+
+        function copyXaml() {
+            const xamlOutput = document.getElementById('xamlOutput');
+            xamlOutput.select();
+            document.execCommand('copy');
+            showNotification('XAML copiato negli appunti!');
+        }
+
+        function downloadXaml() {
+            const xaml = document.getElementById('xamlOutput').value;
+            const className = document.getElementById('className').value;
+            const blob = new Blob([xaml], { type: 'text/xaml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = className + '.xaml';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('File XAML scaricato!');
+        }
+
+        function generateCodeBehind() {
+            const namespace = document.getElementById('namespace').value;
+            const className = document.getElementById('className').value;
+            
+            const codeBehind = `using System.Windows.Controls;
+
+namespace ${namespace}
+{
+    public partial class ${className} : UserControl
+    {
+        public ${className}()
+        {
+            InitializeComponent();
+        }
+        
+        // Aggiungi qui il tuo codice C#
+    }
+}`;
+            
+            const blob = new Blob([codeBehind], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = className + '.cs';
+            a.click();
+            URL.revokeObjectURL(url);
+            showNotification('File code-behind generato!');
+        }
+
+        function loadExample() {
+            const exampleHtml = `<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body { font-family: 'Segoe UI'; margin: 0; padding: 20px; background: #f5f5f5; }
+        .header { background: linear-gradient(45deg, #007bff, #0056b3); color: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .button { background: #28a745; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Dashboard Principale</h1>
+        <p>Benvenuto nella tua applicazione WPF</p>
+    </div>
+    
+    <div class="grid">
+        <div class="card">
+            <h2>Statistiche</h2>
+            <p>Visualizza le statistiche della tua applicazione</p>
+            <button class="button">Mostra Dettagli</button>
+        </div>
+        
+        <div class="card">
+            <h2>Impostazioni</h2>
+            <p>Configura le preferenze dell'applicazione</p>
+            <button class="button">Apri Impostazioni</button>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Ultimi Eventi</h2>
+        <p>Nessun evento recente da mostrare</p>
+    </div>
+</body>
+</html>`;
+            
+            document.getElementById('htmlInput').value = exampleHtml;
+            showNotification('Esempio caricato!');
+        }
+
+        function clearAll() {
+            document.getElementById('htmlInput').value = '';
+            document.getElementById('xamlOutput').value = '';
+            document.getElementById('htmlPreview').innerHTML = '';
+            document.getElementById('elementCount').textContent = '0';
+            document.getElementById('lineCount').textContent = '0';
+            document.getElementById('conversionTime').textContent = '0ms';
+            showNotification('Tutto pulito!');
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = 'notification show';
+            if (type === 'error') {
+                notification.classList.add('error');
+            }
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Inizializzazione
+        document.addEventListener('DOMContentLoaded', function() {
+            // Carica esempio all'avvio
+            loadExample();
+        });
+    </script>
+</body>
+</html>
