@@ -10,14 +10,9 @@ namespace LeasingManagerLib
     {
         public HelmetTypes HelmetType { get; private set; }
 
-        public Motorbike(string plateNumber, double pricePerDay, HelmetTypes helmetType) : base(plateNumber, pricePerDay)
+        public Motorbike(string plateNumber, double pricePerDay, HelmetTypes helmetType, int discountPercent, int discountDays) : base(plateNumber, pricePerDay, discountPercent, discountDays)
         {
             HelmetType = helmetType;
-        }
-
-        public override double totPrice(int days)
-        {
-            return PricePerDay * days;
         }
 
         public override string Description()

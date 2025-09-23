@@ -8,8 +8,20 @@ namespace LeasingManagerLib
 {
     public class Bike : Vehicle
     {
-        public Bike(string plateNumber, double pricePerDay, int discountPercent, int discountDays) : base(plateNumber, pricePerDay, discountPercent, discountDays)
+        public Bike(string plateNumber, double pricePerDay) : base(plateNumber, pricePerDay)
         {
+        }
+
+        public override double totPrice(int days)
+        {
+            if (days > 7)
+            {
+                return PricePerDay * days * 0.9; // 10% discount for more than 7 days
+            }
+            else
+            {
+                return PricePerDay * days;
+            }
         }
 
         public override string Description()
