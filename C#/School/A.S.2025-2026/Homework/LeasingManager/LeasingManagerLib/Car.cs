@@ -10,16 +10,11 @@ namespace LeasingManagerLib
     {
         public int SeatNumber { get; private set; }
 
-        public Car(string plateNumber, double pricePerDay, int seatNumber) : base(plateNumber, pricePerDay)
+        public Car(string plateNumber, double pricePerDay, int seatNumber, int discountPercent, int discountDays) : base(plateNumber, pricePerDay, discountPercent, discountDays)
         {
-            if(SeatNumber < 1)
-                throw new ArgumentException("illegal car seats")
+            if (seatNumber < 1)
+                throw new ArgumentException("illegal car seats");
             SeatNumber = seatNumber;
-        }
-
-        public override double totPrice(int days)
-        {
-            return PricePerDay * days;
         }
 
         public override string Description()

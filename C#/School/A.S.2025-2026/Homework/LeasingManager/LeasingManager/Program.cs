@@ -6,74 +6,135 @@ public class Program
     public static void Main(string[] args)
     {
         LeasingSystem leasingSystem = new LeasingSystem();
-        bool exit = false;
-        string plate;
 
-        Console.WriteLine("=== SISTEMA DI LEASING VEICOLI ===");
-        Console.WriteLine("Benvenuto nel sistema di gestione leasing veicoli!");
+        // Inizializzazione con dati di esempio
+        leasingSystem.AddVehicle(new Car("CAR001", 50.0, 5, 10, 3));
+        leasingSystem.AddVehicle(new Car("CAR002", 75.0, 7, 15, 5));
+        leasingSystem.AddVehicle(new Bike("BIKE001", 20.0, 5, 2));
+        leasingSystem.AddVehicle(new Bike("BIKE002", 25.0, 10, 3));
+        leasingSystem.AddVehicle(new Motorbike("MOTO001", 80.0, HelmetTypes.FullFace, 20, 4));
+        leasingSystem.AddVehicle(new Motorbike("MOTO002", 100.0, HelmetTypes.HalfHelmet, 25, 5));
 
-        while (!exit)
+        bool running = true;
+
+        while (running)
         {
-            Console.WriteLine("\n=== MENU PRINCIPALE ===");
-            Console.WriteLine("1. Aggiungi nuovo veicolo");
-            Console.WriteLine("2. Cerca veicolo per targa");
-            Console.WriteLine("3. Calcola prezzo leasing");
-            Console.WriteLine("4. Effettua leasing");
-            Console.WriteLine("5. Restituisci veicolo");
-            Console.WriteLine("6. Mostra descrizione veicolo");
-            Console.WriteLine("7. Esci");
+            Console.Clear();
+            Console.WriteLine("=== SISTEMA DI LEASING VEICOLI ===");
+            Console.WriteLine("1. Visualizza tutti i veicoli");
+            Console.WriteLine("2. Aggiungi nuovo veicolo");
+            Console.WriteLine("3. Noleggia un veicolo");
+            Console.WriteLine("4. Restituisci un veicolo");
+            Console.WriteLine("5. Esci");
             Console.Write("Seleziona un'opzione: ");
 
             string choice = Console.ReadLine();
 
             switch (choice)
             {
-                case "1":
-                    Console.WriteLine("\n=== AGGIUNGI NUOVO VEICOLO ===");
-                    Console.WriteLine("Seleziona tipo veicolo:");
-                    Console.WriteLine("1. Auto (Car)");
-                    Console.WriteLine("2. Motociclo (Motorbike)");
-                    Console.WriteLine("3. Bicicletta (Bike)");
-                    Console.Write("Scelta: ");
+                case "1": // Visualizza tutti i veicoli
+                    Console.Clear();
+                    Console.WriteLine("=== ELENCO VEICOLI ===");
 
-                    string typeChoice = Console.ReadLine();
+                    if (leasingSystem.Vehicles.Count == 0)
+                    {
+                        Console.WriteLine("Nessun veicolo disponibile nel sistema.");
+                    }
+                    else
+                    {
+                        foreach (var vehicle in leasingSystem.Vehicles)
+                        {
+                            string status = vehicle.IsAvailable ? "Disponibile" : "Noleggiato";
+                            Console.WriteLine($"{vehicle.Description()} - Stato: {status}");
+                        }
+                    }
+
+                    Console.WriteLine("\nPremi un tasto per tornare al menu...");
+                    Console.ReadKey();
+                    break;
+
+                case "2": // Aggiungi nuovo veicolo
+                    Console.Clear();
+                    Console.WriteLine("=== AGGIUNGI NUOVO VEICOLO ===");
+                    Console.WriteLine("1. Auto");
+                    Console.WriteLine("2. Bicicletta");
+                    Console.WriteLine("3. Motociclo");
+                    Console.WriteLine("4. Annulla");
+                    Console.Write("Seleziona tipo veicolo: ");
+
+                    string vehicleType = Console.ReadLine();
 
                     try
                     {
-                        Console.Write("Inserisci targa: ");
-                        plate = Console.ReadLine();
-
-                        Console.Write("Inserisci prezzo giornaliero: ");
-                        double price = double.Parse(Console.ReadLine());
-
-                        switch (typeChoice)
+                        switch (vehicleType)
                         {
-                            case "1":
+                            case "1": // Auto
+                                Console.Write("Inserisci targa: ");
+                                string carPlate = Console.ReadLine();
+
+                                Console.Write("Inserisci prezzo al giorno: ");
+                                double carPrice = double.Parse(Console.ReadLine());
+
                                 Console.Write("Inserisci numero posti: ");
-                                int seats = int.Parse(Console.ReadLine());
-                                leasingSystem.AddVehicle(new Car(plate, price, seats));
+                                int carSeats = int.Parse(Console.ReadLine());
+
+                                Console.Write("Inserisci percentuale sconto: ");
+                                int carDiscount = int.Parse(Console.ReadLine());
+
+                                Console.Write("Inserisci giorni per sconto: ");
+                                int carDiscountDays = int.Parse(Console.ReadLine());
+
+                                leasingSystem.AddVehicle(new Car(carPlate, carPrice, carSeats, carDiscount, carDiscountDays));
                                 Console.WriteLine("Auto aggiunta con successo!");
                                 break;
 
-                            case "2":
-                                Console.WriteLine("Seleziona tipo casco:");
-                                Console.WriteLine("1. FullFace");
-                                Console.WriteLine("2. OpenFace");
-                                Console.WriteLine("3. HalfHelmet");
-                                Console.Write("Scelta: ");
-                                string helmetChoice = Console.ReadLine();
-                                HelmetTypes helmet = (HelmetTypes)(int.Parse(helmetChoice) - 1);
-                                leasingSystem.AddVehicle(new Motorbike(plate, price, helmet));
-                                Console.WriteLine("Motociclo aggiunto con successo!");
-                                break;
+                            case "2": // Bicicletta
+                                Console.Write("Inserisci targa: ");
+                                string bikePlate = Console.ReadLine();
 
-                            case "3":
-                                leasingSystem.AddVehicle(new Bike(plate, price));
+                                Console.Write("Inserisci prezzo al giorno: ");
+                                double bikePrice = double.Parse(Console.ReadLine());
+
+                                Console.Write("Inserisci percentuale sconto: ");
+                                int bikeDiscount = int.Parse(Console.ReadLine());
+
+                                Console.Write("Inserisci giorni per sconto: ");
+                                int bikeDiscountDays = int.Parse(Console.ReadLine());
+
+                                leasingSystem.AddVehicle(new Bike(bikePlate, bikePrice, bikeDiscount, bikeDiscountDays));
                                 Console.WriteLine("Bicicletta aggiunta con successo!");
                                 break;
 
+                            case "3": // Motociclo
+                                Console.Write("Inserisci targa: ");
+                                string motoPlate = Console.ReadLine();
+
+                                Console.Write("Inserisci prezzo al giorno: ");
+                                double motoPrice = double.Parse(Console.ReadLine());
+
+                                Console.WriteLine("Tipi casco disponibili:");
+                                Console.WriteLine("1. FullFace");
+                                Console.WriteLine("2. HalfHelmet");
+                                Console.WriteLine("3. OpenFace");
+                                Console.Write("Seleziona tipo casco: ");
+
+                                HelmetTypes helmetType = (HelmetTypes)(int.Parse(Console.ReadLine()) - 1);
+
+                                Console.Write("Inserisci percentuale sconto: ");
+                                int motoDiscount = int.Parse(Console.ReadLine());
+
+                                Console.Write("Inserisci giorni per sconto: ");
+                                int motoDiscountDays = int.Parse(Console.ReadLine());
+
+                                leasingSystem.AddVehicle(new Motorbike(motoPlate, motoPrice, helmetType, motoDiscount, motoDiscountDays));
+                                Console.WriteLine("Motociclo aggiunto con successo!");
+                                break;
+
+                            case "4": // Annulla
+                                break;
+
                             default:
-                                Console.WriteLine("Tipo veicolo non valido.");
+                                Console.WriteLine("Scelta non valida.");
                                 break;
                         }
                     }
@@ -81,109 +142,61 @@ public class Program
                     {
                         Console.WriteLine($"Errore: {ex.Message}");
                     }
+
+                    Console.WriteLine("\nPremi un tasto per continuare...");
+                    Console.ReadKey();
                     break;
 
-                case "2":
-                    Console.WriteLine("\n=== CERCA VEICOLO ===");
+                case "3": // Noleggia un veicolo
+                    Console.Clear();
+                    Console.WriteLine("=== NOLEGGIO VEICOLO ===");
                     Console.Write("Inserisci targa veicolo: ");
-                    plate = Console.ReadLine();
+                    string leasePlate = Console.ReadLine();
+
+                    Console.Write("Inserisci numero giorni noleggio: ");
+                    int days = int.Parse(Console.ReadLine());
 
                     try
                     {
-                        Vehicle vehicle = leasingSystem.FindVehicle(plate);
-                        if (vehicle != null)
-                        {
-                            Console.WriteLine("Veicolo trovato:");
-                            Console.WriteLine(vehicle.Description());
-                        }
-                        else
-                        {
-                            Console.WriteLine("Nessun veicolo trovato con questa targa.");
-                        }
+                        leasingSystem.LeaseVehicle(leasePlate, days);
+                        Console.WriteLine("Veicolo noleggiato con successo!");
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Errore: {ex.Message}");
                     }
+
+                    Console.WriteLine("\nPremi un tasto per continuare...");
+                    Console.ReadKey();
                     break;
 
-                case "3":
-                    Console.WriteLine("\n=== CALCOLA PREZZO LEASING ===");
+                case "4": // Restituisci un veicolo
+                    Console.Clear();
+                    Console.WriteLine("=== RESTITUZIONE VEICOLO ===");
                     Console.Write("Inserisci targa veicolo: ");
-                    plate = Console.ReadLine();
-
-                    Console.Write("Inserisci numero giorni: ");
-                    string daysInput = Console.ReadLine();
+                    string returnPlate = Console.ReadLine();
 
                     try
                     {
-                        int days = int.Parse(daysInput);
-                        double price = leasingSystem.CalculateTotalPrice(plate, days);
-                        Console.WriteLine($"Prezzo totale per {days} giorni: {price:C}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Errore: {ex.Message}");
-                    }
-                    break;
-
-                case "4":
-                    Console.WriteLine("\n=== EFFETTUA LEASING ===");
-                    Console.Write("Inserisci targa veicolo: ");
-                    plate = Console.ReadLine();
-
-                    try
-                    {
-                        leasingSystem.LeaseVehicle(plate);
-                        Console.WriteLine("Leasing effettuato con successo!");
-                        Console.WriteLine($"Stato attuale: {leasingSystem.GetVehicleDescription(plate)}");
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Errore: {ex.Message}");
-                    }
-                    break;
-
-                case "5":
-                    Console.WriteLine("\n=== RESTITUISCI VEICOLO ===");
-                    Console.Write("Inserisci targa veicolo: ");
-                    plate = Console.ReadLine();
-
-                    try
-                    {
-                        leasingSystem.ReturnVehicle(plate);
+                        leasingSystem.ReturnVehicle(returnPlate);
                         Console.WriteLine("Veicolo restituito con successo!");
-                        Console.WriteLine($"Stato attuale: {leasingSystem.GetVehicleDescription(plate)}");
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Errore: {ex.Message}");
                     }
+
+                    Console.WriteLine("\nPremi un tasto per continuare...");
+                    Console.ReadKey();
                     break;
 
-                case "6":
-                    Console.WriteLine("\n=== DESCRIZIONE VEICOLO ===");
-                    Console.Write("Inserisci targa veicolo: ");
-                    plate = Console.ReadLine();
-
-                    try
-                    {
-                        string description = leasingSystem.GetVehicleDescription(plate);
-                        Console.WriteLine(description);
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine($"Errore: {ex.Message}");
-                    }
-                    break;
-
-                case "7":
-                    exit = true;
-                    Console.WriteLine("Grazie per aver utilizzato il sistema. Arrivederci!");
+                case "5": // Esci
+                    running = false;
                     break;
 
                 default:
-                    Console.WriteLine("Opzione non valida. Riprova.");
+                    Console.WriteLine("Scelta non valida. Premi un tasto per continuare...");
+                    Console.ReadKey();
                     break;
             }
         }
