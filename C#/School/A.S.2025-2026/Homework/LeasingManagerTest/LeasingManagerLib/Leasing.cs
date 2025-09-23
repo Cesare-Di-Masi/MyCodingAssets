@@ -35,8 +35,9 @@ namespace LeasingManagerLib
 
         public Leasing(Vehicle vehicle, int leaseDays)
         {
-            _vehicle = vehicle;
-            _leaseDays = leaseDays;
+            Vehicle = vehicle;
+            LeaseDays = leaseDays;
+            CalculateTotalPrice();
         }
 
         public double CalculateTotalPrice()

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace LeasingSystemTest
 {
+    [TestClass]
     public class LeasingTest
     {
         private class TestVehicle : Vehicle

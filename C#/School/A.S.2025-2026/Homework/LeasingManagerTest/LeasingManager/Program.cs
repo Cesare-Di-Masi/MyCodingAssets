@@ -158,8 +158,11 @@ public class Program
 
                     try
                     {
+                        Vehicle a = leasingSystem.FindVehicle(leasePlate);
+                        var b = new Leasing(a, days);
                         leasingSystem.LeaseVehicle(leasePlate, days);
                         Console.WriteLine("Veicolo noleggiato con successo!");
+                        Console.WriteLine($"Costo totale: {b.CalculateTotalPrice()} EUR");
                     }
                     catch (Exception ex)
                     {
