@@ -12,6 +12,8 @@ namespace LeasingManagerLib
 
         public Car(string plateNumber, double pricePerDay, int seatNumber) : base(plateNumber, pricePerDay)
         {
+            if(SeatNumber < 1)
+                throw new ArgumentException("illegal car seats")
             SeatNumber = seatNumber;
         }
 

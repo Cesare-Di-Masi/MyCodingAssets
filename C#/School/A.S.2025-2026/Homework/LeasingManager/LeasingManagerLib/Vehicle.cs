@@ -9,6 +9,13 @@
 
         public Vehicle(string plateNumber, double pricePerDay)
         {
+
+            if(String.isWhiteOrNull(plateNumber)==true)
+                throw new ArgumentException("illegal numberplate")
+            
+            if(pricePerDay <= 0.0)
+                throw new ArgumentException("illegal price per day")
+
             PlateNumber = plateNumber;
             PricePerDay = pricePerDay;
         }
