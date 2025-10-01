@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.ValueObject
+namespace Domain.Model.ValueObjects
 {
     public record PhoneNumber
     {
@@ -13,7 +13,11 @@ namespace Domain.ValueObject
         public PhoneNumber(string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                throw new ArgumentNullException("number not valid");
+                throw new ArgumentException("Phone number not valid");
+
+            if (!value.All(char.IsDigit) || value.Length < 7 || value.Length > 15) //atenzione, non c'è il controllo della lunghezza massima
+                throw new ArgumentException("Invalid phone number format");
+
             Value = value;
         }
 

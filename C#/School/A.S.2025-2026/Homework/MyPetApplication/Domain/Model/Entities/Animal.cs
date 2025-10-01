@@ -1,15 +1,23 @@
-﻿namespace Domain.Entities
+﻿using Domain.Model.ValueObjects;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Domain.Model.Entities
 {
     public abstract class Animal
     {
-        protected string _name;
+        private string _name;
 
         public string Name
         {
             get { return _name; }
-            protected set
+            private set
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value))
                     throw new ArgumentNullException("il nome non può essere nullo o vuoto");
                 _name = value;
             }
@@ -53,16 +61,34 @@
         private readonly List<VeterinaryVisit> _visitList;
         public IReadOnlyList<VeterinaryVisit> VisitList => _visitList;
 
+        public Breed? Breed { get; private set; }
+
+        public Birthdate Birthday { get; private set; }
+
         // Costruttore che riceve la lista
         public Animal(string name, List<VeterinaryVisit> visits = null)
         {
             // qui è perfettamente valido assegnare il campo readonly perchè siamo nel costruttore
+            Name = name;
+            for (int i = 0; i < visits?.Count; i++)
+            {
+                if (visits[i].Animal.Equals(this) == false)
+                    throw new ArgumentException("animale sbagliato");
+            }
             _visitList = visits ?? new List<VeterinaryVisit>();
+        }
+
+        public Animal(string name, Birthdate birthdate, Breed breed, List<VeterinaryVisit>? visits = null)
+            : this(name, visits)
+        {
+            Breed = breed;
+            Birthday = birthdate;
         }
 
         public void AddVisit(VeterinaryVisit visit)
         {
             if (visit == null) throw new ArgumentNullException(nameof(visit));
+
             if (visit.Animal.Equals(this))
                 _visitList.Add(visit);
             else throw new ArgumentException("animal wrong");
