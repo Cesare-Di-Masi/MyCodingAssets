@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Model.ValueObjects
+﻿namespace Domain.Model.ValueObjects
 {
     public record FullName
     {
@@ -23,9 +17,9 @@ namespace Domain.Model.ValueObjects
         public override string ToString() => $"{First} {Last}";
 
         /*
-         * I record sono tipi valore o tipi riferimento immutabili progettati per la gestione 
-         * dei dati, il compilatore C# crea automaticamente metodi che rendono i record 
-         * confrontabili in base ai loro valori. 
+         * I record sono tipi valore o tipi riferimento immutabili progettati per la gestione
+         * dei dati, il compilatore C# crea automaticamente metodi che rendono i record
+         * confrontabili in base ai loro valori.
          * Quindi due Fullname saranno uguali quando avrannostesso nome e stesso cognome
          */
     }
