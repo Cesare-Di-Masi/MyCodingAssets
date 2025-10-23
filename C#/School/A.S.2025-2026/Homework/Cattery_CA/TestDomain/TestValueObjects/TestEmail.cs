@@ -1,4 +1,5 @@
 ﻿using Domain.Model.ValueObjects;
+
 namespace TestDomain.TestValueObjects
 {
     [TestClass]

@@ -1,14 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Domain.Model.ValueObjects
+﻿namespace Domain.Model.ValueObjects
 {
     public record CAP
     {
-
         public string Value { get; }
 
         public CAP(string value)
@@ -17,6 +10,5 @@ namespace Domain.Model.ValueObjects
                 throw new ArgumentException("CAP non valido deve essere di 5 cifre.");
             Value = value;
         }
-
     }
 }

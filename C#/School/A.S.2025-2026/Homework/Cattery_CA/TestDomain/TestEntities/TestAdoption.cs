@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Model.Entities;
+﻿using Domain.Model.Entities;
+using Domain.Model.ValueObjects;
 
 namespace TestDomain.TestEntities
 {
@@ -11,14 +7,15 @@ namespace TestDomain.TestEntities
     public class TestAdoption
     {
         private Cat validCat = new Cat("Whiskers", true, DateOnly.FromDateTime(DateTime.Now.AddDays(-50)), DateOnly.FromDateTime(DateTime.Now.AddDays(-100)), null, "A friendly cat.");
+
         private Adopter validAdopter = new Adopter
-            (new Domain.Model.ValueObjects.FullName("Mario", "Rossi"), "RSSMRA85RTY7IPD3", DateOnly.FromDateTime(DateTime.Now.AddYears(-25))
-            , new Domain.Model.ValueObjects.Email("mario.ross@gmail.com)"));
+            (new FullName("Mario", "Rossi"), DateOnly.FromDateTime(DateTime.Now.AddYears(-25)), new TaxIDCode("RSSMRA85RTY7IPD3"), new CAP("00100")
+            , new Email("mario.ross@gmail.com)"));
 
         [TestMethod]
         public void Adoption_InvalidValues_ShouldThrow()
         {
-            Assert.ThrowsException<ArgumentException> (() => new Adoption( DateOnly.FromDateTime(DateTime.Now.AddDays(1)), validCat, validAdopter, null));
+            Assert.ThrowsException<ArgumentException>(() => new Adoption(DateOnly.FromDateTime(DateTime.Now.AddDays(1)), validCat, validAdopter, null));
         }
 
         [TestMethod]
@@ -41,6 +38,5 @@ namespace TestDomain.TestEntities
             adoption.ModifyDescription(newDescription);
             Assert.AreEqual(newDescription, adoption.Description);
         }
-
     }
 }

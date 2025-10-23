@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Model.ValueObjects;
+﻿using Domain.Model.ValueObjects;
 
 namespace TestDomain.TestValueObjects
 {
     [TestClass]
     public class TestCAP
     {
-
         [TestMethod]
         public void CAP_invalidValues_ShouldThrow()
         {
@@ -29,6 +23,5 @@ namespace TestDomain.TestValueObjects
                 Assert.ThrowsException<ArgumentException>(() => new CAP(value), $"Expected exception for value: '{value}'");
             }
         }
-
     }
 }

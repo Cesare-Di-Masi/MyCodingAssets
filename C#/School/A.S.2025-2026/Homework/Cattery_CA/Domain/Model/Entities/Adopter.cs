@@ -4,7 +4,6 @@ namespace Domain.Model.Entities
 {
     public class Adopter
     {
-
         public FullName FullName { get; }
         public DateOnly BirthDate { get; }
         public Email Email { get; }
@@ -12,12 +11,8 @@ namespace Domain.Model.Entities
         public TaxIDCode TaxIDCode { get; }
         public CAP CAP { get; }
 
-
-        public Adopter(FullName fullName, string surname, DateOnly birthDate,TaxIDCode taxIdCode, CAP cap, Email email, PhoneNumber? phoneNumber = null)
+        public Adopter(FullName fullName, DateOnly birthDate, TaxIDCode taxIdCode, CAP cap, Email email, PhoneNumber? phoneNumber = null)
         {
-            if (string.IsNullOrWhiteSpace(surname))
-                throw new ArgumentException("Surname cannot be null or empty.", nameof(surname));
-
             if (birthDate > DateOnly.FromDateTime(DateTime.Now))
                 throw new ArgumentException("Birth date cannot be in the future.", nameof(birthDate));
 
@@ -34,7 +29,7 @@ namespace Domain.Model.Entities
 
         public override bool Equals(object? obj)
         {
-            if(obj == null || !(obj is Adopter))
+            if (obj == null || !(obj is Adopter))
                 return false;
 
             Adopter other = (Adopter)obj;
@@ -44,8 +39,6 @@ namespace Domain.Model.Entities
                    Email.Equals(other.Email) &&
                    ((PhoneNumber == null && other.PhoneNumber == null) ||
                     (PhoneNumber != null && PhoneNumber.Equals(other.PhoneNumber)));
-
         }
-
     }
 }

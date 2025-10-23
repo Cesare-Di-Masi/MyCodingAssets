@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Model.ValueObjects;
+﻿using Domain.Model.ValueObjects;
 
 namespace TestDomain.TestValueObjects
 {
     [TestClass]
     public class TestTaxIDCode
     {
-
         [TestMethod]
         public void TaxIDCode_InvalidValues_ShouldThrow()
         {
@@ -23,6 +17,5 @@ namespace TestDomain.TestValueObjects
             Assert.ThrowsException<ArgumentException>(() => taxIDCode = new TaxIDCode("1234 67890ABCD12")); // Invalid characters
             Assert.ThrowsException<ArgumentException>(() => taxIDCode = new TaxIDCode("1234-67890ABCD12")); // Invalid characters
         }
-
     }
 }

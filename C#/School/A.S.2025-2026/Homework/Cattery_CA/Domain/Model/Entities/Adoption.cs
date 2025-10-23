@@ -10,7 +10,7 @@
 
         public Adoption(DateOnly adoptionDate, Cat cat, Adopter adopter, string? description = null)
         {
-            if(adoptionDate > DateOnly.FromDateTime(DateTime.Now))
+            if (adoptionDate > DateOnly.FromDateTime(DateTime.Now))
                 throw new ArgumentException("Adoption date cannot be in the future.", nameof(adoptionDate));
             AdoptionDate = adoptionDate;
             Cat = cat;
@@ -27,6 +27,5 @@
         {
             return $"Adoption of {Cat.Name} by {Adopter.FullName} on {AdoptionDate}. Description: {Description}";
         }
-
     }
 }

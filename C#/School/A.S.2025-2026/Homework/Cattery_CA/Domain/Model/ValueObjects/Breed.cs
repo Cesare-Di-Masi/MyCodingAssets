@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-
-namespace Domain.Model.ValueObjects
+﻿namespace Domain.Model.ValueObjects
 {
     public record Breed
     {
@@ -16,7 +14,6 @@ namespace Domain.Model.ValueObjects
             if (description == null || string.IsNullOrWhiteSpace(description))
                 Description = "no description";
             this.Name = name;
-            
         }
     }
 }

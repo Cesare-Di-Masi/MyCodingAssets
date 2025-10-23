@@ -4,7 +4,6 @@ namespace Domain.Model.Entities
 {
     public class Cat
     {
-
         private string _name;
         private string _description;
         private Breed _breed;
@@ -12,54 +11,61 @@ namespace Domain.Model.Entities
         private DateOnly _arrivingDate, _birthdate;
         private string _id;
 
-        public string Name 
+        public string Name
         {
-            get { return _name; } 
-            private set 
+            get { return _name; }
+            private set
             {
-                if(string.IsNullOrEmpty(value)||string.IsNullOrWhiteSpace(value) )
+                if (string.IsNullOrEmpty(value) || string.IsNullOrWhiteSpace(value))
                     throw new ArgumentException("Name cannot be null or whitespace.", nameof(value));
-                _name = value; 
+                _name = value;
             }
         }
-        public bool IsMale 
+
+        public bool IsMale
         {
             get { return _isMale; }
             private set { _isMale = value; }
         }
 
-        public DateOnly ArrivingDate 
+        public DateOnly ArrivingDate
         {
             get { return _arrivingDate; }
-            private set 
+            private set
             {
-                if(value > DateOnly.FromDateTime(DateTime.Now))
+                if (value > DateOnly.FromDateTime(DateTime.Now))
                     throw new ArgumentException("Arriving date cannot be in the future.", nameof(value));
-                _arrivingDate = value; }
+                _arrivingDate = value;
+            }
         }
-        public DateOnly? BirthDate 
+
+        public DateOnly? BirthDate
         {
             get { return _birthdate; }
-            private set 
+            private set
             {
-                if(value != null && value > DateOnly.FromDateTime(DateTime.Now))
+                if (value != null && value > DateOnly.FromDateTime(DateTime.Now))
                     throw new ArgumentException("Birth date cannot be in the future.", nameof(value));
-                _birthdate = value ?? default(DateOnly); }
+                _birthdate = value ?? default(DateOnly);
+            }
         }
-        public Breed Breed 
+
+        public Breed Breed
         {
             get { return _breed; }
             private set { _breed = value; }
         }
-        public string? Description 
+
+        public string? Description
         {
             get { return _description; }
             private set { _description = value ?? string.Empty; }
         }
-        public string ID 
-        { 
-            get { return _id; } 
-            private set { _id = value; } 
+
+        public string ID
+        {
+            get { return _id; }
+            private set { _id = value; }
         }
 
         public Cat(string name, bool isMale, DateOnly arrivingDate, DateOnly? birthDate, Breed? breed, string? description)
@@ -108,7 +114,7 @@ namespace Domain.Model.Entities
 
         public void ModifyBirthDate(DateOnly newBirthDate)
         {
-            if(newBirthDate > DateOnly.FromDateTime(DateTime.Now))
+            if (newBirthDate > DateOnly.FromDateTime(DateTime.Now))
                 throw new ArgumentException("Birth date cannot be in the future.", nameof(newBirthDate));
             BirthDate = newBirthDate;
         }
@@ -131,6 +137,5 @@ namespace Domain.Model.Entities
                    Description == other.Description &&
                    ID == other.ID;
         }
-
     }
 }

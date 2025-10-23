@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Application.Dto;
+﻿using Application.Dto;
 using Domain.Model.Entities;
 using Domain.Model.ValueObjects;
 
@@ -13,7 +8,7 @@ namespace Application.Mappers
     {
         public static Cat ToEntity(this CatDto dto)
         {
-            if(dto == null)
+            if (dto == null)
                 throw new ArgumentNullException(nameof(dto));
 
             return new Cat(
@@ -24,12 +19,11 @@ namespace Application.Mappers
                 breed: dto.BreedName != null ? new Breed(dto.BreedName) : null,
                 description: dto.Description
             );
-
         }
 
         public static CatDto ToDto(this Cat entity)
         {
-            if(entity == null)
+            if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
             return new CatDto(
                 Name: entity.Name,

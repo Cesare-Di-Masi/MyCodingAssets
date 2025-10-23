@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Model.Entities;
+﻿using Domain.Model.Entities;
 
 namespace TestDomain.TestEntities
 {
@@ -19,7 +14,6 @@ namespace TestDomain.TestEntities
             Assert.ThrowsException<ArgumentException>(() => cat = new Cat(" ", true, birthdate, arrivingDate, null, ""));
             Assert.ThrowsException<ArgumentException>(() => cat = new Cat("Bob", true, birthdate.AddDays(1), arrivingDate, null, ""));
             Assert.ThrowsException<ArgumentException>(() => cat = new Cat("Bob", true, birthdate, arrivingDate.AddDays(1), null, ""));
-
         }
 
         [TestMethod]
@@ -31,7 +25,6 @@ namespace TestDomain.TestEntities
             Cat cat = new Cat("Whiskers", true, arrivingDate, birthdate, null, "A friendly cat.");
 
             Assert.AreEqual("Whiskers", cat.Name);
-
         }
 
         [TestMethod]
@@ -73,7 +66,6 @@ namespace TestDomain.TestEntities
             string expectedString = $"Whiskers is a male cat, arrived on {arrivingDate}.";
 
             Assert.AreEqual(expectedString, cat.ToString());
-
         }
     }
 }

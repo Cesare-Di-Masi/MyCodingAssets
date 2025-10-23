@@ -1,4 +1,5 @@
 ﻿using Domain.Model.ValueObjects;
+
 namespace TestDomain.TestValueObjects
 {
     [TestClass]
@@ -25,8 +26,7 @@ namespace TestDomain.TestValueObjects
         {
             Breed breed = new Breed("Siamese", null);
             Assert.AreEqual("Siamese", breed.Name);
-            Assert.AreEqual("no description",breed.Description);
+            Assert.AreEqual("no description", breed.Description);
         }
-
     }
 }
