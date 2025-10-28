@@ -26,13 +26,13 @@ namespace Application.Mappers
             if (entity == null)
                 throw new ArgumentNullException(nameof(entity));
             return new AdopterDto(
-                FirstName: entity.FullName.First,
-                LastName: entity.FullName.Last,
-                TaxIDCode: entity.TaxIDCode.Value, // Assuming TaxIDCode is not part of Adopter entity
-                CAP: entity.CAP.Value, // Assuming CAP is not part of Adopter entity
-                PhoneNumber: entity.PhoneNumber?.Value ?? string.Empty,
-                Email: entity.Email.Value,
-                BirthDate: entity.BirthDate
+                entity.FullName.First,
+                entity.FullName.Last,
+                entity.TaxIDCode.Value, // Assuming TaxIDCode is not part of Adopter entity
+                entity.CAP.Value, // Assuming CAP is not part of Adopter entity
+                entity.PhoneNumber?.Value ?? string.Empty,
+                entity.Email.Value,
+                entity.BirthDate
                 );
         }
     }
