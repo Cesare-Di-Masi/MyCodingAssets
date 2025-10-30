@@ -17,7 +17,8 @@ namespace Application.Mappers
                 arrivingDate: dto.ArrivingDate,
                 birthDate: dto.BirthDate,
                 breed: dto.BreedName != null ? new Breed(dto.BreedName) : null,
-                description: dto.Description
+                description: dto.Description,
+                id : dto.Id
             );
         }
 

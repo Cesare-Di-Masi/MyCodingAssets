@@ -8,7 +8,8 @@ namespace Domain.Model.Entities
         private string _description;
         private Breed _breed;
         private bool _isMale;
-        private DateOnly _arrivingDate, _birthdate;
+        private DateOnly _arrivingDate; 
+        private DateOnly?_birthdate;
         private string _id;
 
         public string Name
@@ -44,9 +45,9 @@ namespace Domain.Model.Entities
             get { return _birthdate; }
             private set
             {
-                if (value != null && value > DateOnly.FromDateTime(DateTime.Now))
+                if (value > DateOnly.FromDateTime(DateTime.Now))
                     throw new ArgumentException("Birth date cannot be in the future.", nameof(value));
-                _birthdate = value ?? default(DateOnly);
+                _birthdate = value;
             }
         }
 
@@ -79,15 +80,20 @@ namespace Domain.Model.Entities
             CalculateID();
         }
 
+        public Cat(string name, bool isMale, DateOnly arrivingDate, DateOnly? birthDate, Breed? breed, string? description, string id):this(name, isMale, arrivingDate, birthDate, breed, description)
+        {
+            ID = id;
+        }
+
+
         public Cat()
         {
             Name = "Unnamed";
             IsMale = true;
             ArrivingDate = DateOnly.FromDateTime(DateTime.Now);
-            BirthDate = DateOnly.FromDateTime(DateTime.Now);
+            BirthDate = null;
             Breed = new Breed("no breed");
             Description = "no description";
-            CalculateID();
         }
 
         public override string ToString()
@@ -129,13 +135,7 @@ namespace Domain.Model.Entities
             if (obj == null || !(obj is Cat))
                 return false;
             Cat other = (Cat)obj;
-            return Name == other.Name &&
-                   IsMale == other.IsMale &&
-                   ArrivingDate.Equals(other.ArrivingDate) &&
-                   BirthDate.Equals(other.BirthDate) &&
-                   Breed.Equals(other.Breed) &&
-                   Description == other.Description &&
-                   ID == other.ID;
+            return ID == other.ID;
         }
     }
 }

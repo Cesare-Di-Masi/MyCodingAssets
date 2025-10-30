@@ -27,5 +27,16 @@
         {
             return $"Adoption of {Cat.Name} by {Adopter.FullName} on {AdoptionDate}. Description: {Description}";
         }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj == null || !(obj is Adoption))
+                return false;
+            Adoption other = (Adoption)obj;
+            return AdoptionDate.Equals(other.AdoptionDate) &&
+                   Cat.Equals(other.Cat) &&
+                   Adopter.Equals(other.Adopter);
+        }
+
     }
 }

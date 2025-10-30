@@ -20,6 +20,8 @@ namespace Domain.Model.Entities
             BirthDate = birthDate;
             Email = email;
             PhoneNumber = phoneNumber;
+            TaxIDCode = taxIdCode;
+            CAP = cap;
         }
 
         public override string ToString()

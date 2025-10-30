@@ -67,5 +67,20 @@ namespace TestDomain.TestEntities
 
             Assert.AreEqual(expectedString, cat.ToString());
         }
+
+        [TestMethod]
+        public void GenerateId_ShouldCreate_CorrectFormat()
+        {
+            DateOnly birthdate = DateOnly.FromDateTime(DateTime.Now.AddDays(-100));
+            DateOnly arrivingDate = DateOnly.FromDateTime(DateTime.Now.AddDays(-50));
+            Cat cat = new Cat("Whiskers", true, arrivingDate, birthdate, null, "A friendly cat.");
+            string id = cat.ID;
+            string substr = id.Substring(0, 3);
+            Assert.IsFalse(string.IsNullOrWhiteSpace(id));
+            Assert.AreEqual(13, id.Length);
+            Assert.IsTrue(int.TryParse(substr, out _));
+
+        }
+
     }
 }

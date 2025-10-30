@@ -28,8 +28,8 @@ namespace Application.Mappers
             return new AdopterDto(
                 entity.FullName.First,
                 entity.FullName.Last,
-                entity.TaxIDCode.Value, // Assuming TaxIDCode is not part of Adopter entity
-                entity.CAP.Value, // Assuming CAP is not part of Adopter entity
+                entity.TaxIDCode.Value,
+                entity.CAP.Value,
                 entity.PhoneNumber?.Value ?? string.Empty,
                 entity.Email.Value,
                 entity.BirthDate

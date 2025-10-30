@@ -29,7 +29,7 @@ namespace Application.UseCases
             var existingCat = _catRepository.GetById(cat.Id);
 
             if (existingCat != null)
-                throw new InvalidOperationException($"A cat with the name '{cat.Name}' already exists.");
+                throw new ArgumentException($"A cat with the name '{cat.Name}' already exists.");
             Cat newCat = cat.ToEntity();
 
             _catRepository.Add(newCat);
