@@ -2,6 +2,8 @@
 using Application.Interfaces;
 using Application.Mappers;
 using Domain.Model.Entities;
+using Infrastructure.Dto;
+using Infrastructure.Mapper;
 
 namespace Infrastructure.Repositories
 {
@@ -22,11 +24,11 @@ namespace Infrastructure.Repositories
             }
 
             var json = File.ReadAllText(_filePath);
-            var catDtos = System.Text.Json.JsonSerializer.Deserialize<List<CatDto>>(json);
+            var catDtos = System.Text.Json.JsonSerializer.Deserialize<List<CatPersistenceDto>>(json);
 
-            foreach (var dto in catDtos ?? new List<CatDto>())
+            foreach (var dto in catDtos ?? new List<CatPersistenceDto>())
             {
-                var cat = CatMapper.ToEntity(dto);
+                var cat = dto.ToEntity();
                 _cache[cat.ID] = cat;
             }
 

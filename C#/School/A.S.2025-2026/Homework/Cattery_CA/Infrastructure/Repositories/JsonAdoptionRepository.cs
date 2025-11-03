@@ -2,6 +2,8 @@
 using Application.Interfaces;
 using Application.Mappers;
 using Domain.Model.Entities;
+using Infrastructure.Dto;
+using Infrastructure.Mapper;
 
 namespace Infrastructure.Repositories
 {
@@ -20,11 +22,11 @@ namespace Infrastructure.Repositories
                 return;
             }
             var json = File.ReadAllText(_filePath);
-            var adoptionDtos = System.Text.Json.JsonSerializer.Deserialize<List<AdoptionDto>>(json);
+            var adoptionDtos = System.Text.Json.JsonSerializer.Deserialize<List<AdoptionPersistenceDto>>(json);
 
-            foreach (var dto in adoptionDtos ?? new List<AdoptionDto>())
+            foreach (var dto in adoptionDtos ?? new List<AdoptionPersistenceDto>())
             {
-                var adoption = AdoptionMapper.ToEntity(dto);
+                var adoption = dto.ToEntity();
                 string key = $"{adoption.AdoptionDate.ToString("yyyyMMdd")}_{adoption.Cat.ID}_{adoption.Adopter.TaxIDCode.Value}";
                 _cache[key] = adoption;
             }

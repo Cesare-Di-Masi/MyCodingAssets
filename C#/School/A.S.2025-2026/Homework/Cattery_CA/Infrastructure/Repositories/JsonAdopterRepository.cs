@@ -2,6 +2,8 @@
 using Application.Interfaces;
 using Application.Mappers;
 using Domain.Model.Entities;
+using Infrastructure.Dto;
+using Infrastructure.Mapper;
 
 namespace Infrastructure.Repositories
 {
@@ -22,11 +24,11 @@ namespace Infrastructure.Repositories
             }
 
             var json = File.ReadAllText(_filePath);
-            var adopterDtos = System.Text.Json.JsonSerializer.Deserialize<List<AdopterDto>>(json);
+            var adopterDtos = System.Text.Json.JsonSerializer.Deserialize<List<AdopterPersistenceDto>>(json);
 
-            foreach (var dto in adopterDtos ?? new List<AdopterDto>())
+            foreach (var dto in adopterDtos ?? new List<AdopterPersistenceDto>())
             {
-                var adopter = AdopterMapper.ToEntity(dto);
+                var adopter = dto.ToEntity();
                 _cache[adopter.TaxIDCode.Value] = adopter;
             }
 
