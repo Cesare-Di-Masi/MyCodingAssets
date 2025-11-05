@@ -129,8 +129,5 @@ namespace Application.UseCases
                 throw new InvalidOperationException($"No adopter found with Tax ID '{taxId}'.");
             return adopter.ToString();
         }
-
-
-
     }
 }

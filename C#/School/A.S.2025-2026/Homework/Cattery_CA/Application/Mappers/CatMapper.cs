@@ -16,9 +16,9 @@ namespace Application.Mappers
                 isMale: dto.IsMale,
                 arrivingDate: dto.ArrivingDate,
                 birthDate: dto.BirthDate,
-                breed: dto.BreedName != null ? new Breed(dto.BreedName) : null,
+                breed: dto.BreedName == null ? new Breed("Unknown") : new Breed(dto.BreedName),
                 description: dto.Description,
-                id : dto.Id
+                Id: dto.Id
             );
         }
 

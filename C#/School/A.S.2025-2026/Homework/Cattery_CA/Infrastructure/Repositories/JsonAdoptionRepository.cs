@@ -1,5 +1,4 @@
-﻿using Application.Dto;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Mappers;
 using Domain.Model.Entities;
 using Infrastructure.Dto;
@@ -34,7 +33,12 @@ namespace Infrastructure.Repositories
 
         public void Add(Adoption adoption)
         {
-            throw new NotImplementedException();
+            EnsureLoaded();
+            string key = $"{adoption.AdoptionDate.ToString("yyyyMMdd")}_{adoption.Cat.ID}_{adoption.Adopter.TaxIDCode.Value}";
+            if (_cache.ContainsKey(key))
+                throw new ArgumentException($"An adoption record for cat {adoption.Cat.ID} by adopter {adoption.Adopter.TaxIDCode.Value} on date {adoption.AdoptionDate} already exists.", nameof(adoption));
+            _cache[key] = adoption;
+            SaveToFile();
         }
 
         public IEnumerable<Adoption> GetAll()
@@ -45,27 +49,39 @@ namespace Infrastructure.Repositories
 
         public IEnumerable<Adoption> GetByAdopter(string adopterTaxID)
         {
-            throw new NotImplementedException();
+            EnsureLoaded();
+            return _cache.Values.Where(a => a.Adopter.TaxIDCode.Value == adopterTaxID);
         }
 
         public IEnumerable<Adoption> GetByCat(string catID)
         {
-            throw new NotImplementedException();
+            EnsureLoaded();
+            return _cache.Values.Where(a => a.Cat.ID == catID);
         }
 
         public IEnumerable<Adoption> GetByDate(DateOnly adoptionDate)
         {
-            throw new NotImplementedException();
+            EnsureLoaded();
+            return _cache.Values.Where(a => a.AdoptionDate == adoptionDate);
         }
 
         public void Remove(Adoption adoption)
         {
-            throw new NotImplementedException();
+            EnsureLoaded();
+            string key = $"{adoption.AdoptionDate.ToString("yyyyMMdd")}_{adoption.Cat.ID}_{adoption.Adopter.TaxIDCode.Value}";
+            if (_cache.Remove(key))
+                SaveToFile();
         }
 
         public void Remove(DateOnly adoptionDate)
         {
-            throw new NotImplementedException();
+            EnsureLoaded();
+            var keysToRemove = _cache.Keys.Where(k => k.StartsWith(adoptionDate.ToString("yyyyMMdd"))).ToList();
+            foreach (var key in keysToRemove)
+            {
+                _cache.Remove(key);
+            }
+            SaveToFile();
         }
 
         private void SaveToFile()

@@ -1,19 +1,13 @@
 ﻿using Application.Dto;
+using Application.Mappers;
 using Domain.Model.Entities;
 using Domain.Model.ValueObjects;
-using Application.Mappers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TestApplication.TestMappers
 {
     [TestClass]
     public class TestAdoptionMapper
     {
-
         [TestMethod]
         public void ToEntity_Correct()
         {
@@ -29,7 +23,6 @@ namespace TestApplication.TestMappers
             Adoption entity = new Adoption(new DateOnly(2023, 1, 15), catEntity, adopterEntity, "no description");
 
             Assert.AreEqual(dto.ToEntity(), entity);
-
         }
 
         [TestMethod]
@@ -47,9 +40,6 @@ namespace TestApplication.TestMappers
             Adoption entity = new Adoption(new DateOnly(2023, 1, 15), catEntity, adopterEntity, "no description");
 
             Assert.AreEqual(entity.ToDto(), dto);
-
         }
-
-
     }
 }

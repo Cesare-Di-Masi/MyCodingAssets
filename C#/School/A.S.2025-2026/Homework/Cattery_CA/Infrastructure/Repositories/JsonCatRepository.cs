@@ -1,5 +1,4 @@
-﻿using Application.Dto;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Mappers;
 using Domain.Model.Entities;
 using Infrastructure.Dto;
@@ -25,11 +24,13 @@ namespace Infrastructure.Repositories
 
             var json = File.ReadAllText(_filePath);
             var catDtos = System.Text.Json.JsonSerializer.Deserialize<List<CatPersistenceDto>>(json);
-
-            foreach (var dto in catDtos ?? new List<CatPersistenceDto>())
+            if (_cache.Count >= 1)
             {
-                var cat = dto.ToEntity();
-                _cache[cat.ID] = cat;
+                foreach (var dto in catDtos ?? new List<CatPersistenceDto>())
+                {
+                    var cat = dto.ToEntity();
+                    _cache[cat.ID] = cat;
+                }
             }
 
             _initialized = true;
@@ -86,6 +87,7 @@ namespace Infrastructure.Repositories
 
             if (!_cache.ContainsKey(cat.ID))
                 throw new ArgumentException($"No cat with ID {cat.ID} exists.", nameof(cat));
+            _cache[cat.ID] = cat;
             SaveToFile();
         }
 

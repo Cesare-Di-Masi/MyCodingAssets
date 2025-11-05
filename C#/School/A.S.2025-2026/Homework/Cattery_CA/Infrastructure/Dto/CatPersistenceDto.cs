@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Infrastructure.Dto
+﻿namespace Infrastructure.Dto
 {
     public record CatPersistenceDto
         (
@@ -16,5 +10,4 @@ namespace Infrastructure.Dto
             DateOnly? birthdate,
             string? description
             );
-
 }

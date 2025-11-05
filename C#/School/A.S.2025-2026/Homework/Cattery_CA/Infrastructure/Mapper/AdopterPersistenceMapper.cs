@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Domain.Model.Entities;
+﻿using Domain.Model.Entities;
 using Domain.Model.ValueObjects;
 using Infrastructure.Dto;
 
@@ -11,7 +6,6 @@ namespace Infrastructure.Mapper
 {
     public static class AdopterPersistenceMapper
     {
-
         public static Adopter ToEntity(this AdopterPersistenceDto dto)
         {
             return new Adopter(
@@ -36,7 +30,5 @@ namespace Infrastructure.Mapper
                 entity.BirthDate
                 );
         }
-
-
     }
 }

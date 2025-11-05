@@ -1,5 +1,4 @@
-﻿using Application.Dto;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Mappers;
 using Domain.Model.Entities;
 using Infrastructure.Dto;

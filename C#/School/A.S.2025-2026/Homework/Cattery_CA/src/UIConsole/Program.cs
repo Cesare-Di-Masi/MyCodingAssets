@@ -1,9 +1,10 @@
 ﻿using Application.Dto;
 using Application.UseCases;
 using Infrastructure.Repositories;
-class Program
+
+internal class Program
 {
-    static void Main(string[] args)
+    private static void Main(string[] args)
     {
         var catRepo = new JsonCatRepository();
         var adopterRepo = new JsonAdopterRepository();
@@ -11,20 +12,16 @@ class Program
 
         var service = new CatteryService(catRepo, adopterRepo, adoptionRepo);
 
-        var newCat = new CatDto("test1", true, DateOnly.FromDateTime(DateTime.Now), null, null, "A friendly cat",null);
+        var newCat = new CatDto("test1", true, new DateOnly(2020, 5, 21), null, "friendly cat", "Palico", "12345M2020ASD");
 
         try
-        { 
-        
+        {
             service.RegisterNewCat(newCat);
-            Console.WriteLine("New cat registered successfully.");
-
-            var cat = catRepo.GetByName("test1");
-            Console.WriteLine(cat != null ? $"Retrieved cat: {cat}" : "Cat not found.");
+            Console.WriteLine("Cat registered successfully.");
         }
-            catch(Exception ex) { Console.WriteLine(ex.ToString()); }
-
-
-
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error registering cat: {ex.Message}");
+        }
     }
 }

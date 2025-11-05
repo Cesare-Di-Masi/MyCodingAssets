@@ -79,8 +79,6 @@ namespace TestDomain.TestEntities
             Assert.IsFalse(string.IsNullOrWhiteSpace(id));
             Assert.AreEqual(13, id.Length);
             Assert.IsTrue(int.TryParse(substr, out _));
-
         }
-
     }
 }

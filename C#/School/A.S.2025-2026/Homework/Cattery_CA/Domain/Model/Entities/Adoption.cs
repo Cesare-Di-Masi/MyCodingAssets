@@ -37,6 +37,5 @@
                    Cat.Equals(other.Cat) &&
                    Adopter.Equals(other.Adopter);
         }
-
     }
 }

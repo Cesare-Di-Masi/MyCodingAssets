@@ -8,8 +8,8 @@ namespace Domain.Model.Entities
         private string _description;
         private Breed _breed;
         private bool _isMale;
-        private DateOnly _arrivingDate; 
-        private DateOnly?_birthdate;
+        private DateOnly _arrivingDate;
+        private DateOnly? _birthdate;
         private string _id;
 
         public string Name
@@ -69,7 +69,7 @@ namespace Domain.Model.Entities
             private set { _id = value; }
         }
 
-        public Cat(string name, bool isMale, DateOnly arrivingDate, DateOnly? birthDate, Breed? breed, string? description)
+        public Cat(string name, bool isMale, DateOnly arrivingDate, DateOnly? birthDate, Breed? breed, string? description, string? Id = null)
         {
             Name = name;
             IsMale = isMale;
@@ -77,14 +77,13 @@ namespace Domain.Model.Entities
             BirthDate = birthDate;
             Breed = breed ?? new Breed("no breed");
             Description = description ?? "no description";
+            if (Id != null)
+            {
+                ID = Id;
+                return;
+            }
             CalculateID();
         }
-
-        public Cat(string name, bool isMale, DateOnly arrivingDate, DateOnly? birthDate, Breed? breed, string? description, string id):this(name, isMale, arrivingDate, birthDate, breed, description)
-        {
-            ID = id;
-        }
-
 
         public Cat()
         {
