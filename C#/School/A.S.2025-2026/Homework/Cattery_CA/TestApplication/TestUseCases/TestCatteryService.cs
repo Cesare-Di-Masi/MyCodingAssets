@@ -12,7 +12,7 @@ namespace TestApplication.TestUseCases
         {
             IAdopterRepository adopterRepository = null;
             ICatRepository catRepository = null;
-            IAdoptionInterface adoptionRepository = null;
+            IAdoptionRepository adoptionRepository = null;
             CatteryService catteryService = new CatteryService(catRepository, adopterRepository, adoptionRepository);
             DateOnly birthdate = DateOnly.FromDateTime(DateTime.Now.AddDays(-25));
             DateOnly arrivingDate = DateOnly.FromDateTime(DateTime.Now);

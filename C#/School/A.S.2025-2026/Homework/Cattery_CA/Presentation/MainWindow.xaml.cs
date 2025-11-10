@@ -1,13 +1,6 @@
-﻿using System.Text;
+﻿using Application.UseCases;
+using Infrastructure.Repositories;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Presentation
 {
@@ -16,12 +9,26 @@ namespace Presentation
     /// </summary>
     public partial class MainWindow : Window
     {
+        public CatteryService CatteryService = new CatteryService(new JsonCatRepository(), new JsonAdopterRepository(), new JsonAdoptionRepository());
+
         public MainWindow()
         {
             InitializeComponent();
+            Update();
         }
 
-        
+        private void Update()
+        {
+            TxTBlockCatCount.Text = CatteryService.GetTotalCatsCount().ToString();
+            TxTBlockFemalesCatCount.Text = CatteryService.GetFemaleCatsCount().ToString();
+            TxTBlockMalesCatCount.Text = CatteryService.GetMaleCatsCount().ToString();
+        }
 
+        private void BtnMenuCat_Add_Click(object sender, RoutedEventArgs e)
+        {
+            var addCatWindow = new AddCatWindow(CatteryService);
+            addCatWindow.Show();
+            this.Close();
+        }
     }
 }

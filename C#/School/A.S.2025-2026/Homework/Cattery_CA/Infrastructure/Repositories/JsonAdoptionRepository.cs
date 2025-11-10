@@ -6,7 +6,7 @@ using Infrastructure.Mapper;
 
 namespace Infrastructure.Repositories
 {
-    public class JsonAdoptionRepository : IAdoptionInterface
+    public class JsonAdoptionRepository : IAdoptionRepository
     {
         private readonly string _filePath = "adoptions.json";
         private readonly Dictionary<string, Adoption> _cache = new Dictionary<string, Adoption>();

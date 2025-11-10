@@ -9,12 +9,12 @@ namespace Application.UseCases
     {
         private readonly ICatRepository _catRepository;
         private readonly IAdopterRepository _adopterRepository;
-        private readonly IAdoptionInterface _adoptionRepository;
+        private readonly IAdoptionRepository _adoptionRepository;
 
         public CatteryService(
             ICatRepository catRepository,
             IAdopterRepository adopterRepository,
-            IAdoptionInterface adoptionRepository)
+            IAdoptionRepository adoptionRepository)
         {
             _catRepository = catRepository;
             _adopterRepository = adopterRepository;
@@ -26,11 +26,12 @@ namespace Application.UseCases
             if (string.IsNullOrWhiteSpace(cat.Name))
                 throw new ArgumentException("Cat name cannot be empty.", nameof(cat));
 
-            var existingCat = _catRepository.GetById(cat.Id);
+            Cat newCat = cat.ToEntity();
+
+            var existingCat = _catRepository.GetById(newCat.ID);
 
             if (existingCat != null)
                 throw new ArgumentException($"A cat with the name '{cat.Name}' already exists.");
-            Cat newCat = cat.ToEntity();
 
             _catRepository.Add(newCat);
         }
@@ -39,22 +40,24 @@ namespace Application.UseCases
         {
             if (string.IsNullOrWhiteSpace(adopter.TaxIDCode))
                 throw new ArgumentException("Adopter Tax ID Code cannot be empty.", nameof(adopter));
+            var newAdopter = adopter.ToEntity();
             var existingAdopter = _adopterRepository.GetByTaxIDCode(adopter.TaxIDCode);
             if (existingAdopter != null)
                 throw new InvalidOperationException($"An adopter with the Tax ID '{adopter.TaxIDCode}' already exists.");
-            var newAdopter = adopter.ToEntity();
+
             _adopterRepository.Add(newAdopter);
         }
 
         public void RegisterNewAdoption(AdoptionDto adoption)
         {
+            var newAdoption = adoption.ToEntity();
             var cat = _catRepository.GetById(adoption.Cat.Id);
             if (cat == null)
                 throw new InvalidOperationException($"No cat found with ID '{adoption.Cat.Id}'.");
             var adopter = _adopterRepository.GetByTaxIDCode(adoption.Adopter.TaxIDCode);
             if (adopter == null)
                 throw new InvalidOperationException($"No adopter found with Tax ID '{adoption.Adopter.TaxIDCode}'.");
-            var newAdoption = adoption.ToEntity();
+
             _adoptionRepository.Add(newAdoption);
         }
 
@@ -128,6 +131,21 @@ namespace Application.UseCases
             if (adopter == null)
                 throw new InvalidOperationException($"No adopter found with Tax ID '{taxId}'.");
             return adopter.ToString();
+        }
+
+        public int GetFemaleCatsCount()
+        {
+            return _catRepository.GetAll().Count(cat => cat.IsMale == false);
+        }
+
+        public int GetMaleCatsCount()
+        {
+            return _catRepository.GetAll().Count(cat => cat.IsMale == true);
+        }
+
+        public int GetTotalCatsCount()
+        {
+            return _catRepository.GetAll().Count();
         }
     }
 }

@@ -77,12 +77,12 @@ namespace Domain.Model.Entities
             BirthDate = birthDate;
             Breed = breed ?? new Breed("no breed");
             Description = description ?? "no description";
-            if (Id != null)
+            if (Id != null || !string.IsNullOrWhiteSpace(Id)|| !string.IsNullOrEmpty(Id))
             {
                 ID = Id;
-                return;
             }
-            CalculateID();
+            else
+                CalculateID();
         }
 
         public Cat()

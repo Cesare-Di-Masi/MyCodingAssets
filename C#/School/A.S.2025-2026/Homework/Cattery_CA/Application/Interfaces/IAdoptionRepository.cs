@@ -2,7 +2,7 @@
 
 namespace Application.Interfaces
 {
-    public interface IAdoptionInterface
+    public interface IAdoptionRepository
     {
         void Add(Adoption adoption);
 
