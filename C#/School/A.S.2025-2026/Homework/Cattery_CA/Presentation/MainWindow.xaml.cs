@@ -17,6 +17,12 @@ namespace Presentation
             Update();
         }
 
+        public MainWindow(CatteryService cattery)
+        {
+            InitializeComponent();
+            Update();
+        }
+
         private void Update()
         {
             TxTBlockCatCount.Text = CatteryService.GetTotalCatsCount().ToString();
@@ -30,5 +36,13 @@ namespace Presentation
             addCatWindow.Show();
             this.Close();
         }
+
+        private void BtnMenuCat_Manage_Click(object sender, RoutedEventArgs e)
+        {
+            var catManageWindow = new AddCatWindow(CatteryService);
+            catManageWindow.Show();
+            this.Close();
+        }
+
     }
 }

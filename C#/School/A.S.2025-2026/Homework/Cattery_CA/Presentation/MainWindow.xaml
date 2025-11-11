@@ -26,7 +26,7 @@
                 <Menu DockPanel.Dock="Top" Background="#27AE60" Foreground="Black" FontWeight="Bold">
                     <MenuItem Header="Cats">
                         <MenuItem Header="Add" Click="BtnMenuCat_Add_Click" />
-                        <MenuItem Header="View All" />
+                        <MenuItem Header="View All" Click="BtnMenuCat_Manage_Click" />
                     </MenuItem>
                     <MenuItem Header="_Adoption">
                         <MenuItem Header="Adopt" />
@@ -55,17 +55,17 @@
         <!-- Corpo -->
         <StackPanel Grid.Row="2" Margin="40,20,0,0">
             <StackPanel Orientation="Horizontal" Margin="0,10">
-                <TextBlock Text="Numero di gatti:" FontSize="18" Foreground="White" Width="180" />
+                <TextBlock Text="Number of Cats:" FontSize="18" Foreground="White" Width="180" />
                 <TextBlock x:Name="TxTBlockCatCount" Text="12" FontSize="18" Foreground="White" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,10">
-                <TextBlock Text="Maschi:" FontSize="18" Foreground="White" Width="180" />
+                <TextBlock Text="MMale Cats:" FontSize="18" Foreground="White" Width="180" />
                 <TextBlock x:Name="TxTBlockMalesCatCount"  Text="7" FontSize="18" Foreground="White" />
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,10">
-                <TextBlock Text="Femmine:" FontSize="18" Foreground="White" Width="180" />
+                <TextBlock Text="Female Cats:" FontSize="18" Foreground="White" Width="180" />
                 <TextBlock x:Name="TxTBlockFemalesCatCount" Text="1" FontSize="18" Foreground="White" />
             </StackPanel>
         </StackPanel>
