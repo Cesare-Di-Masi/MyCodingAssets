@@ -25,6 +25,8 @@ namespace Infrastructure.Repositories
 
             foreach (var dto in adoptionDtos ?? new List<AdoptionPersistenceDto>())
             {
+                if (dto.adopterTax == null || dto.cat.id == null)
+                    continue;
                 var adoption = dto.ToEntity();
                 string key = $"{adoption.AdoptionDate.ToString("yyyyMMdd")}_{adoption.Cat.ID}_{adoption.Adopter.TaxIDCode.Value}";
                 _cache[key] = adoption;

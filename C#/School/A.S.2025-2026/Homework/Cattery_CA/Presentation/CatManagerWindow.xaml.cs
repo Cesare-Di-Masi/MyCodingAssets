@@ -29,5 +29,17 @@ namespace Presentation
             CatteryService = cattery;
             dgCats.ItemsSource = CatteryService.ViewAllCats();
         }
+
+        public void BtnBackToMain_Click(object sender, RoutedEventArgs e)
+        {
+            var mainWindow = new MainWindow(CatteryService);
+            mainWindow.Show();
+            this.Close();
+        }
+
+        public void BtnRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            dgCats.ItemsSource = CatteryService.ViewAllCats();
+        }
     }
 }

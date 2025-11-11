@@ -9,23 +9,29 @@ namespace Presentation
     /// </summary>
     public partial class MainWindow : Window
     {
-        public CatteryService CatteryService = new CatteryService(new JsonCatRepository(), new JsonAdopterRepository(), new JsonAdoptionRepository());
+        public CatteryService CatteryService;
+        private JsonAdopterRepository JsonAdopterRepository = new JsonAdopterRepository();
+        private JsonCatRepository JsonCatRepository = new JsonCatRepository();
+        private JsonAdoptionRepository JsonAdoptionRepository = new JsonAdoptionRepository();
 
         public MainWindow()
         {
             InitializeComponent();
+
+            CatteryService = new CatteryService(JsonCatRepository, JsonAdopterRepository, JsonAdoptionRepository);
             Update();
         }
 
         public MainWindow(CatteryService cattery)
         {
             InitializeComponent();
+            CatteryService = cattery;
             Update();
         }
 
         private void Update()
-        {
-            TxTBlockCatCount.Text = CatteryService.GetTotalCatsCount().ToString();
+        {|
+            TxTBlockCatCount.Text = CatteryService.GetFemaleCatsCount().ToString();
             TxTBlockFemalesCatCount.Text = CatteryService.GetFemaleCatsCount().ToString();
             TxTBlockMalesCatCount.Text = CatteryService.GetMaleCatsCount().ToString();
         }
@@ -39,10 +45,9 @@ namespace Presentation
 
         private void BtnMenuCat_Manage_Click(object sender, RoutedEventArgs e)
         {
-            var catManageWindow = new AddCatWindow(CatteryService);
+            var catManageWindow = new CatManagerWindow(CatteryService);
             catManageWindow.Show();
             this.Close();
         }
-
     }
 }

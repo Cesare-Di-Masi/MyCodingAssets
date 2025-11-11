@@ -69,9 +69,15 @@ namespace Application.UseCases
             return cat.ToString();
         }
 
-        public List<Cat> ViewAllCats()
+        public List<CatDto> ViewAllCats()
         {
-            return _catRepository.GetAll().ToList();
+            List<Cat> cats = _catRepository.GetAll().ToList();
+            List<CatDto> dtos = new List<CatDto>();
+            for (int i = 0; i < cats.Count(); i++)
+            {
+                dtos.Add(cats[i].ToDto());
+            }
+            return dtos;
         }
 
         public void RemoveCat(string id)

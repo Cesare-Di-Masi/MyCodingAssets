@@ -6,60 +6,200 @@
         xmlns:local="clr-namespace:Presentation"
         mc:Ignorable="d"
         Title="CatManagerWindow" Height="450" Width="800" Background="#2B2B2B">
-    
-        <Window.Resources>
-            <Style TargetType="MenuItem">
-                <Setter Property="Foreground" Value="Black" />
-                <Setter Property="FontWeight" Value="Bold" />
-            </Style>
-        </Window.Resources>
 
-        <Grid>
+    <Window.Resources>
+        <Style TargetType="MenuItem">
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="FontWeight" Value="Bold" />
+        </Style>
+    </Window.Resources>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <!-- Menu -->
-                <RowDefinition Height="5" />
-                <!-- Titolo -->
-                <RowDefinition Height="*" />
-                <!-- Corpo -->
-            </Grid.RowDefinitions>
+    <Grid>
 
-            <!-- Rettangolo Verde con Menu -->
-            <Border Grid.Row="0" Background="#2ECC71" Padding="10"
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <!-- Menu -->
+            <RowDefinition Height="5" />
+            <!-- Titolo -->
+            <RowDefinition Height="*" />
+            <!-- Corpo -->
+        </Grid.RowDefinitions>
+
+        <!-- Rettangolo Verde con Menu -->
+        <Border Grid.Row="0" Background="#2ECC71" Padding="10"
      CornerRadius="0,0,6,6">
-                <DockPanel>
-                    <Menu DockPanel.Dock="Top" Background="#27AE60" Foreground="Black" FontWeight="Bold">
-                        <MenuItem Header="Cats">
-                            <MenuItem Header="Add" />
-                            <MenuItem Header="See All" />
-                        </MenuItem>
-                        <MenuItem Header="_Adoption">
-                            <MenuItem Header="Adopt" />
-                            <MenuItem Header="See All" />
-                        </MenuItem>
-                        <MenuItem Header="_Account">
-                            <MenuItem Header="Guida" />
-                            <MenuItem Header="Informazioni su..." />
-                        </MenuItem>
-                    </Menu>
-                </DockPanel>
-            </Border>
+            <DockPanel>
+                <Menu DockPanel.Dock="Top" Background="#27AE60" Foreground="Black" FontWeight="Bold">
+                    <MenuItem Header="Cats">
+                        <MenuItem Header="Add" />
+                        <MenuItem Header="See All" />
+                    </MenuItem>
+                    <MenuItem Header="_Adoption">
+                        <MenuItem Header="Adopt" />
+                        <MenuItem Header="See All" />
+                    </MenuItem>
+                    <MenuItem Header="_Account">
+                        <MenuItem Header="Guida" />
+                        <MenuItem Header="Informazioni su..." />
+                    </MenuItem>
+                </Menu>
+            </DockPanel>
+        </Border>
 
-        <DataGrid x:Name="dgCats" AutoGenerateColumns="False" MaxHeight="300" Margin="0,0,265,358" Grid.RowSpan="2" Grid.Row="1" >
+        <DataGrid x:Name="dgCats"
+          AutoGenerateColumns="False"
+          MaxHeight="300"
+          Margin="20,20,20,80"
+          Grid.RowSpan="2"
+          Grid.Row="1"
+          Background="#333333"
+          Foreground="White"
+          RowBackground="#3C3C3C"
+          AlternatingRowBackground="#2E2E2E"
+          BorderBrush="#27AE60"
+          BorderThickness="1"
+          GridLinesVisibility="None"
+          HeadersVisibility="Column"
+          HorizontalGridLinesBrush="#27AE60"
+          VerticalGridLinesBrush="#27AE60"
+          FontFamily="Segoe UI"
+          FontSize="14"
+          RowHeight="30"
+          SelectionMode="Single"
+          SelectionUnit="FullRow"
+          CanUserAddRows="False"
+          CanUserDeleteRows="False"
+          CanUserResizeRows="False"
+          IsReadOnly="True">
+
+            <DataGrid.Resources>
+                <!-- Header Style -->
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#27AE60" />
+                    <Setter Property="Foreground" Value="Black" />
+                    <Setter Property="FontWeight" Value="Bold" />
+                    <Setter Property="FontSize" Value="14" />
+                    <Setter Property="Height" Value="35" />
+                    <Setter Property="BorderBrush" Value="#2ECC71" />
+                    <Setter Property="BorderThickness" Value="0,0,1,1" />
+                </Style>
+
+                <!-- Row Hover Effect -->
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Cursor" Value="Hand" />
+                    <Setter Property="Background" Value="#3C3C3C" />
+                    <Setter Property="Foreground" Value="White" />
+                    <Setter Property="BorderThickness" Value="0" />
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#27AE60" />
+                            <Setter Property="Foreground" Value="Black" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#2ECC71" />
+                            <Setter Property="Foreground" Value="Black" />
+                            <Setter Property="FontWeight" Value="Bold" />
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.Resources>
+
             <DataGrid.Columns>
                 <DataGridTextColumn Header="ID" Binding="{Binding Id}" />
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}" IsReadOnly="True"/>
-                <DataGridCheckBoxColumn Header="IsMale" Binding="{Binding IsMale}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Arrived in" Binding="{Binding ArrivingDate, StringFormat={}{0:dd/MM/yyyy}}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Born in" Binding="{Binding BirthDate,StringFormat={}{0:dd/MM/yyyy}, TargetNullValue='Not Adopted'}" IsReadOnly="True" />
-                <DataGridTextColumn Header="Description" Binding="{Binding Description, TargetNullValue='no description'}" IsReadOnly="True" />
-                <DataGridTextColumn Header="Breed" Binding="{Binding BreedName, TargetNullValue='no breed'}" IsReadOnly="True" />
-
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}" />
+                <DataGridCheckBoxColumn Header="IsMale" Binding="{Binding IsMale}" />
+                <DataGridTextColumn Header="Arrived in" Binding="{Binding ArrivingDate, StringFormat={}{0:dd/MM/yyyy}}" />
+                <DataGridTextColumn Header="Born in" Binding="{Binding BirthDate,StringFormat={}{0:dd/MM/yyyy}, TargetNullValue='Not Adopted'}" />
+                <DataGridTextColumn Header="Description" Binding="{Binding Description, TargetNullValue='no description'}" />
+                <DataGridTextColumn Header="Breed" Binding="{Binding BreedName, TargetNullValue='no breed'}" />
             </DataGrid.Columns>
-            
-
         </DataGrid>
 
+        <Button Content="ADD CAT"
+            Width="140" Height="40"
+            FontWeight="Bold"
+            FontFamily="Segoe UI"
+            Background="#27AE60"
+            Foreground="Black"
+            BorderThickness="0"
+            Cursor="Hand"
+            Margin="640,326,20,23" Grid.Row="2">
+            <Button.Triggers>
+                <EventTrigger RoutedEvent="MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                        To="#2ECC71" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                        To="#27AE60" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Button.Triggers>
+        </Button>
+
+        <!-- Pulsante Grigio (Modifica) -->
+        <Button Content="EDIT"
+            Width="140" Height="40"
+            FontWeight="Bold"
+            FontFamily="Segoe UI"
+            Background="#444444"
+            Foreground="White"
+            BorderThickness="0"
+            Cursor="Hand" Margin="330,326,330,23" Grid.Row="2">
+            <Button.Triggers>
+                <EventTrigger RoutedEvent="MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                        To="#555555" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                        To="#444444" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Button.Triggers>
+        </Button>
+
+        <!-- Pulsante Rosso (Rimuovi) -->
+        <Button Content="REMOVE"
+            Width="140" Height="40"
+            FontWeight="Bold"
+            FontFamily="Segoe UI"
+            Background="#C0392B"
+            Foreground="White"
+            BorderThickness="0"
+            Cursor="Hand" Margin="20,327,640,24" Grid.Row="2">
+            <Button.Triggers>
+                <EventTrigger RoutedEvent="MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                        To="#E74C3C" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <ColorAnimation Storyboard.TargetProperty="(Button.Background).(SolidColorBrush.Color)"
+                                        To="#C0392B" Duration="0:0:0.1" />
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+            </Button.Triggers>
+        </Button>
     </Grid>
 </Window>

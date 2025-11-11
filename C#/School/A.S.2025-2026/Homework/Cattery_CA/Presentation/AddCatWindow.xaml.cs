@@ -44,6 +44,7 @@ namespace Presentation
             }
 
             MessageBox.Show("Cat added successfully!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+            BackToMain();
         }
 
         public void BtnClearCat_Click(object sender, RoutedEventArgs e)
@@ -54,6 +55,13 @@ namespace Presentation
             DatePickerBirthdate.SelectedDate = null;
             TxTBoxDescription.Clear();
             TxTBoxBreed.Clear();
+        }
+
+        private void BackToMain()
+        {
+            var mainWindow = new MainWindow(CatteryService);
+            mainWindow.Show();
+            this.Close();
         }
     }
 }

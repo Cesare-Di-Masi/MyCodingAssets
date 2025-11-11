@@ -14,5 +14,16 @@ namespace Infrastructure.Mapper
                 dto.description
                 );
         }
+
+        public static AdoptionPersistenceDto ToDto(this Adoption entity)
+        {
+            return new AdoptionPersistenceDto
+            (
+                adoptionDate: entity.AdoptionDate,
+                cat: entity.Cat.ToDto(),
+                adopterTax: entity.Adopter.ToDto(),
+                description: entity.Description
+            );
+        }
     }
 }

@@ -18,7 +18,7 @@ namespace Infrastructure.Mapper
                 );
         }
 
-        public static AdopterPersistenceDto toDto(this Adopter entity)
+        public static AdopterPersistenceDto ToDto(this Adopter entity)
         {
             return new AdopterPersistenceDto(
                 entity.FullName.First,

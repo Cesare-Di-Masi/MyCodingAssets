@@ -33,8 +33,8 @@
                         <MenuItem Header="View All" />
                     </MenuItem>
                     <MenuItem Header="_Adopters">
-                        <MenuItem Header="Guida" />
-                        <MenuItem Header="Informazioni su..." />
+                        <MenuItem Header="Register" />
+                        <MenuItem Header="View All" />
                     </MenuItem>
                 </Menu>
             </DockPanel>
@@ -60,7 +60,7 @@
             </StackPanel>
 
             <StackPanel Orientation="Horizontal" Margin="0,10">
-                <TextBlock Text="MMale Cats:" FontSize="18" Foreground="White" Width="180" />
+                <TextBlock Text="Male Cats:" FontSize="18" Foreground="White" Width="180" />
                 <TextBlock x:Name="TxTBlockMalesCatCount"  Text="7" FontSize="18" Foreground="White" />
             </StackPanel>
 

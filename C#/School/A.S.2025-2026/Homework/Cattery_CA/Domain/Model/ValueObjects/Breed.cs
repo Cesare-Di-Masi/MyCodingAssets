@@ -10,7 +10,7 @@
         {
             this.Description = description;
             if (string.IsNullOrWhiteSpace(name))
-                throw new ArgumentException("name cannot be null or whitespace", nameof(name));
+                name = "Unknown";
             if (description == null || string.IsNullOrWhiteSpace(description))
                 Description = "no description";
             this.Name = name;

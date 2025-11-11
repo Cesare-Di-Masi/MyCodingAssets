@@ -1,5 +1,4 @@
 ﻿using Application.Interfaces;
-using Application.Mappers;
 using Domain.Model.Entities;
 using Infrastructure.Dto;
 using Infrastructure.Mapper;
@@ -24,12 +23,13 @@ namespace Infrastructure.Repositories
 
             var json = File.ReadAllText(_filePath);
             var catDtos = System.Text.Json.JsonSerializer.Deserialize<List<CatPersistenceDto>>(json);
-            if (_cache.Count >= 1)
+
+            if (catDtos is { Count: > 0 })
             {
-                foreach (var dto in catDtos ?? new List<CatPersistenceDto>())
+                foreach (var dto in catDtos)
                 {
-                    var cat = dto.ToEntity();
-                    _cache[cat.ID] = cat;
+                    if (!string.IsNullOrWhiteSpace(dto.id))
+                        _cache[dto.id] = dto.ToEntity();
                 }
             }
 
@@ -93,7 +93,7 @@ namespace Infrastructure.Repositories
 
         private void SaveToFile()
         {
-            var catDtos = _cache.Values.Select(cat => CatMapper.ToDto(cat)).ToList();
+            var catDtos = _cache.Values.Select(cat => CatPersistenceMapper.ToDto(cat)).ToList();
             var json = System.Text.Json.JsonSerializer.Serialize(catDtos, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
             File.WriteAllText(_filePath, json);
         }
