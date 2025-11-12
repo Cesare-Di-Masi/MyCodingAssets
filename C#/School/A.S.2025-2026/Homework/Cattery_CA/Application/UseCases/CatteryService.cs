@@ -36,6 +36,17 @@ namespace Application.UseCases
             _catRepository.Add(newCat);
         }
 
+        public void UpdateCat(CatDto cat)
+        {
+            var existingCat = _catRepository.GetById(cat.Id);
+            if (existingCat == null)
+                throw new InvalidOperationException($"No cat found with ID '{cat.Id}'.");
+
+            Cat catEntity = cat.ToEntity();
+
+            _catRepository.Update(catEntity);
+        }
+
         public void RegisterNewAdopter(AdopterDto adopter)
         {
             if (string.IsNullOrWhiteSpace(adopter.TaxIDCode))

@@ -17,7 +17,6 @@ namespace Presentation
         public MainWindow()
         {
             InitializeComponent();
-
             CatteryService = new CatteryService(JsonCatRepository, JsonAdopterRepository, JsonAdoptionRepository);
             Update();
         }
@@ -30,8 +29,8 @@ namespace Presentation
         }
 
         private void Update()
-        {|
-            TxTBlockCatCount.Text = CatteryService.GetFemaleCatsCount().ToString();
+        {
+            TxTBlockCatCount.Text = CatteryService.GetTotalCatsCount().ToString();
             TxTBlockFemalesCatCount.Text = CatteryService.GetFemaleCatsCount().ToString();
             TxTBlockMalesCatCount.Text = CatteryService.GetMaleCatsCount().ToString();
         }
