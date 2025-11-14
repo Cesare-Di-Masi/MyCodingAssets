@@ -37,6 +37,12 @@ namespace Presentation
             this.Close();
         }
 
+        public void BtnSeeAllCats_Click(object sender, RoutedEventArgs e)
+        {
+            dgCats.ItemsSource = CatteryService.ViewAllCats();
+        }
+
+      
         public void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             dgCats.ItemsSource = CatteryService.ViewAllCats();

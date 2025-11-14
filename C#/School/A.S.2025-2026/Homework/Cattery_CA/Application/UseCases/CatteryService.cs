@@ -164,5 +164,13 @@ namespace Application.UseCases
         {
             return _catRepository.GetAll().Count();
         }
+
+        public void DeleteCat(string id)
+        {
+            var cat = _catRepository.GetById(id);
+            if (cat == null)
+                throw new InvalidOperationException($"No cat found with ID '{id}'.");
+            _catRepository.Remove(id);
+        }
     }
 }

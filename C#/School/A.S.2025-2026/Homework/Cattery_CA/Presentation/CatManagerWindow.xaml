@@ -36,12 +36,12 @@
                         <MenuItem Header="See All" Click="BtnSeeAllCats_Click" />
                     </MenuItem>
                     <MenuItem Header="_Adoption">
-                        <MenuItem Header="Adopt" Click="BtnAdoptCat_Click" />
-                        <MenuItem Header="See All" Click="BtnSeeAllAdoptions_Click" />
+                        <MenuItem Header="Adopt"  />
+                        <MenuItem Header="See All"  />
                     </MenuItem>
                     <MenuItem Header="_Adopters">
-                        <MenuItem Header="Register" Click="BtnRegisterAdopter_Click" />
-                        <MenuItem Header="See all" Click="BtnSeeAllAdopters_Click" />
+                        <MenuItem Header="Register"  />
+                        <MenuItem Header="See all" />
                     </MenuItem>
                 </Menu>
             </DockPanel>
