@@ -15,33 +15,28 @@
     </Window.Resources>
 
     <Grid>
-
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <!-- Menu -->
-            <RowDefinition Height="5" />
-            <!-- Titolo -->
+            <RowDefinition Height="100" />
             <RowDefinition Height="*" />
-            <!-- Corpo -->
         </Grid.RowDefinitions>
 
         <!-- Rettangolo Verde con Menu -->
         <Border Grid.Row="0" Background="#2ECC71" Padding="10"
-     CornerRadius="0,0,6,6">
+         CornerRadius="0,0,6,6">
             <DockPanel>
                 <Menu DockPanel.Dock="Top" Background="#27AE60" Foreground="Black" FontWeight="Bold">
-                    <MenuItem Header="Home" Click="BtnBackToMain_Click" />
                     <MenuItem Header="Cats">
-                        <MenuItem Header="Add" Click="BtnAddCat_Click" />
-                        <MenuItem Header="See All" Click="BtnSeeAllCats_Click" />
+                        <MenuItem Header="Add" Click="BtnMenuCat_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuCat_Manage_Click" />
                     </MenuItem>
                     <MenuItem Header="_Adoption">
-                        <MenuItem Header="Adopt"  />
-                        <MenuItem Header="See All"  />
+                        <MenuItem Header="Adopt" Click="BtnMenuAdoption_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuAdoption_Manage_Click" />
                     </MenuItem>
                     <MenuItem Header="_Adopters">
-                        <MenuItem Header="Register"  />
-                        <MenuItem Header="See all" />
+                        <MenuItem Header="Register" Click="BtnMenuAdopter_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuAdopter_Manage_Click" />
                     </MenuItem>
                 </Menu>
             </DockPanel>
@@ -50,7 +45,7 @@
         <DataGrid x:Name="dgCats"
           AutoGenerateColumns="False"
           MaxHeight="300"
-          Margin="20,20,20,80"
+          Margin="20,20,20,90"
           Grid.RowSpan="2"
           Grid.Row="1"
           Background="#333333"

@@ -77,7 +77,7 @@ namespace Domain.Model.Entities
             BirthDate = birthDate;
             Breed = breed ?? new Breed("no breed");
             Description = description ?? "no description";
-            if (Id != null || !string.IsNullOrWhiteSpace(Id)|| !string.IsNullOrEmpty(Id))
+            if (Id != null || !string.IsNullOrWhiteSpace(Id) || !string.IsNullOrEmpty(Id))
             {
                 ID = Id;
             }

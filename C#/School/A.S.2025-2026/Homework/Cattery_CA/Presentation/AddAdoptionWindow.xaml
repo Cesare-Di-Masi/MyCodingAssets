@@ -5,8 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Presentation"
         mc:Ignorable="d"
-        Title="AddAdoptionWindow" Height="450" Width="800">
+        Title="AddAdoptionWindow" Height="450" Width="800" Background="#2B2B2B">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="100" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0" Background="#2ECC71" Padding="10"
+  CornerRadius="0,0,6,6">
+            <DockPanel>
+                <Menu DockPanel.Dock="Top" Background="#27AE60" Foreground="Black" FontWeight="Bold">
+                    <MenuItem Header="Cats">
+                        <MenuItem Header="Add" Click="BtnMenuCat_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuCat_Manage_Click" />
+                    </MenuItem>
+                    <MenuItem Header="_Adoption">
+                        <MenuItem Header="Adopt" Click="BtnMenuAdoption_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuAdoption_Manage_Click" />
+                    </MenuItem>
+                    <MenuItem Header="_Adopters">
+                        <MenuItem Header="Register" Click="BtnMenuAdopter_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuAdopter_Manage_Click" />
+                    </MenuItem>
+                </Menu>
+            </DockPanel>
+        </Border>
     </Grid>
 </Window>

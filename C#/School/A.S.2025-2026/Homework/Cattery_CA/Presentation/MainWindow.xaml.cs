@@ -48,5 +48,33 @@ namespace Presentation
             catManageWindow.Show();
             this.Close();
         }
+
+        private void BtnMenuAdopter_Manage_Click(object sender, RoutedEventArgs e)
+        {
+            var adopterManageWindow = new AdopterManagerWindow(CatteryService);
+            adopterManageWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuAdoption_Manage_Click(object sender, RoutedEventArgs e)
+        {
+            var adoptionManageWindow = new AdoptionManagerWindow(CatteryService);
+            adoptionManageWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuAdoption_Add_Click(object sender, RoutedEventArgs e)
+        {
+            var addAdoptionWindow = new AddAdoptionWindow(CatteryService);
+            addAdoptionWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuAdopter_Add_Click(object sender, RoutedEventArgs e)
+        {
+            var addAdopterWindow = new AddAdopterWindows(CatteryService);
+            addAdopterWindow.Show();
+            this.Close();
+        }
     }
 }

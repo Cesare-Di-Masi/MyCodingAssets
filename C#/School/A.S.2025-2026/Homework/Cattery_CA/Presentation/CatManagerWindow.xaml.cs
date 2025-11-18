@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Application.Dto;
+﻿using Application.Dto;
 using Application.UseCases;
+using System.Windows;
 
 namespace Presentation
 {
@@ -42,7 +30,6 @@ namespace Presentation
             dgCats.ItemsSource = CatteryService.ViewAllCats();
         }
 
-      
         public void BtnRefresh_Click(object sender, RoutedEventArgs e)
         {
             dgCats.ItemsSource = CatteryService.ViewAllCats();
@@ -92,6 +79,48 @@ namespace Presentation
             {
                 MessageBox.Show("Please select a cat to delete.", "No Cat Selected", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
+        }
+
+        private void BtnMenuCat_Add_Click(object sender, RoutedEventArgs e)
+        {
+            var addCatWindow = new AddCatWindow(CatteryService);
+            addCatWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuCat_Manage_Click(object sender, RoutedEventArgs e)
+        {
+            var catManageWindow = new CatManagerWindow(CatteryService);
+            catManageWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuAdopter_Manage_Click(object sender, RoutedEventArgs e)
+        {
+            var adopterManageWindow = new AdopterManagerWindow(CatteryService);
+            adopterManageWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuAdoption_Manage_Click(object sender, RoutedEventArgs e)
+        {
+            var adoptionManageWindow = new AdoptionManagerWindow(CatteryService);
+            adoptionManageWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuAdoption_Add_Click(object sender, RoutedEventArgs e)
+        {
+            var addAdoptionWindow = new AddAdoptionWindow(CatteryService);
+            addAdoptionWindow.Show();
+            this.Close();
+        }
+
+        private void BtnMenuAdopter_Add_Click(object sender, RoutedEventArgs e)
+        {
+            var addAdopterWindow = new AddAdopterWindows(CatteryService);
+            addAdopterWindow.Show();
+            this.Close();
         }
     }
 }

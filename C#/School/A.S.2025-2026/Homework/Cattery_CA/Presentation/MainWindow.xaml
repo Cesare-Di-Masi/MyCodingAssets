@@ -29,12 +29,12 @@
                         <MenuItem Header="View All" Click="BtnMenuCat_Manage_Click" />
                     </MenuItem>
                     <MenuItem Header="_Adoption">
-                        <MenuItem Header="Adopt" />
-                        <MenuItem Header="View All" />
+                        <MenuItem Header="Adopt" Click="BtnMenuAdoption_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuAdoption_Manage_Click" />
                     </MenuItem>
                     <MenuItem Header="_Adopters">
-                        <MenuItem Header="Register" />
-                        <MenuItem Header="View All" />
+                        <MenuItem Header="Register" Click="BtnMenuAdopter_Add_Click" />
+                        <MenuItem Header="View All" Click="BtnMenuAdopter_Manage_Click" />
                     </MenuItem>
                 </Menu>
             </DockPanel>
