@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <header>
+        <h1>
+            Modulo di prova
+        </h1>
+
+        <form>
+            <fieldset>
+                <legend>
+                    Anagrafica
+                </legend>
+                <label>
+                    Nome:
+                </label>
+                <input type="text">
+                <label>
+                    Cognome:
+                </label>
+                <input type="text">
+                <label>
+                    Data di nascita
+                </label>
+                <input type="date">
+            </fieldset>
+
+            <fieldset>
+                <legend>
+                    Newsletter
+                </legend>
+                <label>
+                    Email (obbligatorio)
+                </label>
+                <input type="email" placeholder="esempio@esempio.it" required>
+
+                <fieldset>
+                    <legend>
+                        A quale newsletter iscriversi?
+                    </legend>
+                    <input type="checkbox">
+                    <label> Cucina</label>
+                    <input type="checkbox">
+                    <label> Libri</label>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Settimanale o mensile?</legend>
+                    <input type="radio">
+                    <label>Settimanale</label>
+                    <input type="radio">
+                    <label>Mensile</label>
+                </fieldset>
+
+            </fieldset>
+
+            <label>Password (obbligatorio, min 8 caratteri)</label>
+            <input type="password" min="8" required>
+            <button type="submit">
+                Invia
+            </button> 
+
+        </form>
+
+    </header>
+    
+</body>
+</html>
