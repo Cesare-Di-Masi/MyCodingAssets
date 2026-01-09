@@ -1,0 +1,78 @@
+*
+{
+    padding: 0;
+    margin: 0;
+
+}
+body
+{
+    font-family: Arial, Helvetica, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    justify-content: center;
+}
+header
+{
+    justify-content: start;
+    display: flex;
+    margin-bottom: 20px;
+    align-items: start;
+    flex-direction: row;
+    box-shadow: gainsboro 0px 3px 7px;
+    color: blue;    
+}
+label
+{
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+main
+{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+footer
+{
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: blue;
+    background-color: gainsboro;
+}
+.SezioneMeteo
+{
+    margin-top: 20px;
+    text-align: center;
+}
+form
+{
+    background: #fff;
+    padding: 5px;
+    border-radius: 10px;
+    align-items: column;
+    width: 100vh;
+    max-width: 550px;
+    display: flex;
+    flex-direction: column;
+    
+}
+form button
+{
+    width: 100%;
+    padding: 10px;
+    background: #007BFF;
+    border: none;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+form button:hover
+{
+    background: #0056b3;
+}
