@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36212.18 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DIMASI_VERIFICA", "DIMASI_VERIFICA\DIMASI_VERIFICA.csproj", "{1D9346EE-D673-4C83-B5E2-868C3FDBD0F0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StorageConsole", "StorageConsole\StorageConsole.csproj", "{4B9E4339-94C6-4244-B392-1152EAA38BFE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D9346EE-D673-4C83-B5E2-868C3FDBD0F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D9346EE-D673-4C83-B5E2-868C3FDBD0F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D9346EE-D673-4C83-B5E2-868C3FDBD0F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D9346EE-D673-4C83-B5E2-868C3FDBD0F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B9E4339-94C6-4244-B392-1152EAA38BFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B9E4339-94C6-4244-B392-1152EAA38BFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B9E4339-94C6-4244-B392-1152EAA38BFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B9E4339-94C6-4244-B392-1152EAA38BFE}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1FA8E65E-C108-4A0E-B0FD-E2DB1BD5E324}
+	EndGlobalSection
+EndGlobal
