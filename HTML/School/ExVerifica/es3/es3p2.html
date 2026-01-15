@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contatti</title>
+</head>
+
+<body>
+    <main>
+        <section>
+            <h1>Contatti</h1>
+            <form>
+                <fieldset>
+                    <legend>Inserisci i tuoi dati di contatto</legend>
+                    <label for="inputPhone">Telefono:</label>
+                    <input type="tel" id="inputPhone">
+                    <label for="inputEmail">Email</label>
+                    <input type="email" placeholder="esempio@mail.it" id="inputEmail">
+                </fieldset>
+                <fieldset>
+                    <legend>
+                        A cosa vuoi iscriverti?
+                    </legend>
+                    <ul>
+                        <li>
+                            <input type="radio" id="inputRadioNews" name="radioInscType" value="news">
+                            <label for="inputRadioNews">Newsletter</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="inputRadioProjectsNotifcations" name="radioInscType"
+                                value="projects">
+                            <label for="inputRadioProjectsNotifcations">Notifiche progetti</label>
+                        </li>
+                        <li>
+                            <input type="radio" id="inputRadioNothing" name="radioInscType" value="none">
+                            <label for="inputRadioNothing">Nulla</label>
+                        </li>
+                    </ul>
+                </fieldset>
+                <fieldset>
+                    <legend>Validazione</legend>
+                    <label for="inputDate">Data di nascita</label>
+                    <input type="date" id="inputDate">
+                    <p>
+                        Quali di queste immagini sono corrette?
+                    </p>
+                    <ol>
+                        <li>
+                            <label for="checkImage1">Immagine 1:</label>
+                            <input type="checkbox" value="img1" id="checkImage1">
+                            <img src="stock.jpg" alt="Descrizione immagine 1" width="50px" height="100px">
+                        </li>
+                        <li>
+                            <label for="checkImage2">Immagine 2:</label>
+                            <input type="checkbox" value="img2" id="checkImage2">
+                            <img src="stock.jpg" alt="Descrizione immagine 2" width="100px" height="50px">
+                        </li>
+                        <li>
+                            <label for="checkImage3">Immagine 3:</label>
+                            <input type="checkbox" value="img3" id="checkImage3">
+                            <img src="stock.jpg" alt="Descrizione immagine 3" width="50px" height="50px">
+                        </li>
+                    </ol>
+                </fieldset>
+            </form>
+        </section>
+    </main>
+</body>
+
+</html>
