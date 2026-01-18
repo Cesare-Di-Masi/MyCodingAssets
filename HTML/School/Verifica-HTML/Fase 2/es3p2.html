@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" >
+    <link rel="stylesheet" href="style.css">
+    <title>Document</title>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li>
+                    <a href="es3p1.html">Pagina 1</a>
+                </li>
+                <li>
+                    <a href="es3p2.html">Questa Pagina 2</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Autenticazione</h1>
+
+        <form>
+            <fieldset title="Credenziali">
+                <legend>Credenziali</legend>
+                <label for="mailver">Email:</label>
+                <input type="email" required placeholder="esempio@mail.it" id="mailver">
+                <Label for="passver">Password:</Label>
+                <input type="password" required id="passver">
+            </fieldset>
+
+            <fieldset>
+                <legend>Metodo di accesso</legend>
+                <input type="radio" id="direttover">
+                <label for="direttover">Diretto</label>
+                <input type="radio" id="indirettover">
+                <label for="indirettover">Indiretto</label>
+            </fieldset>
+
+            <fieldset>
+                <legend>A cosa vuoi accedere?</legend>
+                <ul>
+                    <li>
+                        <input type="checkbox" id="prodottiver">
+                        <label for="prodottiver">Prodotti</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="infover">
+                        <label for="infover">Informazioni</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="contattiver">
+                        <label for="contattiver">Contatti</label>
+                    </li>
+                    
+                </ul>
+            </fieldset>
+
+            <button type="submit"> Accedi</button>
+        </form>
+
+        <section>
+            <h2>
+                Contatti
+            </h2>
+            <h3>Puoi scegliere le seguenti modalità di contatto:</h3>
+
+            <ol>
+                <li>
+                    Telefono: <span class="contattiver">+393203233260</span>
+                </li>
+                <li>
+                    Email: <span class="contattiver">prova@gmail.com</span>
+                </li>
+            </ol>
+
+        </section>
+        
+
+    </main>
+
+</body>
+</html>

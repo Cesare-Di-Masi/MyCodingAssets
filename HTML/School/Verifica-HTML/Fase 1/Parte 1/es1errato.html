@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esercizio 1 errato</title>
+</head>
+<body> <!-- per la barra di navigazione usiamo header e non aside-->
+    <aside> <!-- non usiamo aside per indicare la navigazione, usiamo nav-->
+        <div class="navList"> <!-- per fare una lista usiamo ul e poi li per indicare gli elementi-->
+            <a href="a.html">Pagina A</a>
+            <a href="b.html">Pagina B</a>
+        </div>
+    </aside>
+    <div class="main"> <!-- non ha senso creare una classe main padre di main-->
+        <main>
+            <div class="section">  
+                <p> 
+                    Testo di prova
+                </p>
+            </div>
+            <section>
+                <strong>Titolo sezione</strong> <!-- non usiamo strong ma usiamo h1
+                per indicare il titolo di una sezione, soprattutto se noi necessitiamo che sia in bold-->
+                <div class="container">
+                    <p>
+                        Testo di prova
+                    </p>
+                </div>
+                <ul> <!-- se dobbiamo fare una lista ordinata non usiamo un ma ol-->
+                    <article>Articolo 1</article> <!-- mancano gli li per indicare gli elementi-->
+                    <article>Articolo 2</article> <!--gli articoli non hanno le intestazioni-->
+                    <article>Articolo 3</article>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
