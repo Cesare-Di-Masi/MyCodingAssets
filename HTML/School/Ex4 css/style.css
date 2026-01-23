@@ -4,6 +4,12 @@
     margin: 0;
 
 }
+h1
+{
+font-size: medium;
+font-weight: 700;
+color: blue;
+}
 body
 {
     font-family: Arial, Helvetica, sans-serif;
@@ -22,6 +28,7 @@ header
     flex-direction: row;
     box-shadow: gainsboro 0px 3px 7px;
     color: blue;    
+    
 }
 label
 {
@@ -38,15 +45,25 @@ main
 footer
 {
     text-align: center;
-    margin-top: 20px;
-    font-size: 14px;
+    padding: 15px;
     color: blue;
     background-color: gainsboro;
 }
 .SezioneMeteo
 {
-    margin-top: 20px;
+    
+    width: 35vh;
+    height: 80vh;
+    background-color: white;
     text-align: center;
+    box-shadow: 0 6px 10px gainsboro;
+    border-radius: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+        
 }
 form
 {
@@ -58,21 +75,71 @@ form
     max-width: 550px;
     display: flex;
     flex-direction: column;
+    margin: auto;
     
 }
+
+form fieldset
+{
+    box-shadow: 0 3px 10px gainsboro;
+    display: flex;
+    flex-direction: column;
+    border: gainsboro;
+    padding: 10px;
+    
+}
+
+form fieldset .usernameform,
+form fieldset .passwordform {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+form fieldset label {
+    width: 90px;
+    font-weight: 600;
+}
+
+
+fieldset input::placeholder {
+    color: #999;
+}
+
+form fieldset input {
+    flex: 1;
+    border: none;
+    border-bottom: 2px solid #7a7aff;
+    padding: 6px 4px;
+    outline: none;
+    font-size: 14px;
+}
+
+form fieldset input:focus {
+    border-bottom-color: #2100b3;
+}
+
 form button
 {
-    width: 100%;
+   width: 100%;
     padding: 10px;
-    background: #007BFF;
+    background: gainsboro;
     border: none;
-    border-radius: 5px;
-    color: #fff;
-    font-size: 16px;
     cursor: pointer;
+    font-weight: 600;
 }
 
 form button:hover
 {
     background: #0056b3;
+}
+
+.container{
+    height: 88vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 60px;
+    padding: 10px;
 }
