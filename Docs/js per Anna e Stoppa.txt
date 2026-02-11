@@ -78,3 +78,14 @@ function displayComuni(list) {
 
 // Avvio
 document.addEventListener("DOMContentLoaded", updateComuni);
+
+//ricerca
+document.getElementById("searchBar").addEventListener("input", (e) => {
+    const q = e.target.value.toLowerCase();
+    const filtered = comuniCache.filter(c => 
+        c.nome.toLowerCase().includes(q) || 
+        c.provincia.toLowerCase().includes(q)
+    );
+    displayComuni(filtered);
+});
+
