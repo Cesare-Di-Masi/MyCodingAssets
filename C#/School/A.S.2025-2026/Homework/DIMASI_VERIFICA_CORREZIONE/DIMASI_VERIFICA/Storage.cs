@@ -52,11 +52,11 @@ namespace DIMASI_VERIFICA
             foreach (var item in order.ProductDetails.Keys)
             {
                 if (StorageInventory.TryGetValue(item, out int qu) == false)
-                    throw new Exception($"{item} does not exist in storage");
+                    throw new ArgumentException($"{item} does not exist in storage");
 
                 int quantity = order.ProductDetails[item];
                 if (quantity > StorageInventory[item])
-                    throw new Exception("invalid item quantity");
+                    throw new ArgumentException("invalid item quantity");
                 StorageInventory[item] -= quantity;
             }
 

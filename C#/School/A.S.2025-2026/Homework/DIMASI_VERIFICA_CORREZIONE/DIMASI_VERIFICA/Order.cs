@@ -46,7 +46,7 @@ namespace DIMASI_VERIFICA
             {
                 //controllo che la data dell'ordine non sia passata
                 if (value.CompareTo(DateOnly.FromDateTime(DateTime.Now)) < 0)
-                    throw new ArgumentException("illegal orderDate");
+                    throw new ArgumentOutOfRangeException("illegal orderDate");
                 _orderDate = value;
             }
         }
