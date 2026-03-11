@@ -1,6 +1,4 @@
-﻿using System.Security.AccessControl;
-
-namespace Domain.Model.Entities
+﻿namespace Domain.Model.Entities
 {
     public class BlogPost
     {
@@ -12,11 +10,11 @@ namespace Domain.Model.Entities
         public string Title
         {
             get { return _title; }
-            private set 
+            private set
             {
-                if(string.IsNullOrEmpty(_title))
-                    throw new ArgumentNullException("title is not valid");
-                _title = value; 
+                /*if (string.IsNullOrEmpty(_title))
+                    throw new ArgumentNullException("title is not valid");*/
+                _title = value;
             }
         }
 
@@ -26,7 +24,7 @@ namespace Domain.Model.Entities
 
             private set
             {
-                if (string.IsNullOrEmpty(value))
+                if (string.IsNullOrWhiteSpace(value))
                     throw new ArgumentNullException("content is not valid");
                 _content = value;
             }
@@ -38,9 +36,9 @@ namespace Domain.Model.Entities
         }
 
         public DateTime CreatedAt
-        { 
+        {
             get { return _createdAt; }
-            private set 
+            private set
             {
                 if (value > DateTime.Now)
                     throw new ArgumentException("invalid creation date");
@@ -48,7 +46,7 @@ namespace Domain.Model.Entities
             }
         }
 
-        public BlogPost(string title, string content) 
+        public BlogPost(string title, string content)
         {
             Title = title;
             Content = content;
@@ -66,11 +64,10 @@ namespace Domain.Model.Entities
             Content = content;
         }
 
-        public BlogPost(string title, string content, DateTime createdAt, Guid id):this(title,content)  
+        public BlogPost(string title, string content, DateTime createdAt, Guid id) : this(title, content)
         {
             CreatedAt = createdAt;
-            _id=id;
+            _id = id;
         }
-
     }
 }

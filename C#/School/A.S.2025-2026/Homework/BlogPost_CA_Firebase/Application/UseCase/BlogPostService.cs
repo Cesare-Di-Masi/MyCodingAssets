@@ -1,83 +1,118 @@
-﻿using Application.Interface;
-using Domain.Model.Entities;
-using Application.Dto;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Dto;
+using Application.Interface;
 using Application.Mapper;
 
 namespace Application.UseCase
 {
-    public class BlogPostService
+    /// <summary>
+    /// Service handling all blog post business logic operations.
+    /// Provides CRUD operations and advanced search/filtering capabilities through the repository abstraction.
+    /// </summary>
+    public class BlogPostService : IBlogPostService
     {
+        private readonly IBlogPostRepo _blogPostRepo;
 
-        private IBlogPostRepo _blogPostRepo;
-        private List<BlogPost> blogPosts;
-        public BlogPostService(IBlogPostRepo blogRepo) 
+        /// <summary>
+        /// Initializes the service with a blog post repository dependency.
+        /// </summary>
+        public BlogPostService(IBlogPostRepo blogRepo)
         {
-            blogRepo = _blogPostRepo;
-            blogPosts = LoadAsync().Result;
+            _blogPostRepo = blogRepo;
         }
 
-        public void NewPost(BlogPostDto Post)
+        /// <summary>
+        /// Creates a new article by converting the DTO to a domain entity and storing it in the repository.
+        /// </summary>
+        public async Task CreateArticleAsync(BlogPostDto post)
         {
-            blogPosts.Add(Post.ToEntity());
-            SaveAsync();
+            await _blogPostRepo.CreateArticleAsync(post.ToEntity());
         }
 
-        public List<BlogPostDto> GetAllPosts()
+        /// <summary>
+        /// Retrieves all articles from the repository and converts them to DTOs for presentation.
+        /// </summary>
+        public async Task<List<BlogPostDto>> GetAllArticlesAync()
         {
-            List<BlogPostDto> allPosts = blogPosts.Select(p => p.ToDto()).ToList();
-            return allPosts;
+            var entities = await _blogPostRepo.GetAllArticlesAsync();
+            return entities.Select(e => e.ToDto()).ToList();
         }
 
-        public BlogPostDto? SearchById(Guid id)
+        /// <summary>
+        /// Searches for an article by its ID and converts it to a DTO if found.
+        /// Returns null if no article matches the provided ID.
+        /// </summary>
+        public async Task<BlogPostDto?> SearchById(string id)
         {
-            foreach (var Post in blogPosts)
-            {
-                if (Post.Id == id)
-                    return Post.ToDto();
-            }
-            return null;
+            var entity = await _blogPostRepo.GetArticleByIdAsync(id);
+            return entity?.ToDto();
         }
 
-        public void RemovePost(Guid Id)
+        /// <summary>
+        /// Deletes an article by ID after verifying it exists.
+        /// Throws InvalidOperationException if the article is not found.
+        /// </summary>
+        public async Task DeleteArticleAsync(string id)
         {
-            BlogPost? p =SearchById(Id).ToEntity();
-
-            if (p != null)
-            {
-                blogPosts.Remove(p);
-            }
-            SaveAsync();
+            var entity = await _blogPostRepo.GetArticleByIdAsync(id);
+            if (entity == null)
+                throw new InvalidOperationException("Article not found");
+            await _blogPostRepo.DeleteArticleAsync(id);
         }
 
-        public void UpdatePost(Guid id, BlogPostDto dto)
+        /// <summary>
+        /// Updates an existing article with new title and content.
+        /// Throws InvalidOperationException if the article to update does not exist.
+        /// </summary>
+        public async Task UpdatePostAsync(string id, BlogPostDto dto)
         {
-            BlogPost? p = SearchById(id).ToEntity();
-
-            if(p==null)
-            {
-                throw new ArgumentException("Post does not exist");
-            }
-
-            p.ModifyTitle(dto.Title);
-            p.ModifyContent(dto.Content);
-            SaveAsync();
-
+            var entity = await _blogPostRepo.GetArticleByIdAsync(id);
+            if (entity == null)
+                throw new InvalidOperationException("Article not found");
+            await _blogPostRepo.UpdateArticleAsync(id, dto.ToEntity());
         }
 
-        public async Task SaveAsync()
+        /// <summary>
+        /// Searches for articles by title and returns matching results as DTOs.
+        /// </summary>
+        public async Task<List<BlogPostDto>> SearchByTitleAsync(string title)
         {
-            await _blogPostRepo.SaveAsync(blogPosts);
+            var entities = await _blogPostRepo.GetByTitleAsync(title);
+            return entities.Select(e => e.ToDto()).ToList();
         }
 
-        public async Task<List<BlogPost>> LoadAsync()
+        /// <summary>
+        /// Searches for articles by content and returns matching results as DTOs.
+        /// </summary>
+        public async Task<List<BlogPostDto>> SearchByContentAsync(string content)
         {
-            return await _blogPostRepo.LoadAsync();
+            var entities = await _blogPostRepo.GetByContent(content);
+            return entities.Select(e => e.ToDto()).ToList();
         }
 
+        /// <summary>
+        /// Searches for articles created on the specified date and returns matching results as DTOs.
+        /// </summary>
+        public async Task<List<BlogPostDto>> SearchByDateAsync(DateOnly date)
+        {
+            var entities = await _blogPostRepo.GetByDate(date);
+            return entities.Select(e => e.ToDto()).ToList();
+        }
+
+        /// <summary>
+        /// Searches for articles created within the specified date range (inclusive) and returns matching results as DTOs.
+        /// </summary>
+        public async Task<List<BlogPostDto>> SearchByPeriodAsync(DateOnly startPeriod, DateOnly endPeriod)
+        {
+            var entities = await _blogPostRepo.GetByPeriod(startPeriod, endPeriod);
+            return entities.Select(e => e.ToDto()).ToList();
+        }
+
+        /// <summary>
+        /// Counts the number of articles created on the specified date.
+        /// </summary>
+        public async Task<int> CountByDate(DateOnly date)
+        {
+            return await _blogPostRepo.CountByDate(date);
+        }
     }
 }
