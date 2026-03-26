@@ -9,7 +9,7 @@
 /* ── CONFIG ──────────────────────────────────────────────── */
 const OPENSKY_URL  = 'https://opensky-network.org/api/states/all';
 const METEO_URL    = 'https://api.open-meteo.com/v1/forecast';
-const REFRESH_SECS = 30;
+const REFRESH_SECS = 15;
 const MAX_AC       = 250;   // markers on map
 
 /* ── REGION VIEWS ────────────────────────────────────────── */
@@ -104,23 +104,27 @@ if (document.readyState === 'loading') {
 window.ThemeManager = ThemeManager;
 
 /* ════════════════════════════════════════════════════════════
-   DATA LOADER — Robust Flight Data Management
+   DATA LOADER — Robust Flight Data Management with OpenSky Integration
    ════════════════════════════════════════════════════════════ */
 const DataLoader = (() => {
   const config = {
     opensky_url: 'https://opensky-network.org/api/states/all',
+    username: null,
+    password: null,
     timeout_ms: 10000,
-    retry_attempts: 3,
-    retry_delay_ms: 1000,
-    log_level: 'info'
+    max_backoff_ms: 120000,
+    log_level: 'info',
+    bounds: null
   };
 
   let loadStats = {
     lastUpdate: null,
     successCount: 0,
     failureCount: 0,
+    rateLimitHits: 0,
     lastError: null,
-    dataSource: 'simulation'
+    dataSource: 'simulation',
+    nextAllowedRequest: Date.now()
   };
 
   const Logger = {
@@ -131,6 +135,21 @@ const DataLoader = (() => {
     success: (msg, data) => console.log('✅ [SUCCESS]', msg, data || '')
   };
 
+  function buildUrl() {
+    let url = config.opensky_url;
+    if (config.bounds) {
+      const { lamin, lamax, lomin, lomax } = config.bounds;
+      url += `?lamin=${lamin}&lamax=${lamax}&lomin=${lomin}&lomax=${lomax}`;
+    }
+    return url;
+  }
+
+  function buildAuthHeader() {
+    if (!config.username || !config.password) return null;
+    const credentials = `${config.username}:${config.password}`;
+    return 'Basic ' + btoa(credentials);
+  }
+
   async function fetchWithTimeout(url, timeoutMs = config.timeout_ms) {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => {
@@ -139,10 +158,14 @@ const DataLoader = (() => {
     }, timeoutMs);
 
     try {
+      const headers = { 'Accept': 'application/json', 'Cache-Control': 'no-cache' };
+      const authHeader = buildAuthHeader();
+      if (authHeader) headers['Authorization'] = authHeader;
+
       const response = await fetch(url, {
         signal: controller.signal,
         method: 'GET',
-        headers: { 'Accept': 'application/json', 'Cache-Control': 'no-cache' }
+        headers
       });
       clearTimeout(timeoutId);
       return response;
@@ -172,19 +195,41 @@ const DataLoader = (() => {
     return { flights, timestamp: json.time, total: json.states.length, valid: flights.length };
   }
 
-  async function fetchFromOpenSky(attempt = 1) {
+  async function fetchFromOpenSky(backoffDelay = 0) {
     try {
-      Logger.info(`Fetching OpenSky API (attempt ${attempt}/${config.retry_attempts})...`);
-      const response = await fetchWithTimeout(config.opensky_url, config.timeout_ms);
+      const now = Date.now();
+      if (now < loadStats.nextAllowedRequest) {
+        const wait = loadStats.nextAllowedRequest - now;
+        Logger.warn(`Rate limit cooldown: waiting ${wait}ms before request...`);
+        await new Promise(r => setTimeout(r, wait));
+      }
+
+      const url = buildUrl();
+      const isAuthenticated = !!buildAuthHeader();
+      Logger.info(`Fetching OpenSky API ${isAuthenticated ? '(authenticated)' : '(unauthenticated)'}...`);
+      
+      const response = await fetchWithTimeout(url, config.timeout_ms);
 
       if (!response.ok) {
         const error = new Error(`HTTP ${response.status}: ${response.statusText}`);
         error.status = response.status;
+
         if (response.status === 429) {
-          Logger.error('Rate limited! Waiting before retry...', { status: 429, retryAfter: response.headers.get('Retry-After') });
-          await new Promise(r => setTimeout(r, config.retry_delay_ms * attempt));
+          loadStats.rateLimitHits++;
+          const nextDelay = Math.min(backoffDelay === 0 ? 10000 : backoffDelay * 2, config.max_backoff_ms);
+          Logger.error('Rate limited (429)! Exponential backoff...', { 
+            nextRetryIn: nextDelay + 'ms',
+            hitCount: loadStats.rateLimitHits,
+            authenticated: isAuthenticated
+          });
+          loadStats.nextAllowedRequest = Date.now() + nextDelay;
+          await new Promise(r => setTimeout(r, nextDelay));
+          return fetchFromOpenSky(nextDelay);
         } else if (response.status >= 500) {
           Logger.error('Server error, will retry...', { status: response.status });
+          const retryDelay = Math.min(backoffDelay === 0 ? 5000 : backoffDelay * 2, 30000);
+          await new Promise(r => setTimeout(r, retryDelay));
+          return fetchFromOpenSky(retryDelay);
         }
         throw error;
       }
@@ -196,6 +241,7 @@ const DataLoader = (() => {
         throw new Error(`Failed to parse JSON: ${parseErr.message}`);
       }
 
+      loadStats.nextAllowedRequest = Date.now() + (isAuthenticated ? 600 : 10000);
       const data = parseOpenSkyResponse(json);
       loadStats.dataSource = 'opensky-live';
       loadStats.successCount++;
@@ -204,15 +250,7 @@ const DataLoader = (() => {
 
     } catch (err) {
       loadStats.lastError = err.message;
-      if (attempt < config.retry_attempts) {
-        const delay = config.retry_delay_ms * Math.pow(2, attempt - 1);
-        Logger.warn(`Attempt ${attempt} failed: ${err.message}. Retrying in ${delay}ms...`);
-        await new Promise(r => setTimeout(r, delay));
-        return fetchFromOpenSky(attempt + 1);
-      } else {
-        loadStats.failureCount++;
-        throw new Error(`Failed after ${config.retry_attempts} attempts: ${err.message}`);
-      }
+      throw err;
     }
   }
 
@@ -246,6 +284,7 @@ const DataLoader = (() => {
     } catch (err) {
       Logger.error(`OpenSky API failed: ${err.message}`);
       Logger.info('Falling back to simulation data...');
+      loadStats.failureCount++;
       return {
         success: false,
         flights: null,
@@ -259,8 +298,20 @@ const DataLoader = (() => {
   function getStats() {
     return {
       ...loadStats,
-      uptime: loadStats.lastUpdate ? Math.round((Date.now() - loadStats.lastUpdate) / 1000) + 's ago' : 'never'
+      uptime: loadStats.lastUpdate ? Math.round((Date.now() - loadStats.lastUpdate) / 1000) + 's ago' : 'never',
+      authenticated: !!config.username
     };
+  }
+
+  function setCredentials(username, password) {
+    config.username = username;
+    config.password = password;
+    Logger.info('Credentials updated', { username: username || 'none', authenticated: !!username });
+  }
+
+  function setBounds(lamin, lamax, lomin, lomax) {
+    config.bounds = { lamin, lamax, lomin, lomax };
+    Logger.info('Bounding box updated', config.bounds);
   }
 
   function setConfig(opts) {
@@ -271,7 +322,8 @@ const DataLoader = (() => {
   async function testConnectivity() {
     Logger.info('Testing OpenSky API connectivity...');
     try {
-      const response = await fetchWithTimeout(config.opensky_url, 5000);
+      const url = buildUrl();
+      const response = await fetchWithTimeout(url, 5000);
       if (response.ok) {
         Logger.success('✅ OpenSky API is reachable');
         return true;
@@ -285,7 +337,7 @@ const DataLoader = (() => {
     }
   }
 
-  return { load, getStats, setConfig, testConnectivity, Logger };
+  return { load, getStats, setCredentials, setBounds, setConfig, testConnectivity, Logger };
 })();
 
 if (typeof module !== 'undefined' && module.exports) {
@@ -1637,6 +1689,33 @@ window.getLoadInfo = function() {
       locked: lockedFlight ? 1 : 0
     }
   };
+};
+
+window.setupOpenSky = function(username, password) {
+  DataLoader.setCredentials(username, password);
+  console.log('✅ OpenSky credentials configured');
+  console.log('💡 Tip: Run window.reloadData() to fetch with auth');
+};
+
+window.setTrackingArea = function(area = 'italy') {
+  const areas = {
+    italy: { lamin: 35, lamax: 48, lomin: 6, lomax: 19, name: 'Italy' },
+    eu: { lamin: 35, lamax: 70, lomin: -10, lomax: 40, name: 'Europe' },
+    us: { lamin: 24, lamax: 50, lomin: -125, lomax: -66, name: 'USA' },
+    na: { lamin: 15, lamax: 85, lomin: -180, lomax: -50, name: 'North America' }
+  };
+  
+  if (!areas[area]) {
+    console.error(`❌ Unknown area: ${area}`);
+    console.log('Available areas:', Object.keys(areas).join(', '));
+    return false;
+  }
+  
+  const { lamin, lamax, lomin, lomax, name } = areas[area];
+  DataLoader.setBounds(lamin, lamax, lomin, lomax);
+  console.log(`✅ Tracking area set to: ${name}`);
+  console.log(`   Bounds: lat[${lamin}°, ${lamax}°] lon[${lomin}°, ${lomax}°]`);
+  return true;
 };
 
 /* ────────────────────────────────────────────────────────────

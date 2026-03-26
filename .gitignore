@@ -378,23 +378,55 @@ MSBuild_Logs/
 # MFractors (Xamarin productivity tool) working folder
 **/.mfractor/
 
-# Local History for Visual Studio
+# Local history
+.history/
 **/.localhistory/
-
-# Visual Studio History (VSHistory) files
 .vshistory/
 
-# BeatPulse healthcheck temp database
-healthchecksdb
+# Zencoder and Zenflow local folders
+.zencoder/
+.zenflow/
 
-# Backup folder for Package Reference Convert tool in Visual Studio 2017
-MigrationBackup/
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Ionide (cross platform F# VS Code tools) working folder
-**/.ionide/
+# Generic temporary and backup files
+*.bak
+*.tmp
+*.swp
+*~
+*.log
+*.pid
+*.seed
+*.pid.lock
 
-# Fody - auto-generated XML schema
-FodyWeavers.xsd
+# Environment and IDE files
+.idea/
+.gradle/
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+.python-version
+.spyderproject
+.spyproject
+.ropeproject
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
 
 # VS Code files for those working on multiple tools
 .vscode/*
@@ -403,9 +435,63 @@ FodyWeavers.xsd
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
-
-# Local History for Visual Studio Code
 .history/
+**/.localhistory/
+.vshistory/
+.vscode-test
+
+# Dependency directories
+node_modules/
+jspm_packages/
+.pnpm-store/
+bower_components/
+.npm
+.eslintcache
+.stylelintcache
+vcpkg_installed/
+
+# Python Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[codz]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+.eggs/
+
+# Build and deployment
+dist/
+build/
+Build/
+build-*/
+out/
+bin/
+obj/
+.serverless/
+.terraform/
+.dynamodb/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.temp/
+.cache/
+.parcel-cache/
+CMakeFiles/
+CMakeCache.txt
+
+# Compiled libraries and executables
+*.exe
+*.dll
+*.so
+*.dylib
+*.lib
+*.a
+*.app
+*.o
+*.obj
+*.pdb
+*.ilk
 
 # Built Visual Studio Code Extensions
 *.vsix
