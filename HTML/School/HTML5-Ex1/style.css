@@ -1,0 +1,62 @@
+/* ==========================================================
+   FOGLIO DI STILE ESTERNO - GRAFICA AVANZATA
+   ========================================================== */
+
+/* 1. SELETTORE FIGLIO DIRETTO ( > )
+   Applica uno stile al titolo h2 direttamente dentro il box articolo */
+.custom-article > h2 {
+    text-transform: uppercase;
+    letter-spacing: -0.5px;
+    margin-bottom: 0.25rem;
+}
+
+/* 2. SELETTORE FRATELLO ADIACENTE ( + )
+   Applica un bordo inferiore al sottotitolo h3 che segue direttamente l'h2 */
+.custom-article > h2 + h3 {
+    border-bottom: 2px solid rgba(0, 0, 0, 0.15);
+    padding-bottom: 15px;
+}
+
+/* 3. PSEUDO-CLASSE STRUTTURALE ( :nth-child )
+   Evidenzia gli elementi dispari (odd) della lista nell'articolo */
+.article-list li:nth-child(odd) {
+    font-weight: bold;
+    color: #d63384; /* Colore magenta per risaltare sul giallo */
+}
+.article-list li {
+    margin-bottom: 8px;
+}
+
+/* 4. SELETTORE DI ATTRIBUTO ( [attr^="val"] )
+   Stile personalizzato e animazione per il bottone con link esterno HTTPS */
+a[href^="https"] {
+    border-radius: 30px;
+    padding: 12px 25px;
+    transition: all 0.3s ease-in-out;
+}
+a[href^="https"]:hover {
+    transform: translateY(-4px); /* Il bottone si solleva */
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Aumenta l'ombra */
+    background-color: #343a40; /* Grigio scuro su hover */
+}
+
+
+
+/* ==========================================================
+   MIGLIORAMENTI ESTETICI (Appealing)
+   ========================================================== */
+
+/* Uniforma le immagini delle card ritagliandole alla stessa altezza senza deformarle */
+.card-image-fit {
+    height: 220px;
+    object-fit: cover;
+}
+
+/* Effetto hover (sollevamento) sulle card laterali */
+.custom-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.custom-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1) !important;
+}
