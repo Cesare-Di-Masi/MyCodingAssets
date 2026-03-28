@@ -1,0 +1,71 @@
+<div class="animate-fade-in">
+    <div class="row mb-5">
+        <div class="col-7">
+            <h1 class="fw-800 mb-1">Link Manager</h1>
+            <p class="text-muted mb-0">Organize and categorize your documentation and resources.</p>
+        </div>
+        <div class="col-5 text-end">
+            <button class="btn btn-accent px-4 py-2 fw-bold" onclick="addLink()">
+                <i class="bi bi-plus-lg me-1"></i> Add Link
+            </button>
+        </div>
+    </div>
+
+    <div id="links-container" class="row g-4">
+        <!-- Links grouped by category -->
+    </div>
+</div>
+
+<script>
+    (function() {
+        let links = JSON.parse(localStorage.getItem('hub-links') || '[{"category": "Dev Tools", "name": "MDN Docs", "url": "https://developer.mozilla.org"}, {"category": "Design", "name": "Dribbble", "url": "https://dribbble.com"}]');
+
+        window.renderLinks = function() {
+            const container = document.getElementById('links-container');
+            const categories = [...new Set(links.map(l => l.category))];
+
+            if(links.length === 0) {
+                container.innerHTML = `<div class="col-12 text-center py-5 text-muted">No links saved yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = categories.map(cat => `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 h-100">
+                        <h6 class="fw-800 text-uppercase mb-3 d-flex align-items-center">
+                            <i class="bi bi-folder2-open me-2 text-accent"></i> ${cat}
+                        </h6>
+                        <ul class="list-unstyled mb-0">
+                            ${links.filter(l => l.category === cat).map((l, i) => `
+                                <li class="d-flex justify-content-between align-items-center py-2 border-bottom border-dark border-opacity-10">
+                                    <a href="${l.url}" target="_blank" class="text-decoration-none text-white">${l.name}</a>
+                                    <button class="btn btn-sm text-danger border-0 p-0" onclick="deleteLink('${l.name}')">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `).join('');
+            localStorage.setItem('hub-links', JSON.stringify(links));
+        }
+
+        window.addLink = function() {
+            const name = prompt("Link name:");
+            const url = prompt("Link URL (with https://):");
+            const category = prompt("Category (e.g., Design, Dev):");
+            if(name && url && category) {
+                links.push({ name, url, category });
+                renderLinks();
+            }
+        }
+
+        window.deleteLink = function(name) {
+            links = links.filter(l => l.name !== name);
+            renderLinks();
+        }
+
+        renderLinks();
+    })();
+</script>

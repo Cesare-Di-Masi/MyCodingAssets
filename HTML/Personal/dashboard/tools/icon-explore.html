@@ -1,0 +1,64 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">Icon Explorer</h1>
+            <p class="text-muted mb-0">Browse and copy Bootstrap Icons for your UI.</p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <input type="text" id="icon-search" class="form-control bg-secondary bg-opacity-10 border-0 text-white rounded-pill px-4" 
+                   placeholder="Search icons (e.g. 'home', 'user')..." oninput="filterIcons()">
+        </div>
+    </div>
+
+    <div class="row g-3 row-cols-2 row-cols-md-4 row-cols-lg-6" id="icon-grid">
+        <!-- Icons injected here -->
+    </div>
+</div>
+
+<script>
+    (function() {
+        const searchEl = document.getElementById('icon-search');
+        const grid = document.getElementById('icon-grid');
+        const commonIcons = [
+            'house', 'person', 'gear', 'bell', 'search', 'envelope', 'calendar', 'chat', 'check-circle',
+            'exclamation-triangle', 'info-circle', 'star', 'heart', 'trash', 'pencil', 'plus-lg',
+            'arrow-right', 'arrow-left', 'download', 'upload', 'cloud', 'wifi', 'cpu', 'database',
+            'shield-lock', 'palette', 'link-45deg', 'markdown', 'terminal', 'clock-history'
+        ];
+
+        window.renderIcons = function(list) {
+            grid.innerHTML = list.map(icon => `
+                <div class="col">
+                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-3 text-center h-100 icon-card" 
+                         style="cursor: pointer; transition: all 0.2s;" onclick="copyIconName('${icon}')">
+                        <i class="bi bi-${icon} fs-2 mb-2" style="color: var(--accent);"></i>
+                        <div class="small text-muted text-truncate">${icon}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        window.filterIcons = function() {
+            const term = searchEl.value.toLowerCase();
+            localStorage.setItem('hub-icon-search', term);
+            const filtered = commonIcons.filter(i => i.includes(term));
+            renderIcons(filtered);
+        }
+
+        window.copyIconName = function(name) {
+            const code = `<i class="bi bi-${name}"></i>`;
+            navigator.clipboard.writeText(code);
+            alert('Copied: ' + code);
+            logActivity('Icon Explorer', 'Copied icon: ' + name);
+        }
+
+        // Load saved state
+        searchEl.value = localStorage.getItem('hub-icon-search') || '';
+        filterIcons();
+    })();
+</script>
+
+<style>
+    .icon-card:hover { background: var(--accent) !important; }
+    .icon-card:hover i, .icon-card:hover div { color: #000 !important; }
+</style>

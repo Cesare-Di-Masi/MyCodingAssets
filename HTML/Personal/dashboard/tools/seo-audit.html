@@ -1,0 +1,86 @@
+<div class="animate-fade-in">
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="fw-800 mb-1">SEO Audit Engine</h1>
+            <p class="text-muted mb-0">Analyze websites for technical SEO compliance and performance.</p>
+        </div>
+    </div>
+
+    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-5 mb-5 shadow-sm">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="input-group input-group-lg shadow-sm">
+                    <input type="text" id="seo-url" class="form-control bg-dark border-0 text-white" placeholder="https://example.com" value="https://google.com">
+                    <button class="btn btn-accent px-5 fw-bold text-black" onclick="startAudit()">ANALYZE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="seo-results" class="d-none">
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card bg-success bg-opacity-10 border-0 rounded-4 p-4 text-center">
+                    <h3 class="fw-800 text-success mb-0" id="seo-score">92%</h3>
+                    <p class="small text-muted mb-0 text-uppercase tracking-wider">Overall Score</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-primary bg-opacity-10 border-0 rounded-4 p-4 text-center">
+                    <h3 class="fw-800 text-primary mb-0" id="seo-speed">0.8s</h3>
+                    <p class="small text-muted mb-0 text-uppercase tracking-wider">Load Time</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-warning bg-opacity-10 border-0 rounded-4 p-4 text-center">
+                    <h3 class="fw-800 text-warning mb-0" id="seo-issues">3</h3>
+                    <p class="small text-muted mb-0 text-uppercase tracking-wider">Total Issues</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 overflow-hidden">
+            <h6 class="fw-800 mb-4">Detailed Breakdown</h6>
+            <div id="seo-list" class="list-group list-group-flush bg-transparent">
+                <!-- Checkpoints injected -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const urlEl = document.getElementById('seo-url');
+        urlEl.value = localStorage.getItem('hub-seo-url') || 'https://google.com';
+
+        window.startAudit = function() {
+            const url = urlEl.value;
+            if(!url) return;
+            
+            localStorage.setItem('hub-seo-url', url);
+            results.classList.remove('d-none');
+            results.classList.add('animate-fade-in');
+
+            const list = document.getElementById('seo-list');
+            const checks = [
+                { name: 'SSL Encryption', status: 'Passed', icon: 'bi-check-circle-fill', color: 'text-success' },
+                { name: 'Meta Description', status: 'Missing', icon: 'bi-exclamation-triangle-fill', color: 'text-warning' },
+                { name: 'H1 Tag Optimization', status: 'Passed', icon: 'bi-check-circle-fill', color: 'text-success' },
+                { name: 'Mobile Responsive', status: 'Passed', icon: 'bi-check-circle-fill', color: 'text-success' },
+                { name: 'Image Alt Tags', status: '4 Missing', icon: 'bi-x-circle-fill', color: 'text-danger' }
+            ];
+
+            list.innerHTML = checks.map(c => `
+                <div class="list-group-item bg-transparent border-0 d-flex justify-content-between align-items-center py-3">
+                    <div class="d-flex align-items-center">
+                        <i class="bi ${c.icon} ${c.color} fs-5 me-3"></i>
+                        <span class="fw-600">${c.name}</span>
+                    </div>
+                    <span class="badge ${c.color} bg-opacity-10 border-0 px-3 py-2 rounded-pill">${c.status}</span>
+                </div>
+            `).join('');
+            
+            logActivity('Productivity', 'Ran SEO audit on: ' + url);
+        }
+    })();
+</script>

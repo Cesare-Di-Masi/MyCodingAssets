@@ -1,0 +1,178 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">Financial Ledger <span class="badge bg-accent text-black small">PRO</span></h1>
+            <p class="text-muted mb-0">Track project overhead and personal spending with categorized entries.</p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <button class="btn btn-accent px-5 py-2 fw-bold shadow-accent" onclick="createNewExpense()">
+                <i class="bi bi-plus-lg me-2"></i> ADD ENTRY
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Stats -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 text-center">
+                <span class="small fw-800 text-muted mb-1 text-uppercase tracking-wider">Total Monthly</span>
+                <h3 class="fw-800 mb-0 text-accent" id="total-monthly">$0.00</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 text-center">
+                <span class="small fw-800 text-muted mb-1 text-uppercase tracking-wider">Top Category</span>
+                <h3 class="fw-800 mb-0" id="top-category">--</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 text-center">
+                <span class="small fw-800 text-muted mb-1 text-uppercase tracking-wider">Entries</span>
+                <h3 class="fw-800 mb-0" id="entry-count">0</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 overflow-hidden">
+        <div class="card-header bg-transparent border-white border-opacity-5 p-4 d-flex justify-content-between">
+            <h6 class="small fw-900 text-uppercase mb-0">Transaction History</h6>
+            <button class="btn btn-sm text-muted p-0" onclick="exportExpenses()"><i class="bi bi-download me-1"></i> Export JSON</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead class="bg-dark bg-opacity-25">
+                    <tr>
+                        <th class="p-4 border-0 small fw-800 text-muted text-uppercase">Date</th>
+                        <th class="p-4 border-0 small fw-800 text-muted text-uppercase">Description</th>
+                        <th class="p-4 border-0 small fw-800 text-muted text-uppercase">Category</th>
+                        <th class="p-4 border-0 small fw-800 text-muted text-uppercase text-end">Amount</th>
+                        <th class="p-4 border-0"></th>
+                    </tr>
+                </thead>
+                <tbody id="expense-list" class="font-monospace">
+                    <!-- Entries injected -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    .shadow-accent { box-shadow: 0 8px 25px rgba(250, 204, 21, 0.2); }
+    .table-dark { --bs-table-bg: transparent; }
+    .category-badge {
+        font-size: 0.65rem;
+        padding: 4px 10px;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.05);
+    }
+</style>
+
+<script>
+    (function() {
+        let entries = JSON.parse(localStorage.getItem('hub-expenses-v2') || '[]');
+
+        window.renderExpenses = function() {
+            const list = document.getElementById('expense-list');
+            const totalEl = document.getElementById('total-monthly');
+            const countEl = document.getElementById('entry-count');
+            const topCatEl = document.getElementById('top-category');
+
+            if(entries.length === 0) {
+                list.innerHTML = '<tr><td colspan="5" class="text-center p-5 text-muted">No transactions found.</td></tr>';
+                totalEl.textContent = '$0.00';
+                countEl.textContent = '0';
+                topCatEl.textContent = '--';
+                return;
+            }
+
+            let total = 0;
+            const cats = {};
+
+            list.innerHTML = '';
+            entries.forEach((e, i) => {
+                total += parseFloat(e.amount);
+                cats[e.category] = (cats[e.category] || 0) + parseFloat(e.amount);
+                
+                const tr = document.createElement('tr');
+                tr.className = 'animate-fade-in';
+                
+                const tdDate = document.createElement('td');
+                tdDate.className = 'p-4 border-white border-opacity-5 text-muted small';
+                tdDate.textContent = e.date;
+                
+                const tdDesc = document.createElement('td');
+                tdDesc.className = 'p-4 border-white border-opacity-5 fw-600';
+                tdDesc.textContent = e.desc;
+                
+                const tdCat = document.createElement('td');
+                tdCat.className = 'p-4 border-white border-opacity-5';
+                const catBadge = document.createElement('span');
+                catBadge.className = 'category-badge text-uppercase';
+                catBadge.textContent = e.category;
+                tdCat.appendChild(catBadge);
+                
+                const tdAmount = document.createElement('td');
+                tdAmount.className = 'p-4 border-white border-opacity-5 text-end text-accent fw-bold';
+                tdAmount.textContent = `$${parseFloat(e.amount).toFixed(2)}`;
+                
+                const tdAction = document.createElement('td');
+                tdAction.className = 'p-4 border-white border-opacity-5 text-end';
+                const delBtn = document.createElement('button');
+                delBtn.className = 'btn btn-sm text-danger opacity-50';
+                delBtn.innerHTML = '<i class="bi bi-trash"></i>';
+                delBtn.onclick = () => deleteExpense(i);
+                tdAction.appendChild(delBtn);
+                
+                tr.appendChild(tdDate);
+                tr.appendChild(tdDesc);
+                tr.appendChild(tdCat);
+                tr.appendChild(tdAmount);
+                tr.appendChild(tdAction);
+                list.appendChild(tr);
+            });
+
+            totalEl.textContent = `$${total.toFixed(2)}`;
+            countEl.textContent = entries.length;
+            
+            const top = Object.entries(cats).sort((a,b) => b[1] - a[1])[0];
+            topCatEl.textContent = top ? top[0].toUpperCase() : '--';
+
+            localStorage.setItem('hub-expenses-v2', JSON.stringify(entries));
+        }
+
+        window.createNewExpense = function() {
+            const desc = prompt("Description:");
+            const amount = prompt("Amount ($):");
+            const category = prompt("Category (e.g., Software, Food, Sub):", "Other");
+            
+            if(desc && amount && !isNaN(amount)) {
+                entries.unshift({
+                    date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                    desc,
+                    amount,
+                    category
+                });
+                renderExpenses();
+                logActivity('Productivity', `Added expense: ${desc}`);
+            }
+        }
+
+        window.deleteExpense = function(i) {
+            entries.splice(i, 1);
+            renderExpenses();
+        }
+
+        window.exportExpenses = function() {
+            const blob = new Blob([JSON.stringify(entries, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hub-expenses.json';
+            a.click();
+        }
+
+        renderExpenses();
+    })();
+</script>

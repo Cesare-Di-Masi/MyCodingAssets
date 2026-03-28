@@ -1,0 +1,77 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">Favicon Gen</h1>
+            <p class="text-muted mb-0">Generate preview favicons from text or emoji for your web projects.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4">
+                <div class="mb-4">
+                    <label class="small text-muted fw-bold mb-2">Character / Emoji</label>
+                    <input type="text" id="fav-text" class="form-control bg-dark bg-opacity-25 border-0 text-white p-3 rounded-3" value="T" maxlength="2" oninput="updateFav()">
+                </div>
+                <div class="mb-0">
+                    <label class="small text-muted fw-bold mb-2">Background Color</label>
+                    <input type="color" id="fav-bg" class="form-control bg-dark bg-opacity-25 border-0 p-1" value="#facc15" oninput="updateFav()">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card border-0 rounded-4 p-5 d-flex align-items-center justify-content-center" style="background: var(--bg-secondary);">
+                <canvas id="fav-canvas" width="128" height="128" class="rounded-3 shadow-lg mb-4"></canvas>
+                <button class="btn btn-accent px-4 py-2 fw-bold" onclick="downloadFav()">
+                    <i class="bi bi-download me-1"></i> Download PNG
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const textEl = document.getElementById('fav-text');
+        const bgEl = document.getElementById('fav-bg');
+        const canvas = document.getElementById('fav-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Load saved state
+        textEl.value = localStorage.getItem('hub-fav-text') || 'T';
+        bgEl.value = localStorage.getItem('hub-fav-bg') || '#facc15';
+
+        window.updateFav = function(isSilent = false) {
+            const char = textEl.value;
+            const bg = bgEl.value;
+
+            localStorage.setItem('hub-fav-text', char);
+            localStorage.setItem('hub-fav-bg', bg);
+
+            // Draw BG
+            ctx.fillStyle = bg;
+            ctx.fillRect(0, 0, 128, 128);
+
+            // Draw Text
+            ctx.fillStyle = (parseInt(bg.slice(1), 16) > 0xffffff / 2) ? '#000' : '#fff';
+            ctx.font = 'bold 80px Plus Jakarta Sans';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(char, 64, 64);
+            
+            if (!isSilent) {
+                logActivity('Design', `Favicon preview updated: ${char}`);
+            }
+        }
+
+        window.downloadFav = function() {
+            const link = document.createElement('a');
+            link.download = 'favicon.png';
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        updateFav(true);
+    })();
+</script>

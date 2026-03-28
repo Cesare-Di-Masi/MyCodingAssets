@@ -1,0 +1,83 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">Gradient Builder</h1>
+            <p class="text-muted mb-0">Visual CSS linear gradient generator with copy-paste code.</p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <button class="btn btn-accent px-4 py-2 fw-bold" onclick="copyCSS()">
+                <i class="bi bi-clipboard me-1"></i> Copy CSS
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 mb-4">
+                <h6 class="small fw-800 text-uppercase mb-4 opacity-50">Settings</h6>
+                <div class="mb-3">
+                    <label class="small text-muted fw-bold mb-2">Color 1</label>
+                    <input type="color" id="grad-c1" class="form-control bg-dark bg-opacity-25 border-0 p-1" value="#facc15" oninput="updateGrad()">
+                </div>
+                <div class="mb-3">
+                    <label class="small text-muted fw-bold mb-2">Color 2</label>
+                    <input type="color" id="grad-c2" class="form-control bg-dark bg-opacity-25 border-0 p-1" value="#3b82f6" oninput="updateGrad()">
+                </div>
+                <div class="mb-0">
+                    <label class="small text-muted fw-bold mb-2">Angle: <span id="grad-angle-val">135</span>°</label>
+                    <input type="range" id="grad-angle" class="form-range" min="0" max="360" value="135" oninput="updateGrad()">
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div id="grad-preview" class="card border-0 rounded-4 shadow-sm mb-4" style="height: 300px; background: linear-gradient(135deg, #facc15, #3b82f6);"></div>
+            <div class="card bg-dark bg-opacity-50 border-0 rounded-4 p-3">
+                <code class="text-accent small fw-bold" id="grad-css">background: linear-gradient(135deg, #facc15, #3b82f6);</code>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const c1El = document.getElementById('grad-c1');
+        const c2El = document.getElementById('grad-c2');
+        const angleEl = document.getElementById('grad-angle');
+        const preview = document.getElementById('grad-preview');
+        const css = document.getElementById('grad-css');
+        const angleVal = document.getElementById('grad-angle-val');
+
+        // Load saved state
+        c1El.value = localStorage.getItem('hub-grad-c1') || '#facc15';
+        c2El.value = localStorage.getItem('hub-grad-c2') || '#3b82f6';
+        angleEl.value = localStorage.getItem('hub-grad-angle') || '135';
+
+        window.updateGrad = function(isSilent = false) {
+            const c1 = c1El.value;
+            const c2 = c2El.value;
+            const angle = angleEl.value;
+
+            localStorage.setItem('hub-grad-c1', c1);
+            localStorage.setItem('hub-grad-c2', c2);
+            localStorage.setItem('hub-grad-angle', angle);
+
+            const grad = `linear-gradient(${angle}deg, ${c1}, ${c2})`;
+            preview.style.background = grad;
+            css.textContent = `background: ${grad};`;
+            angleVal.textContent = angle;
+            
+            if (!isSilent) {
+                logActivity('Design', 'Updated gradient');
+            }
+        }
+
+        window.copyCSS = function() {
+            const text = css.textContent;
+            navigator.clipboard.writeText(text);
+            alert('CSS Copied!');
+        }
+
+        updateGrad(true);
+    })();
+</script>

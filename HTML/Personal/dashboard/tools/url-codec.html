@@ -1,0 +1,60 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">URL Codec</h1>
+            <p class="text-muted mb-0">Safely encode and decode URL parameters and strings.</p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <div class="btn-group">
+                <button class="btn btn-accent px-4 py-2 fw-bold" onclick="processURL('encode')">Encode</button>
+                <button class="btn btn-dark border border-white border-opacity-10 px-4 py-2 fw-bold text-white" onclick="processURL('decode')">Decode</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-12">
+            <div class="card border-0 rounded-4 shadow-sm mb-4" style="background: var(--bg-secondary);">
+                <div class="card-header bg-transparent border-white border-opacity-5 p-3 d-flex justify-content-between align-items-center">
+                    <span class="small fw-800 text-uppercase opacity-50 px-2">Input / Output</span>
+                    <button class="btn btn-link btn-sm text-decoration-none text-muted" onclick="copyURL()">
+                        <i class="bi bi-clipboard me-1"></i> Copy
+                    </button>
+                </div>
+                <div class="card-body p-0">
+                    <textarea id="url-input" class="form-control bg-transparent border-0 p-4 font-monospace" 
+                              style="height: 400px; color: var(--text-main); font-size: 0.9rem; resize: none;" 
+                              placeholder="Paste text or URL here..."></textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const input = document.getElementById('url-input');
+
+        input.value = localStorage.getItem('hub-url-input') || '';
+
+        window.processURL = function(mode) {
+            try {
+                input.value = mode === 'encode' ? encodeURIComponent(input.value) : decodeURIComponent(input.value);
+                localStorage.setItem('hub-url-input', input.value);
+                logActivity('Development', mode === 'encode' ? 'Encoded URL' : 'Decoded URL');
+            } catch (e) {
+                alert("Error: Invalid URL encoding");
+            }
+        }
+
+        window.copyURL = function() {
+            input.select();
+            document.execCommand('copy');
+            alert('Copied to clipboard!');
+        }
+
+        input.addEventListener('input', () => {
+            localStorage.setItem('hub-url-input', input.value);
+        });
+    })();
+</script>

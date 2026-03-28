@@ -1,34 +1,165 @@
-<div class="container-fluid animate-fade-in">
-    <div class="row mb-5">
-        <div class="col-12 text-center text-md-start">
-            <h1 class="fw-bold display-6">System <span class="text-primary">Overview</span></h1>
-            <p class="text-muted">Bentornato. Ecco i tuoi strumenti ad accesso rapido.</p>
-        </div>
-    </div>
-
-    <div class="row g-4" id="pinned-tools-grid">
-        </div>
-
-    <div class="row mt-5 g-4">
-        <div class="col-lg-8">
-            <div class="card p-4 h-100">
-                <h5 class="fw-bold mb-4 text-primary">Andamento Attività</h5>
-                <div style="height: 250px;">
-                    <canvas id="hubMainChart"></canvas>
+<div class="animate-fade-in">
+    <div class="card border-0 rounded-4 overflow-hidden mb-5 shadow-lg bg-dark text-white position-relative">
+        <i class="bi bi-cpu-fill position-absolute text-accent opacity-10" style="font-size: 18rem; right: -4rem; bottom: -6rem; transform: rotate(-15deg); pointer-events: none;"></i>
+        
+        <div class="card-body p-4 p-lg-5 position-relative z-1">
+            <div class="row align-items-center">
+                <div class="col-lg-8">
+                    <div class="d-flex align-items-center mb-3">
+                        <div class="icon-box-sm bg-accent text-black rounded-circle me-2 shadow">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                        </div>
+                        <span class="badge bg-white text-dark px-3 py-2 rounded-pill fw-bold" style="font-size: 0.75rem;">TECHHUB V5.5 ENGINE ONLINE</span>
+                    </div>
+                    <h1 class="display-4 fw-800 tracking-tight mb-2">Ready, <span id="dash-user-name" class="text-accent">Guest</span>?</h1>
+                    <p class="lead opacity-75 mb-4">Tutti i tuoi strumenti di sviluppo e produttività sono sincronizzati e pronti all'uso.</p>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-accent btn-lg px-4 fw-bold shadow-sm" onclick="navigateTo('tasks')">
+                            <i class="bi bi-check2-all me-2"></i>I miei Task
+                        </button>
+                        <div class="dash-clock-inline ms-3 d-none d-md-flex align-items-center">
+                            <i class="bi bi-clock me-2 text-accent"></i>
+                            <span id="dash-clock" class="font-monospace fw-bold fs-4">00:00:00</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
+    </div>
+
+    <div class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h3 class="fw-800 mb-1">Toolbox</h3>
+                <p class="text-muted mb-0 small text-uppercase fw-bold tracking-widest">Tutti gli strumenti disponibili nella cartella /tools</p>
+            </div>
+            <div class="badge bg-secondary bg-opacity-10 text-muted p-2 px-3 border border-secondary border-opacity-25 rounded-3">
+                <span id="tool-count">0</span> Strumenti Caricati
+            </div>
+        </div>
         
-        <div class="col-lg-4">
-            <div class="card h-100">
-                <div class="card-header bg-transparent border-0 pt-4 px-4">
-                    <h5 class="fw-bold mb-0">Live <span class="text-danger">Log</span></h5>
-                </div>
-                <div class="card-body px-0">
-                    <ul class="list-group list-group-flush" id="recent-activity-list">
-                        </ul>
-                </div>
+        <div class="row g-4" id="dashboard-tools-grid">
+            <div class="col-12 text-center py-5 opacity-50">
+                <div class="spinner-border text-accent mb-2" role="status"></div>
+                <p>Inizializzazione moduli...</p>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .fw-800 { font-weight: 800; }
+    .tracking-tight { letter-spacing: -2px; }
+    .tracking-widest { letter-spacing: 2px; }
+    
+    .icon-box-sm {
+        width: 32px; height: 32px;
+        display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Stile Card dei Tool */
+    .tool-card-wrapper {
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .tool-card-body {
+        background: var(--bg-secondary);
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+        height: 100%;
+    }
+
+    .tool-card-wrapper:hover {
+        transform: translateY(-8px);
+    }
+
+    .tool-card-wrapper:hover .tool-card-body {
+        background: var(--bg-primary);
+        border-color: var(--accent);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    }
+
+    /* Icona nel cerchio Glass */
+    .tool-icon-circle {
+        width: 70px;
+        height: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(var(--accent-rgb, 250, 204, 21), 0.1);
+        color: var(--accent);
+        border-radius: 22px;
+        margin: 0 auto 1.5rem;
+        transition: all 0.3s ease;
+        font-size: 1.8rem;
+    }
+
+    .tool-card-wrapper:hover .tool-icon-circle {
+        background: var(--accent);
+        color: #000;
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .dash-clock-inline {
+        background: rgba(255,255,255,0.05);
+        padding: 0.5rem 1.5rem;
+        border-radius: 12px;
+        border: 1px solid rgba(255,255,255,0.1);
+    }
+</style>
+
+<script>
+    (function() {
+        // Funzione per generare la griglia dei tool basandosi sul registro globale
+        function renderDashboardTools() {
+            const grid = document.getElementById('dashboard-tools-grid');
+            const counter = document.getElementById('tool-count');
+            
+            // Accediamo a HUB_REGISTRY definito in hub-logic.js
+            // Filtriamo per includere solo quelli che non sono la dashboard stessa
+            const tools = HUB_REGISTRY.filter(t => t.id !== 'dashboard');
+            
+            if (!grid) return;
+            
+            grid.innerHTML = tools.map(tool => `
+                <div class="col-6 col-md-4 col-xl-3">
+                    <a href="#${tool.id}" class="tool-card-wrapper" onclick="navigateTo('${tool.id}')">
+                        <div class="card tool-card-body rounded-4 p-4 text-center">
+                            <div class="tool-icon-circle shadow-sm">
+                                <i class="bi ${tool.icon || 'bi-app-indicator'}"></i>
+                            </div>
+                            <h6 class="fw-800 mb-1">${tool.name}</h6>
+                            <p class="small text-muted mb-0 opacity-75">${tool.desc || 'Strumento di sistema'}</p>
+                        </div>
+                    </a>
+                </div>
+            `).join('');
+
+            if(counter) counter.textContent = tools.length;
+        }
+
+        function updateLiveElements() {
+            // Clock
+            const now = new Date();
+            const clockEl = document.getElementById('dash-clock');
+            if(clockEl) clockEl.textContent = now.toLocaleTimeString('it-IT', { hour12: false });
+
+            // User Name
+            const profile = JSON.parse(localStorage.getItem('hub-profile-data')) || { nome: 'Guest' };
+            const userEl = document.getElementById('dash-user-name');
+            if(userEl) userEl.textContent = profile.nome;
+        }
+
+        // Init
+        renderDashboardTools();
+        updateLiveElements();
+        
+        const dashInterval = setInterval(updateLiveElements, 1000);
+        
+        // Pulizia intervallo se si cambia vista
+        window.addEventListener('hashchange', () => clearInterval(dashInterval), { once: true });
+    })();
+</script>

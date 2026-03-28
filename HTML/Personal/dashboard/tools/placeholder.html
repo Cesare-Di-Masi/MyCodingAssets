@@ -1,0 +1,82 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">Mockup Placeholders</h1>
+            <p class="text-muted mb-0">Generate Lorem Ipsum text and image placeholder links for your mockups.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-6">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 mb-4">
+                <h6 class="small fw-800 text-uppercase mb-4 opacity-50">Lorem Ipsum</h6>
+                <div class="mb-3">
+                    <label class="small text-muted fw-bold mb-2">Paragraphs</label>
+                    <input type="number" id="lorem-count" class="form-control bg-dark bg-opacity-25 border-0 text-white" value="3" min="1" max="10">
+                </div>
+                <button class="btn btn-accent w-100 fw-bold py-2" onclick="genLorem()">Generate Text</button>
+                <div id="lorem-output" class="mt-4 small text-muted font-monospace" style="max-height: 200px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4">
+                <h6 class="small fw-800 text-uppercase mb-4 opacity-50">Image Placeholder</h6>
+                <div class="row g-3 mb-3">
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold mb-2">Width</label>
+                        <input type="number" id="img-w" class="form-control bg-dark bg-opacity-25 border-0 text-white" value="800">
+                    </div>
+                    <div class="col-6">
+                        <label class="small text-muted fw-bold mb-2">Height</label>
+                        <input type="number" id="img-h" class="form-control bg-dark bg-opacity-25 border-0 text-white" value="600">
+                    </div>
+                </div>
+                <button class="btn btn-accent w-100 fw-bold py-2" onclick="genImgLink()">Generate Link</button>
+                <div class="mt-4 p-3 bg-dark bg-opacity-50 rounded-3 text-center">
+                    <code id="img-link-out" class="small text-accent fw-bold">https://placehold.co/800x600</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const loremCountEl = document.getElementById('lorem-count');
+        const imgWEl = document.getElementById('img-w');
+        const imgHEl = document.getElementById('img-h');
+
+        // Load saved state
+        loremCountEl.value = localStorage.getItem('hub-lorem-count') || '3';
+        imgWEl.value = localStorage.getItem('hub-img-w') || '800';
+        imgHEl.value = localStorage.getItem('hub-img-h') || '600';
+
+        window.genLorem = function(isSilent = false) {
+            const count = loremCountEl.value;
+            localStorage.setItem('hub-lorem-count', count);
+            const text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. ".repeat(count);
+            document.getElementById('lorem-output').textContent = text;
+            
+            if (!isSilent) {
+                logActivity('Productivity', 'Generated Lorem Ipsum');
+            }
+        }
+
+        window.genImgLink = function(isSilent = false) {
+            const w = imgWEl.value;
+            const h = imgHEl.value;
+            localStorage.setItem('hub-img-w', w);
+            localStorage.setItem('hub-img-h', h);
+            const link = `https://placehold.co/${w}x${h}`;
+            document.getElementById('img-link-out').textContent = link;
+            
+            if (!isSilent) {
+                logActivity('Productivity', 'Generated Image Link');
+            }
+        }
+
+        genLorem(true);
+        genImgLink(true);
+    })();
+</script>

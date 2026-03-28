@@ -1,0 +1,162 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">Task Manager</h1>
+            <p class="text-muted mb-0">Organize your system workflows and personal goals.</p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <div class="d-inline-flex bg-secondary bg-opacity-10 p-2 rounded-4 border border-white border-opacity-5">
+                <input type="text" id="new-task-input" class="form-control bg-transparent border-0 text-white" placeholder="Type a new task..." style="width: 250px; outline: none !important; box-shadow: none !important;">
+                <button class="btn btn-indigo rounded-3 px-3" onclick="addTask()" style="background: var(--accent); border: none;">
+                    <i class="bi bi-plus-lg"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 overflow-hidden">
+                <div class="card-header bg-transparent border-white border-opacity-5 p-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="small fw-800 text-uppercase mb-0 opacity-50" style="letter-spacing: 0.1em;">Active Tasks</h6>
+                        <span class="badge bg-indigo bg-opacity-10 text-indigo rounded-pill px-3 py-2" id="task-counter-badge" style="color: #818cf8;">0 Tasks</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush" id="task-list">
+                        <!-- Tasks go here -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #task-list .list-group-item {
+        background: transparent;
+        border-color: rgba(255,255,255,0.05);
+        padding: 1.5rem 2rem;
+        transition: all 0.2s ease;
+    }
+    #task-list .list-group-item:hover {
+        background: rgba(255,255,255,0.02);
+    }
+    .task-checkbox {
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.5rem !important;
+        border: 2px solid rgba(255,255,255,0.2) !important;
+        background-color: transparent !important;
+        cursor: pointer;
+    }
+    .task-checkbox:checked {
+        background-color: var(--accent) !important;
+        border-color: var(--accent) !important;
+    }
+    .task-text {
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+    .task-text.completed {
+        opacity: 0.5;
+        text-decoration: line-through;
+    }
+    .btn-delete-task {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        color: #ef4444;
+    }
+    .list-group-item:hover .btn-delete-task {
+        opacity: 1;
+    }
+</style>
+
+<script>
+    (function() {
+        const inputEl = document.getElementById('new-task-input');
+        
+        window.getTasks = function() { 
+            try {
+                return JSON.parse(localStorage.getItem('hub-tasks') || '[]'); 
+            } catch (e) {
+                return [];
+            }
+        }
+        
+        window.saveTasks = function(t) { 
+            localStorage.setItem('hub-tasks', JSON.stringify(t)); 
+            renderTasks(); 
+        }
+
+        window.renderTasks = function() {
+            const list = document.getElementById('task-list');
+            const badge = document.getElementById('task-counter-badge');
+            const tasks = getTasks();
+            
+            badge.textContent = `${tasks.filter(t => !t.completed).length} Pending`;
+            
+            if (tasks.length === 0) {
+                list.innerHTML = `<div class="p-5 text-center text-muted opacity-50"><i class="bi bi-inbox fs-1 d-block mb-3"></i>No tasks found. Start by adding one above.</div>`;
+                return;
+            }
+
+            list.innerHTML = '';
+            tasks.forEach((task, i) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex align-items-center gap-3';
+                
+                const cb = document.createElement('input');
+                cb.type = 'checkbox';
+                cb.className = 'form-check-input task-checkbox mt-0';
+                cb.checked = task.completed;
+                cb.onchange = () => toggleTask(i);
+                
+                const span = document.createElement('span');
+                span.className = `task-text ${task.completed ? 'completed' : ''} flex-grow-1`;
+                span.textContent = task.text;
+                
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-link btn-delete-task p-0';
+                btn.innerHTML = '<i class="bi bi-trash3"></i>';
+                btn.onclick = () => deleteTask(i);
+                
+                li.appendChild(cb);
+                li.appendChild(span);
+                li.appendChild(btn);
+                list.appendChild(li);
+            });
+        }
+
+        window.addTask = function() {
+            const val = inputEl.value.trim();
+            if(!val) return;
+            const tasks = getTasks();
+            tasks.push({ text: val, completed: false });
+            saveTasks(tasks);
+            inputEl.value = '';
+            logActivity('Tasks', `Created: ${val}`);
+        }
+
+        window.toggleTask = function(i) {
+            const tasks = getTasks();
+            tasks[i].completed = !tasks[i].completed;
+            saveTasks(tasks);
+            logActivity('Tasks', `Updated status: ${tasks[i].text}`);
+        }
+
+        window.deleteTask = function(i) {
+            const tasks = getTasks();
+            const removed = tasks.splice(i, 1);
+            saveTasks(tasks);
+            logActivity('Tasks', `Deleted: ${removed[0].text}`);
+        }
+
+        renderTasks();
+        
+        inputEl.addEventListener('keypress', (e) => {
+            if(e.key === 'Enter') addTask();
+        });
+    })();
+</script>

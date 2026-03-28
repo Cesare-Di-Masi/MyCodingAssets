@@ -1,0 +1,46 @@
+<div class="animate-fade-in">
+    <div class="row mb-5">
+        <div class="col-12">
+            <h1 class="fw-800 mb-1">Time Zones</h1>
+            <p class="text-muted mb-0">Global clock manager for tracking time across multiple cities.</p>
+        </div>
+    </div>
+
+    <div class="row g-4" id="tz-grid">
+        <!-- Clocks injected -->
+    </div>
+</div>
+
+<script>
+    const zones = [
+        { city: 'London', zone: 'Europe/London' },
+        { city: 'New York', zone: 'America/New_York' },
+        { city: 'Tokyo', zone: 'Asia/Tokyo' },
+        { city: 'San Francisco', zone: 'America/Los_Angeles' },
+        { city: 'Sydney', zone: 'Australia/Sydney' },
+        { city: 'Dubai', zone: 'Asia/Dubai' }
+    ];
+
+    function updateClocks() {
+        const grid = document.getElementById('tz-grid');
+        grid.innerHTML = zones.map(z => {
+            const time = new Intl.DateTimeFormat('en-US', {
+                timeZone: z.zone,
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false
+            }).format(new Date());
+            
+            return `
+                <div class="col-md-4">
+                    <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-4 text-center">
+                        <h6 class="small fw-800 text-uppercase opacity-50 mb-3">${z.city}</h6>
+                        <h2 class="fw-800 mb-0 font-monospace text-accent">${time}</h2>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    setInterval(updateClocks, 1000);
+    updateClocks();
+</script>

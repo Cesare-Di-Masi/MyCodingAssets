@@ -1,0 +1,98 @@
+<div class="animate-fade-in">
+    <div class="row mb-5">
+        <div class="col-12 text-center">
+            <h1 class="fw-800 mb-1">Advanced Calculator</h1>
+            <p class="text-muted mb-0">Quick calculations with precision and ease.</p>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+        <div class="card bg-secondary bg-opacity-10 border-0 shadow-lg rounded-5 p-4" style="max-width: 400px; width: 100%;">
+            <div class="bg-dark bg-opacity-50 p-4 rounded-4 mb-4 text-end">
+                <div id="calc-history" class="small text-muted mb-1 overflow-hidden" style="height: 20px;"></div>
+                <div id="calc-display" class="fs-1 fw-bold text-accent">0</div>
+            </div>
+            
+            <div class="row g-2">
+                <!-- Row 1 -->
+                <div class="col-3"><button class="btn btn-dark w-100 rounded-4 py-3 fw-bold text-danger" onclick="clearCalc()">C</button></div>
+                <div class="col-3"><button class="btn btn-dark w-100 rounded-4 py-3 fw-bold" onclick="appendOperator('(')">(</button></div>
+                <div class="col-3"><button class="btn btn-dark w-100 rounded-4 py-3 fw-bold" onclick="appendOperator(')')">)</button></div>
+                <div class="col-3"><button class="btn btn-accent w-100 rounded-4 py-3 fw-bold text-black" onclick="appendOperator('/')">÷</button></div>
+                
+                <!-- Row 2 -->
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('7')">7</button></div>
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('8')">8</button></div>
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('9')">9</button></div>
+                <div class="col-3"><button class="btn btn-accent w-100 rounded-4 py-3 fw-bold text-black" onclick="appendOperator('*')">×</button></div>
+                
+                <!-- Row 3 -->
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('4')">4</button></div>
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('5')">5</button></div>
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('6')">6</button></div>
+                <div class="col-3"><button class="btn btn-accent w-100 rounded-4 py-3 fw-bold text-black" onclick="appendOperator('-')">-</button></div>
+                
+                <!-- Row 4 -->
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('1')">1</button></div>
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('2')">2</button></div>
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('3')">3</button></div>
+                <div class="col-3"><button class="btn btn-accent w-100 rounded-4 py-3 fw-bold text-black" onclick="appendOperator('+')">+</button></div>
+                
+                <!-- Row 5 -->
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('0')">0</button></div>
+                <div class="col-3"><button class="btn btn-secondary bg-opacity-10 border-0 w-100 rounded-4 py-3 fw-bold" onclick="appendNumber('.')">.</button></div>
+                <div class="col-6"><button class="btn btn-accent w-100 rounded-4 py-3 fw-bold text-black" onclick="calculateResult()">=</button></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const display = document.getElementById('calc-display');
+        const history = document.getElementById('calc-history');
+        let currentExpr = localStorage.getItem('hub-calc-expr') || '';
+
+        if (currentExpr) {
+            display.textContent = currentExpr;
+        }
+
+        window.appendNumber = function(num) {
+            currentExpr += num;
+            display.textContent = currentExpr;
+            localStorage.setItem('hub-calc-expr', currentExpr);
+        }
+
+        window.appendOperator = function(op) {
+            currentExpr += op;
+            display.textContent = currentExpr;
+            localStorage.setItem('hub-calc-expr', currentExpr);
+        }
+
+        window.clearCalc = function() {
+            currentExpr = '';
+            display.textContent = '0';
+            history.textContent = '';
+            localStorage.removeItem('hub-calc-expr');
+        }
+
+        window.calculateResult = function() {
+            if (!currentExpr) return;
+            try {
+                // Basic sanitization: only allow numbers, operators, and parentheses
+                if (/[^0-9\+\-\*\/\.\(\)]/.test(currentExpr)) {
+                    throw new Error("Invalid characters");
+                }
+                const res = eval(currentExpr);
+                history.textContent = currentExpr + ' =';
+                currentExpr = res.toString();
+                display.textContent = currentExpr;
+                localStorage.setItem('hub-calc-expr', currentExpr);
+                logActivity('Calculator', `Computed: ${history.textContent} ${res}`);
+            } catch (e) {
+                display.textContent = 'Error';
+                setTimeout(clearCalc, 1000);
+            }
+        }
+    })();
+</script>

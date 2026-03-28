@@ -1,0 +1,50 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">ASCII Table</h1>
+            <p class="text-muted mb-0">Quick reference for ASCII character encoding and decimal/hex values.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table table-dark table-hover mb-0 font-monospace small">
+                        <thead>
+                            <tr class="bg-dark">
+                                <th class="p-3 border-0">DEC</th>
+                                <th class="p-3 border-0">HEX</th>
+                                <th class="p-3 border-0">CHR</th>
+                                <th class="p-3 border-0 text-muted">Description</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ascii-body">
+                            <!-- Injected -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const specials = {
+            0: 'NUL', 10: 'LF', 13: 'CR', 32: 'Space'
+        };
+        let html = '';
+        for(let i=32; i<127; i++) {
+            html += `
+                <tr>
+                    <td class="p-3 border-white border-opacity-5">${i}</td>
+                    <td class="p-3 border-white border-opacity-5">0x${i.toString(16).toUpperCase()}</td>
+                    <td class="p-3 border-white border-opacity-5 text-accent fw-bold">${String.fromCharCode(i)}</td>
+                    <td class="p-3 border-white border-opacity-5 text-muted">${specials[i] || ''}</td>
+                </tr>
+            `;
+        }
+        document.getElementById('ascii-body').innerHTML = html;
+    })();
+</script>

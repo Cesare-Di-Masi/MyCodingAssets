@@ -1,0 +1,151 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-center">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">JWT Analyzer <span class="badge bg-accent text-black small">PRO</span></h1>
+            <p class="text-muted mb-0">Deep inspection of JSON Web Tokens with expiry tracking and claim validation.</p>
+        </div>
+        <div class="col-md-5 text-md-end mt-3 mt-md-0">
+            <button class="btn btn-accent px-5 py-2 fw-bold shadow-accent" onclick="analyzeSecureToken()">
+                <i class="bi bi-shield-lock-fill me-2"></i> ANALYZE
+            </button>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Input Panel -->
+        <div class="col-lg-5">
+            <div class="card border-0 rounded-4 shadow-sm h-100 overflow-hidden" style="background: var(--bg-secondary);">
+                <div class="card-header bg-transparent border-white border-opacity-5 p-3">
+                    <span class="small fw-800 text-uppercase opacity-50 px-2">ENCODED TOKEN</span>
+                </div>
+                <div class="card-body p-0">
+                    <textarea id="jwt-input" class="form-control bg-transparent border-0 p-4 font-monospace text-white-50" 
+                              style="height: 550px; font-size: 0.85rem; resize: none; line-height: 1.6;" 
+                              placeholder="Paste your eyJhbGci... token here" oninput="analyzeSecureToken()"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inspector Panel -->
+        <div class="col-lg-7">
+            <!-- Stats Row -->
+            <div class="row g-3 mb-4">
+                <div class="col-6">
+                    <div id="status-card" class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-3 text-center">
+                        <span class="small fw-800 text-muted text-uppercase mb-1" style="font-size: 0.6rem;">TOKEN STATUS</span>
+                        <h6 id="token-status" class="mb-0 fw-800 text-uppercase">--</h6>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div id="expiry-card" class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-3 text-center">
+                        <span class="small fw-800 text-muted text-uppercase mb-1" style="font-size: 0.6rem;">EXPIRES IN</span>
+                        <h6 id="token-expiry" class="mb-0 fw-800 text-uppercase">--</h6>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segments -->
+            <div class="card border-0 rounded-4 shadow-sm mb-4" style="background: var(--bg-secondary);">
+                <div class="card-header bg-transparent border-white border-opacity-5 p-3">
+                    <span class="small fw-800 text-uppercase opacity-50 px-2 text-danger">HEADER: <small class="text-muted" id="header-alg">ALGORITHM</small></span>
+                </div>
+                <div class="card-body p-0">
+                    <pre id="jwt-header" class="p-4 mb-0 font-monospace text-danger bg-dark bg-opacity-25" style="font-size: 0.85rem; min-height: 100px;"></pre>
+                </div>
+            </div>
+
+            <div class="card border-0 rounded-4 shadow-sm" style="background: var(--bg-secondary);">
+                <div class="card-header bg-transparent border-white border-opacity-5 p-3">
+                    <span class="small fw-800 text-uppercase opacity-50 px-2 text-primary">PAYLOAD: <small class="text-muted">DATA & CLAIMS</small></span>
+                </div>
+                <div class="card-body p-0">
+                    <pre id="jwt-payload" class="p-4 mb-0 font-monospace text-primary bg-dark bg-opacity-25" style="font-size: 0.85rem; min-height: 250px;"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    pre { white-space: pre-wrap; word-wrap: break-word; }
+    .shadow-accent { box-shadow: 0 8px 25px rgba(250, 204, 21, 0.2); }
+</style>
+
+<script>
+    (function() {
+        const inputEl = document.getElementById('jwt-input');
+        let lastLoggedToken = "";
+
+        window.analyzeSecureToken = (isSilent = false) => {
+            const token = inputEl.value.trim();
+            const headerEl = document.getElementById('jwt-header');
+            const payloadEl = document.getElementById('jwt-payload');
+            const statusEl = document.getElementById('token-status');
+            const expiryEl = document.getElementById('token-expiry');
+            const algLabel = document.getElementById('header-alg');
+
+            localStorage.setItem('hub-jwt-input', token);
+
+            if(!token) return resetInspector();
+
+            const parts = token.split('.');
+            if(parts.length !== 3) {
+                statusEl.textContent = "INVALID FORMAT";
+                statusEl.className = "mb-0 fw-800 text-uppercase text-danger";
+                return;
+            }
+
+            try {
+                const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')));
+                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+
+                headerEl.textContent = JSON.stringify(header, null, 4);
+                payloadEl.textContent = JSON.stringify(payload, null, 4);
+                algLabel.textContent = header.alg || 'UNKNOWN';
+
+                // Success status
+                statusEl.textContent = "VALID";
+                statusEl.className = "mb-0 fw-800 text-uppercase text-success";
+
+                // Check Expiry
+                if(payload.exp) {
+                    const now = Math.floor(Date.now() / 1000);
+                    const diff = payload.exp - now;
+                    
+                    if(diff < 0) {
+                        statusEl.textContent = "EXPIRED";
+                        statusEl.className = "mb-0 fw-800 text-uppercase text-danger";
+                        expiryEl.textContent = "PAST DUE";
+                    } else {
+                        const h = Math.floor(diff / 3600);
+                        const m = Math.floor((diff % 3600) / 60);
+                        expiryEl.textContent = `${h}h ${m}m`;
+                    }
+                } else {
+                    expiryEl.textContent = "NO EXPIRY";
+                }
+
+                if (!isSilent && token !== lastLoggedToken) {
+                    logActivity('Security', `Analyzed JWT (${header.alg})`);
+                    lastLoggedToken = token;
+                }
+            } catch (e) {
+                statusEl.textContent = "DECODE ERROR";
+                statusEl.className = "mb-0 fw-800 text-uppercase text-danger";
+            }
+        }
+
+        window.resetInspector = function() {
+            document.getElementById('jwt-header').textContent = "";
+            document.getElementById('jwt-payload').textContent = "";
+            document.getElementById('token-status').textContent = "--";
+            document.getElementById('token-expiry').textContent = "--";
+            lastLoggedToken = "";
+        }
+
+        // Load saved state
+        inputEl.value = localStorage.getItem('hub-jwt-input') || '';
+        if(inputEl.value) analyzeSecureToken(true);
+
+    })();
+</script>

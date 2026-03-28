@@ -1,0 +1,30 @@
+<div class="animate-fade-in">
+    <div class="row mb-5 align-items-end">
+        <div class="col-md-7">
+            <h1 class="fw-800 mb-1">CORS Proxy</h1>
+            <p class="text-muted mb-0">Bypass Cross-Origin Resource Sharing restrictions during development.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card bg-secondary bg-opacity-10 border-0 rounded-4 p-5">
+                <h5 class="fw-bold mb-4">How to use</h5>
+                <p class="text-muted">Prepend the proxy URL to your request URL in your code to bypass browser CORS blocks.</p>
+                
+                <div class="p-4 bg-dark bg-opacity-50 rounded-4 mb-4">
+                    <code class="text-accent fw-bold" id="proxy-url">https://cors-anywhere.herokuapp.com/</code>
+                </div>
+
+                <div class="alert alert-warning border-0 rounded-4 p-4">
+                    <h6 class="fw-bold mb-2"><i class="bi bi-exclamation-triangle-fill me-2"></i>Development Only</h6>
+                    <p class="small mb-0">Public proxies should never be used in production apps as they can intercept your data. Use them only for local testing and debugging.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    logActivity('Security', 'Viewed CORS Proxy info');
+</script>
