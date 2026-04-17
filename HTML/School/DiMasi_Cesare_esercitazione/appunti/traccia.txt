@@ -1,0 +1,58 @@
+Traccia
+
+Obiettivi della prova
+Dimostrare la capacità di strutturare una pagina web moderna utilizzando i tag semantici di HTML5,
+integrare un framework CSS (Bootstrap) per il layout e applicare stili personalizzati tramite CSS
+esterno utilizzando selettori avanzati.
+
+Scenario
+Sei stato incaricato di realizzare la pagina di un articolo per un Blog Tecnologico. La pagina deve
+essere moderna, responsive (adattabile a cellulari e PC) e semanticamente corretta per favorire
+l'indicizzazione sui motori di ricerca (SEO).
+
+Requisiti Tecnici Obbligatori
+1. Struttura HTML5
+Il documento deve essere valido HTML5.
+Devi utilizzare obbligatoriamente i seguenti tag semantici per strutturare la pagina:
+ <header> (per l'intestazione)
+ <nav> (per il menu di navigazione)
+ <main> (per il contenuto principale)
+ <article> (per il corpo dell'articolo)
+ <aside> (per la barra laterale/sidebar)
+ <footer> (per il piè di pagina)
+Non utilizzare tag generici come <div> al posto di quelli semantici sopra elencati (se non proprio
+indispensabili).
+2. Integrazione Bootstrap
+Importare Bootstrap tramite CDN (link CSS e JS) nell'<head> e prima della chiusura del <body>.
+Utilizzare il Grid System di Bootstrap (container, row, col-...) per creare un layout a due colonne:
+ Colonna principale (Contenuto articolo): più larga.
+ Colonna laterale (Sidebar): più stretta.
+Nota: Su schermi piccoli (mobile) le colonne devono andare automaticamente una sotto l'altra.
+Utilizzare almeno un componente Bootstrap a scelta tra: Navbar, Card, Button, o Alert.
+3. Foglio di Stile Esterno (CSS)
+Creare un file separato chiamato style.css e collegarlo all'index.html.
+VIETATO usare stili inline (attributo style="..." nell'HTML).
+
+VIETATO usare selettori ID (#id) per lo styling principale (usarli solo se strettamente necessario per
+ancoraggi).
+4. Selettori CSS Avanzati (Punto Cruciale)
+Nel file style.css devi dimostrare l'uso di almeno TRE dei seguenti selettori avanzati (non semplici tag,
+classi o ID):
+ Selettore Figlio Diretto >
+ Selettore Fratello Adiacente +
+ Pseudo-classe strutturale :
+ Selettore di Attributo :
+Attenzione: Ogni selettore avanzato usato deve produrre un effetto visibile nella pagina (cambio
+colore, bordo, sfondo, e così via).
+Contenuti da Inserire
+Per permettere la verifica dei requisiti, la pagina deve contenere:
+ Un titolo principale nell'<header>.
+ Un menu di navigazione con almeno 3 link.
+ Un articolo con: Titolo (h2), Sottotitolo (h3), almeno un paragrafo (p) e una lista (ul o ol).
+ Una sidebar con almeno 2 elementi (es. link ad altri articoli o banner).
+ Un link esterno nell'articolo (che punti a un sito https).
+Consegna
+ Creare una cartella cognome_nome_esercitazione
+ Inserire i file index.html e style.css
+ Comprimere la cartella in un file .zip
+ Caricare il file .zip su Classroom in corrispondenza del compito ed entro la fine delle due ore.

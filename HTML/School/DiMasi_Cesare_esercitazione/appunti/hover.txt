@@ -1,0 +1,4 @@
+Hover su quali elementi:
+navbar testo -> diventano più bianchi
+card a destra -> si ingrandiscono e i bottoni diventano njeri
+il pulsante in basso diventa verde

@@ -1,0 +1,12 @@
+.element-list:nth-child(odd) {
+    background-color: yellow;
+}
+
+.Articolo-Sec > h4
+{
+    color: blue;
+}
+
+.Articolo-Sec + .Articolo-Sec {
+    background: lightgray;
+}
