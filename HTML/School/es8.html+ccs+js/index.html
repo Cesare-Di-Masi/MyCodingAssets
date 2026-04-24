@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Convertitore PX to REM</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 50px;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px; 
+        }
+
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            padding: 8px;
+            margin: 10px;
+            width: 80px;
+        }
+
+        button {
+            padding: 8px 15px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #risultato, #risultato2 {
+            font-weight: bold;
+            color: #28a745;
+            font-size: 1.2em;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Convertitore PX ➔ REM</h1>
+        <p>Inserisci i Pixel:</p>
+        <input type="number" id="inputPixel" placeholder="es. 16">
+        <button id="btnCalcola">Converti</button>
+
+        <p id="risultato"></p>
+    </div>
+
+    <div class="container">
+        <h1>Convertitore REM ➔ PX</h1>
+        <p>Inserisci i REM:</p>
+        <input type="number" id="inputRem" placeholder="es. 1">
+        <button id="btnCalcolaPx">Converti</button>
+
+        <p id="risultato2"></p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

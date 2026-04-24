@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestione Spese SPA</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+    <main>
+        <div class="container mt-5">
+            <div class="row g-5">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title mb-4">Nuova Attività</h5>
+                            <form id="spese-form">
+                                <div class="mb-3">
+                                    <label for="nome-attivita" class="form-label">Nome Attività</label>
+                                    <input type="text" class="form-control" id="nome-attivita" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="costo-previsto" class="form-label">Costo Previsto (€)</label>
+                                    <input type="number" class="form-control" id="costo-previsto" step="0.01" required>
+                                </div>
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" class="form-check-input" id="privacy-check" required>
+                                    <label class="form-check-label" for="privacy-check">Accetto condizione di privacy</label>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100">Aggiungi alla lista</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <h5 class="sidebar-title mb-3">Elenco Spese</h5>
+                    <div class="card shadow-sm">
+                        <ul class="list-group list-group-flush" id="lista-ul">
+                            </ul>
+                    </div>
+                </div>
+            </div>
+
+            <hr class="my-5">
+
+            <div class="text-center pb-5">
+                <h2 id="display-totale">Totale Spesa: 0€ (budget max. 500€)</h2>
+                <div id="messaggio-alert" class="mt-2 text-danger h5" style="display: none;">
+                    BUDGET SUPERATO!!!
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

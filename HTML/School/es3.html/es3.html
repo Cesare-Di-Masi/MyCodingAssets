@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <header>
+        <h1>
+            Modulo di prova
+        </h1>
+    </header>
+    <form>
+        <fieldset>
+            <legend>
+                Anagrafica
+            </legend>
+            <label for="Name">
+                Nome:
+            </label>
+            <input type="text" id="Name" />
+            <label for="Surname">
+                Cognome:
+            </label>
+            <input type="text" id="Surname" />
+            <label for="Date">
+                Data di nascita:
+            </label>
+            <input type="date" id="Date" />
+        </fieldset>
+        <fieldset>
+            <legend>
+                Newsletter
+            </legend>
+            <label for="Email">
+                Email (obbligatorio):
+            </label>
+            <input type="email" id="Email" placeholder="esempio@esempio.it" required />
+            <!-- required = l'utente è obbligato ad inserire la password -->
+            <fieldset>
+                <legend>
+                    A quale newsletter iscriversi?
+                </legend>
+                <input type="checkbox" id="Kitchen">
+                <label for="Kitchen">
+                    Cucina
+                </label>
+                <input type="checkbox" id="Book">
+                <label for="Book">
+                    Libri
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>
+                    Settimanale o mensile?
+                </legend>
+                <input type="radio" id="Week">
+                <label for="Week">
+                    Settimanale
+                </label>
+                <input type="radio" id="Month">
+                <label for="Month">
+                    Mensile
+                </label>
+            </fieldset>
+        </fieldset>
+        <label for="Password">
+            Password (obbligatorio, min. 8 caratteri):
+        </label>
+        <input type="password" id="Password" required minlength="8"/>
+        <button>
+            Invia
+        </button>
+    </form>
+</body>
+
+</html>

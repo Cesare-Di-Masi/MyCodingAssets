@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Il Messaggio Segreto</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding-top: 50px;
+            transition: background-color 0.3s ease;
+            /* Aggiunge un cambio di colore fluido */
+        }
+
+        #messaggio {
+            width: 300px;
+            padding: 20px;
+            background-color: lightyellow;
+            border: 2px solid orange;
+            /* Corretto: aggiunto "px" dopo il 2 */
+            margin: 20px auto;
+            /* All'inizio il messaggio è NASCOSTO */
+            display: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1 id="titolo">Vuoi leggere il segreto?</h1>
+
+    <button id="btnToggle">Mostra / Nascondi Segreto</button>
+
+    <div id="messaggio">
+        <p> "Uomini forti destini forti, uomini deboli destini deboli, non c'è altra strada." </p>
+    </div>
+
+    <script>
+        // 1. Prendiamo gli elementi dalla pagina
+        const scatola = document.getElementById('messaggio');
+        const btnToggle = document.getElementById('btnToggle');
+        const titolo = document.getElementById('titolo');
+
+        // 2. Cosa succede quando clicco l'unico bottone
+        btnToggle.onclick = function () {
+
+            // Controlliamo se la scatola è già visibile
+            if (scatola.style.display === "block") {
+                // SE È APERTA: la chiudiamo
+                scatola.style.display = "none";
+                document.body.style.backgroundColor = "white";
+
+                // Rimettiamo il titolo originale (Opzionale ma utile!)
+                titolo.textContent = "Vuoi leggere il segreto?";
+            } else {
+                // ALTRIMENTI (se è chiusa): la apriamo
+                scatola.style.display = "block";
+                document.body.style.backgroundColor = "lightgreen";
+
+                // Cambiamo il testo del titolo
+                titolo.textContent = "Ecco il segreto!";
+            }
+        };
+    </script>
+
+</body>
+
+</html>

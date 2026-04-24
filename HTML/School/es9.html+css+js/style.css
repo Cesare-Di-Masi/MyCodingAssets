@@ -1,0 +1,113 @@
+/* --- Stili generali della pagina --- */
+body {
+    
+    background-color: #f4f7f6;
+    color: #333;
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ddd;
+}
+
+h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+#status-message {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #666;
+}
+
+/* --- Layout a griglia per le card --- */
+#dashboard {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+/* --- Stile base della Card --- */
+.card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-left: 8px solid #ccc; /* Bordo di default */
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 18px;
+    color: #444;
+    text-transform: capitalize;
+}
+
+.card p {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.5;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* --- Classi condizionali per ONLINE (Pari) e OFFLINE (Dispari) --- */
+.online {
+    border-left-color: #28a745;
+}
+.online .status-badge {
+    background-color: #e2f5e5;
+    color: #28a745;
+}
+
+.offline {
+    border-left-color: #dc3545;
+}
+.offline .status-badge {
+    background-color: #fdeaea;
+    color: #dc3545;
+}
+
+.error {
+    color: #dc3545;
+}

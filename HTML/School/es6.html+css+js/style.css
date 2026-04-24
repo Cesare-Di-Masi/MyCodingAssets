@@ -1,0 +1,109 @@
+/* Importiamo un font moderno da Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+/* Reset base e stile del corpo della pagina */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    margin: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+}
+
+/* Titolo principale */
+h1 {
+    color: #2c3e50;
+    margin-bottom: 20px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+
+/* Stile del pulsante */
+#startBtn {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(76, 175, 80, 0.3);
+}
+
+/* Effetto hover sul pulsante */
+#startBtn:hover:not(:disabled) {
+    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(76, 175, 80, 0.4);
+}
+
+/* Stile del pulsante quando è disabilitato (durante il download) */
+#startBtn:disabled {
+    background-color: #a5d6a7;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+}
+
+/* Finestra di output (effetto terminale moderno) */
+#output {
+    background-color: #ffffff;
+    width: 90%;
+    max-width: 500px;
+    min-height: 250px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    border: 1px solid #e1e8ed;
+    
+    font-family: 'Courier New', Courier, monospace !important;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* Stile dei paragrafi generati dinamicamente */
+#output p {
+    margin: 8px 0;
+    padding: 8px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid lightblue;
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Differenziamo i messaggi di successo */
+#output p[style*="color: green"] {
+    border-left-color: #2ecc71;
+    background-color: #eafaf1;
+}
+
+/* AGGIUNTA: Differenziamo i messaggi di errore */
+#output p[style*="color: red"] {
+    border-left-color: #e74c3c; /* Un rosso più acceso per il bordo */
+    background-color: #fee2e2;  /* Un rosso molto chiaro per lo sfondo, equivalente al verde chiaro */
+}
+
+/* Stile per il testo di attesa */
+#output em {
+    color: #7f8c8d;
+    font-style: normal;
+}
+
+/* Titolo finale di completamento */
+#output h3 {
+    text-align: center;
+    color: #27ae60;
+    margin-top: 20px;
+    animation: fadeIn 0.8s ease-in-out;
+}
+
+/* Piccola animazione per l'apparizione del testo */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}

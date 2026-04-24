@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en"> <!-- la lingua dovrebbe essere in italiano visto che la pagina è scritta tutta in italiano -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esercizio 1 errato</title>
+</head>
+<body>
+    <!-- sopra il main andrebbe l'header, non l'aside che è un contenuto marginale -->
+    <aside>
+        <!-- va bene il div ma sarebbe meglio un nav -->
+        <div class="navList">
+            <a href="a.html">Pagina A</a>
+            <a href="b.html">Pagina B</a>
+        </div>
+    </aside>
+    <!-- il div non va perchè è una ridondanza, il main è già all'interno del file, non ha bisogno di specificare una classe main -->
+    <div class="main">
+        <main>
+            <div class="section">
+                <p>
+                    Testo di prova
+                </p>
+            </div>
+            <section>
+                <strong>Titolo sezione</strong>
+                <div class="container">
+                    <p>
+                        Testo di prova
+                    </p>
+                </div>
+                <ul>
+                    <!-- ul non può contenere article così. Può invece avere il tag li con dentro gli article-->
+                    <article>Articolo 1</article>
+                    <article>Articolo 2</article>
+                    <article>Articolo 3</article>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

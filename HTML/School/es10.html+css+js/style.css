@@ -1,0 +1,26 @@
+/* Stile per l'allerta budget */
+.budget-alert {
+    color: #dc3545 !important;
+    font-weight: bold;
+    transform: scale(1.1);
+    transition: all 0.3s ease;
+}
+
+/* Allineamento elementi della lista */
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    animation: fadeIn 0.4s ease-in-out;
+}
+
+/* Piccola animazione all'aggiunta */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.sidebar-title {
+    font-weight: 600;
+    color: #495057;
+}

@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagina 2</title>
+</head>
+
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li>
+                    <a href="es3p1.html">Pagina 1</a>
+                </li>
+                <li>
+                    <a href="es3p2.html">Questa pagina</a>
+                </li>
+            </ul>
+        </nav>
+        <h1>
+            Autenticazione
+        </h1>
+    </header>
+    <main>
+        <form>
+            <fieldset>
+                <legend>
+                    Credenziali
+                </legend>
+                <label for="Email">
+                    Email:
+                </label>
+                <input type="email" id="Email" required placeholder="esempio@mail.it">
+                <label for="Password">
+                    Password:
+                </label>
+                <input type="password" id="Password" required>
+            </fieldset>
+            <fieldset>
+                <legend>
+                    Metodo di accesso
+                </legend>
+                <input type="radio" name="MetodoAccesso" id="Diretto">
+                <label for="Diretto">
+                    Diretto
+                </label>
+                <input type="radio" name="MetodoAccesso" id="Indiretto">
+                <label for="Indiretto">
+                    Indiretto
+                </label>
+            </fieldset>
+            <fieldset>
+                <legend>
+                    A cosa vuoi accedere?
+                </legend>
+                <ul>
+                    <li>
+                        <input type="checkbox" name="Accensione" id="Prodotti">
+                        <label for="Prodotti">
+                            Prodotti
+                        </label>
+                    </li>
+                    <li>
+                        <input type="checkbox" name="Accensione" id="Informazioni">
+                        <label for="Informazioni">
+                            Informazioni
+                        </label>
+                    </li>
+                    <li>
+                        <input type="checkbox" name="Accensione" id="Contatti">
+                        <label for="Contatti">
+                            Contatti
+                        </label>
+                    </li>
+                </ul>
+            </fieldset>
+            <button>
+                Accedi
+            </button>
+        </form>
+        <section>
+            <h2>
+                Contatti
+            </h2>
+            <h3>
+                Puoi scegliere le seguenti modalità di contatto:
+            </h3>
+            <ol>
+                <li>
+                    Telefono:
+                    <span>
+                        +123456789
+                    </span>
+                </li>
+                <li>
+                    Email:
+                    <span>
+                        esempio@gmail.it
+                    </span>
+                </li>
+            </ol>
+        </section>
+    </main>
+</body>
+
+</html>

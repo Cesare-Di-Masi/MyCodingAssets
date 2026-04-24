@@ -1,0 +1,194 @@
+/* I commenti prof li ho segnati in modo tale che questo progetto lo posso utilizzare per studiare */
+/* Reset generale di margini e padding + box model consistente */
+* {
+    margin: 0;                                /* rimuove margini di default */                         
+    padding: 0;                               /* rimuove padding di default */
+    box-sizing: border-box;                   /* include padding e border nelle dimensioni */
+    font-family: Arial, sans-serif;           /* font globale */
+}
+/* HEADER della pagina */
+header {
+    text-transform: uppercase;                /* testo tutto maiuscolo */                 
+    padding: 15px;                            /* spazio interno */
+    color: blue;                            /* colore testo */
+    font-weight: bold;                        /* testo in grassetto */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);  /* ombra sotto l’header */
+    font-size: xx-small;                      /* dimensione testo molto piccola */
+}
+/* CONTENITORE principale */
+.container {
+    display: flex;                            /* layout flex */
+    flex-direction: column;                   /* elementi disposti in colonna */
+    align-items: center;                      /* centrati orizzontalmente */
+    padding: 40px 20px;                       /* spazio interno */
+    gap: 40px;                                /* spazio tra gli elementi */
+}
+/* BOX LOGIN (desktop) */
+.login-box {
+    position: fixed;                          /* posizione fissa nella viewport */
+    top: 50%;                                 /* centrato verticalmente */
+    left: 50%;                                /* centrato orizzontalmente */
+    transform: translate(-70%, -50%);         /* spostamento per centraggio visivo */
+    height: 165px;                            /* altezza fissa */
+    min-height: 165px;                        /* altezza minima */
+    width: 600px;                             /* larghezza fissa */
+    min-width: 600px;                         /* larghezza minima */
+    background-color: white;                /* sfondo bianco */
+    padding: 20px;                            /* spazio interno */
+    width: 100%;                              /* larghezza adattabile */
+    max-width: 400px;                         /* larghezza massima */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* ombra del box */
+}
+/* Titolo "Login" */
+.login-box p {
+    font-weight: 700;                          /* testo molto marcato */
+}
+/* Gruppo label + input */
+.login-box .form-group {
+    display: flex;                             /* layout orizzontale */               
+    justify-content: space-between;            /* spazio tra label e input */ 
+    align-items: center;                       /* allineamento verticale */         
+    margin-top: 0px;                           /* nessun margine sopra */           
+}
+/* Label del form */
+.login-box label {
+    margin: 0;                                 /* rimuove margini */                  
+    flex: 1;                                   /* occupa 1 parte dello spazio */                    
+}
+/* Input del form */
+.login-box input {
+    flex: 2;                                   /* input più largo della label */               
+    margin-left: 10px;                         /* distanza dalla label */        
+    border: none;                              /* rimuove bordi */
+    border-bottom: 2px solid blue;           /* solo bordo inferiore */
+    padding: 3px 0;                            /* spazio interno verticale */
+    outline: none;                             /* rimuove bordo focus */
+}
+/* Bottone di login */
+.login-box button {
+    text-transform: uppercase;                 /* testo maiuscolo */
+    margin-top: 15px;                          /* spazio sopra */
+    width: 100%;                               /* bottone a tutta larghezza */
+    padding: 10px;                             /* spazio interno */
+    background-color: #dcdcdc;               /* colore di sfondo */
+    border: none;                              /* rimuove bordo */
+    border-radius: 5px;                        /* angoli arrotondati */
+}
+/* BOX METEO (desktop) */
+.meteo-box {
+    position: fixed;                           /* posizione fissa */
+    right: 20px;                               /* distanza dal lato destro */
+    top: 50%;                                  /* centrato verticalmente */
+    transform: translateY(-50%);               /* centraggio verticale preciso */
+    height: 400px;                             /* altezza */
+    width: 200px;                              /* larghezza */
+    min-height: 400px;                         /* altezza minima */
+    padding: 30px;                             /* spazio interno */
+    text-align: center;                        /* testo centrato */
+}
+/* FOOTER */
+footer {
+    text-transform: uppercase;                 /* testo maiuscolo */
+    background-color: #dcdcdc;               /* sfondo */
+    text-align: center;                        /* testo centrato */
+    padding: 15px;                             /* spazio interno */
+    color: blue;                             /* colore testo */
+    font-weight: bold;                         /* testo in grassetto */
+    position: fixed;                           /* posizione fissa */
+    bottom: 0;                                 /* ancorato in basso */
+    left: 0;                                   /* allineato a sinistra */
+    width: 100%;                               /* larghezza completa */
+}
+/* MEDIA QUERY DESKTOP LARGE */
+@media (min-width: 900px) {
+    .container {
+        flex-direction: row;                   /* elementi in riga */
+        justify-content: center;               /* centrati orizzontalmente */
+    }
+
+    .meteo-box {
+        height: 300px;                            /* nuova altezza */
+        width: 250px;                             /* nuova larghezza */
+        border-radius: 40px;                      /* angoli molto arrotondati */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2); /* ombra */
+        display: flex;                            /* flex layout */
+        flex-direction: column;                   /* contenuti in colonna */
+        justify-content: center;                  /* centrati verticalmente */
+    }
+}
+
+/* MEDIA QUERY SMARTPHONE */
+@media (max-width: 480px) {
+    /* Header centrato su mobile */
+    header {
+        text-align: center;                        /* testo centrato */ 
+        word-break: break-word;                    /* va a capo senza rompere layout */
+    }
+    /* Titolo Login più grande */
+    .login-box p {
+        font-size: 30px;                           /* aumenta dimensione testo */
+        font-weight: 600;                          /* peso medio */
+        margin-bottom: 25px;                       /* spazio sotto */
+        text-align: center;                        /* centrato */
+    }
+    /* Login senza box grafico */
+    .login-box {
+        background: none;                          /* rimuove sfondo */
+        box-shadow: none;                          /* rimuove ombra */
+        border: none;                              /* rimuove bordo */
+        width: 90%;                                /* larghezza adattabile */
+        min-width: auto;                           /* nessuna larghezza minima */
+        max-width: 350px;                          /* larghezza massima */
+        height: auto;                              /* altezza dinamica */          
+        padding: 15px;                             /* spazio interno */
+        position: fixed;                           /* resta centrato */
+        top: 50%;                                  /* centro verticale */
+        left: 50%;                                 /* centro orizzontale */
+        transform: translate(-50%, -50%);
+        display: flex;                             /* layout flex */
+        flex-direction: column;                    /* elementi in colonna */
+        align-items: center;                       /* centrati */
+    }
+    /* Gruppi input in colonna */
+    .login-box .form-group {
+        flex-direction: column;                    /* label sopra input */
+        align-items: center;                       /* centrati */
+        width: 100%;                               /* tutta larghezza */
+        margin-top: 10px;                          /* spazio sopra */
+        margin-bottom: 20px;                       /* spazio sotto */
+    }
+    /* Spazio extra tra gruppi */
+    .login-box .form-login {
+        margin-bottom: 1px;
+    }
+    /* Label mobile */
+    .login-box label {
+        text-transform: uppercase;                 /* testo maiuscolo */
+        margin-bottom: 5px;                        /* spazio sotto */
+        text-align: center;                        /* centrato */
+    }
+    /* Input mobile */
+    .login-box input {
+        width: 90%;                                /* input più largo */
+        margin-left: 0;                            /* niente margine laterale */
+        text-align: center;                        /* testo e placeholder centrati */
+    }
+    /* Bottone mobile */
+     .login-box button {
+        width: 25%;                                /* bottone più piccolo */
+        margin: 15px auto 0 auto;                  /* centrato */
+    }
+    /* Meteo sotto il login */
+    .meteo-box {
+        position: fixed;                           /* posizionamento fissa */      
+        left: 50%;                                 /* centrato */           
+        top: calc(65% + 200px);                    /* sotto il login */
+        transform: translateX(-50%);
+        width: 100%;                               /* tutta larghezza */
+        max-width: none;                           /* nessun limite */
+        height: auto;                              /* altezza dinamica */
+        padding: 15px;                             /* spazio interno */
+        text-align: center;                        /* testo centrato */
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);  /* ombra */
+    }
+}

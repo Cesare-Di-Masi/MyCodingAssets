@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+    <title>Serie A</title>
+</head>
+<body>
+    <img src="logo.png" alt="Immagine non trovata">
+    <header><h1>Statistiche Serie A</h1></header>
+    <main>
+        <label for="stagione">Stagione: </label>
+        
+        <select id="stagione">
+            <option value="2022">2022/2023</option>
+            <option value="2023">2023/2024</option>
+            <option value="2024">2024/2025</option>
+        </select>
+
+        <label for="nome">Nome della squadra (minimo 3 lettere): </label>
+        <input type="text" id="nome" placeholder="Es. Milan">
+
+        <div id="risultati"></div>
+    </main>
+</body>
+</html>
