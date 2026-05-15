@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestore Voti Scolastici</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1>Registro Voti</h1>
+        
+        <div class="input-section">
+            <input type="number" id="votoInput" placeholder="Inserisci voto (1-10)" step="0.1" min="1" max="10">
+            <button id="addBtn">Aggiungi</button>
+        </div>
+
+        <p id="error-msg" class="error"></p>
+
+        <div class="results">
+            <h2>Media: <span id="mediaDisplay">0</span></h2>
+            <div id="statusIcon"></div>
+        </div>
+
+        <ul id="listaVoti">
+            </ul>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

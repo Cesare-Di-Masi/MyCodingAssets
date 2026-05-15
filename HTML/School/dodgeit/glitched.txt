@@ -1,0 +1,105 @@
+import { registerBehavior } from "../MonsterAI.js";
+
+registerBehavior("normal", {
+    init(monster) {
+        monster.cfg.hue = Math.random();
+        monster.cfg.speed = 2.2;
+        monster._behaviorState.isAttacking = false;
+        monster._behaviorState.isCharging = false;
+        monster._behaviorState.chargeTimer = 0;
+        // Glitch iniziale: posizioni multiple ricalcolate
+        _chooseNewEdge(monster);
+    },
+
+    update(monster, player, dt) {
+        _pushHistory(monster, player);
+
+        // --- EFFETTO GLITCH COSTANTE (VISIVO E FISICO) ---
+        // Fa vibrare il mostro e cambia colore freneticamente
+        if (Math.random() > 0.8) {
+            monster.x += (Math.random() * 10 - 5);
+            monster.y += (Math.random() * 10 - 5);
+            monster.cfg.hue = Math.random(); // Flash di colori
+        }
+
+        // --- STATO CARICA CORROTTO ---
+        if (monster._behaviorState.isCharging) {
+            // Vibrazione intensa durante la carica
+            monster.x += (Math.random() * 14 - 7);
+            monster.cfg.speed = 0.5; // Non si ferma del tutto, "scivola" via
+            
+            monster._behaviorState.chargeTimer -= dt; 
+            if (monster._behaviorState.chargeTimer <= 0) {
+                monster._behaviorState.isCharging = false;
+                monster._behaviorState.isAttacking = true;
+            }
+            return;
+        }
+
+        // --- STATO ATTACCO GLITCHATO ---
+        if (monster._behaviorState.isAttacking) {
+            // A volte raddoppia la velocità per un frame (speed burst)
+            monster.cfg.speed = Math.random() > 0.9 ? 8.0 : 3.5; 
+            
+            const dx = monster.target.x - monster.x;
+            const dy = monster.target.y - monster.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Glitch di collisione: a volte resetta l'attacco prima di arrivare
+            if (dist < 40 || Math.random() > 0.99) {
+                monster._behaviorState.isAttacking = false;
+                _chooseNewEdge(monster);
+            }
+            return;
+        }
+
+        // --- LOGICA DI ALLINEAMENTO INSTABILE ---
+        const idx = Math.max(0, monster.history.length - 1 - monster.cfg.latency);
+        const past = monster.history[idx] ?? { x: monster.x, y: monster.y };
+
+        const alignedX = Math.abs(monster.x - past.x) < 40;
+        const alignedY = Math.abs(monster.y - past.y) < 40;
+
+        // Il mostro può "impazzire" e attaccare anche se non allineato (5% chance)
+        if ((alignedX || alignedY) || Math.random() > 0.95) {
+            monster._behaviorState.isCharging = true;
+            monster._behaviorState.chargeTimer = 0.3; // Carica più veloce e instabile
+            
+            // Target corrotto: a volte punta dietro il giocatore o di lato
+            const glitchOffset = Math.random() > 0.7 ? 150 : 0;
+            monster.target = { 
+                x: past.x + (Math.random() * glitchOffset - glitchOffset/2), 
+                y: past.y + (Math.random() * glitchOffset - glitchOffset/2)
+            }; 
+        } else {
+            // Movimento ai bordi con "salti" di frame
+            monster.cfg.speed = 1.8;
+            monster.target = monster._behaviorState.targetEdge;
+            
+            // Ogni tanto cambia target al bordo senza motivo
+            if (Math.random() > 0.98) _chooseNewEdge(monster);
+
+            const dist = Math.sqrt(Math.pow(monster.target.x - monster.x, 2) + Math.pow(monster.target.y - monster.y, 2));
+            if (dist < 30) _chooseNewEdge(monster);
+        }
+    },
+});
+
+// Helper functions (mantieni quelle che avevi, ma con il padding che abbiamo sistemato)
+function _chooseNewEdge(monster) {
+    const bounds = monster.bounds;
+    const side = Math.floor(Math.random() * 4);
+    const padding = 50; 
+
+    switch (side) {
+        case 0: monster._behaviorState.targetEdge = { x: Math.random() * bounds.width, y: padding }; break;
+        case 1: monster._behaviorState.targetEdge = { x: bounds.width - padding, y: Math.random() * bounds.height }; break;
+        case 2: monster._behaviorState.targetEdge = { x: Math.random() * bounds.width, y: bounds.height - padding }; break;
+        case 3: monster._behaviorState.targetEdge = { x: padding, y: Math.random() * bounds.height }; break;
+    }
+}
+
+function _pushHistory(monster, player) {
+    monster.history.push({ x: player.x, y: player.y });
+    if (monster.history.length > 50) monster.history.shift();
+}

@@ -1,0 +1,117 @@
+# --- altro ---
+.frontmatter
+
+# --- Dipendenze ---
+node_modules/
+jspm_packages/
+web_modules/
+
+# --- Variabili d'ambiente (CRITICO: Non caricarle mai!) ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# --- Build e Output ---
+dist/
+build/
+out/
+.next/
+server/dist/
+client/build/
+
+# --- Log e Debug ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+*.log
+pids
+*.pid
+*.seed
+*.cap
+
+# --- Test e Copertura ---
+coverage/
+.nyc_output/
+junit.xml
+
+# --- IDE e Editor ---
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+.project
+.classpath
+.settings/
+
+# --- File di Sistema ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Database Locali ---
+*.sqlite
+data/db/
+
+# --- SPAZZATURA FRONTEND (Bootstrap, JS, HTML, CSS) ---
+.cache/
+.sass-cache/
+*.css.map
+*.js.map
+.parcel-cache/
+.eslintcache
+.stylelintcache
+# Se usi Bootstrap compilato localmente
+assets/css/bootstrap.css.map
+assets/js/bootstrap.bundle.js.map
+
+# --- TYPESCRIPT ---
+*.tsbuildinfo
+# Evita di caricare i file JS generati se il progetto è solo TS
+# (Usa con cautela se non hai una cartella /dist)
+# *.js
+# *.d.ts
+
+# --- ZENCODER & VIDEO TRANSCODING ---
+# File temporanei di output o log di codifica
+.zencoder-debug/
+zencoder-error.log
+*.tmp-video
+# Evita di caricare i file video pesanti usati per test
+*.mp4
+*.m4v
+*.mov
+*.avi
+*.wmv
+
+# --- SPAZZATURA DI SISTEMA & IDE ---
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# --- LOG E CRASH REPORT ---
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# --- CARTELLA "TEST" E "DOCS" (Se non vuoi caricarle) ---
+out/
+temp/
+tmp/
+vendor/
