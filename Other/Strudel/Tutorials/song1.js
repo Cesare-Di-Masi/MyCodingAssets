@@ -1,0 +1,1 @@
+$: satisfies("[bd <hh oh>]*2</hh>")
