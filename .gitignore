@@ -502,3 +502,6 @@ CMakeCache.txt
 *.msix
 *.msm
 *.msp
+
+# Added by Repo Command Center
+.rcc-index/
