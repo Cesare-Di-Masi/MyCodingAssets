@@ -1,0 +1,21 @@
+{
+  "repoPath": "..",
+  "port": 4747,
+  "githubClientId": "",
+  "editorUri": "vscode://file/",
+  "ignoreDirs": [
+    "node_modules", ".git", "dist", "build", "bin", "obj", ".vs",
+    "__pycache__", ".next", "target", "vendor", ".venv", "venv",
+    "coverage", ".idea", ".cache", ".parcel-cache", ".rcc-index"
+  ],
+  "maxSearchResults": 200,
+  "largeFileThresholdMB": 10,
+  "graphCommitLimit": 400,
+  "maxFileReadBytes": 500000,
+  "maxFileWriteBytes": 5242880,
+  "auth": {
+    "enabled": false,
+    "token": "",
+    "allowLocalhostWithoutToken": true
+  }
+}

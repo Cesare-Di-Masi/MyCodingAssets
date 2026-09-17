@@ -1,0 +1,9 @@
+node_modules/
+.rcc-index/
+data/auth.json
+data/repos.json
+data/active.json
+.DS_Store
+Thumbs.db
+*.log
+lighthouse-accessibility.json

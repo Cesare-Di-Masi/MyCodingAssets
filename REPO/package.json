@@ -1,0 +1,17 @@
+{
+  "name": "repo-command-center",
+  "version": "2.0.0",
+  "description": "Local-first Git/GitHub Repository Command Center",
+  "main": "backend/server.js",
+  "engines": {
+    "node": ">=22.5"
+  },
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node backend/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "simple-git": "^3.25.0"
+  }
+}
