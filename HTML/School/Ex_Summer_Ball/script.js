@@ -1,6 +1,4 @@
-// =========================================================
-// 1. RECUPERO ELEMENTI DOM E STATO GLOBALE
-// =========================================================
+
 const area = document.getElementById("area");
 const bottone = document.getElementById("startStop");
 const contatoreEl = document.getElementById("contatore");
@@ -21,9 +19,6 @@ function coloreCasuale() {
   return `#${r}${g}${b}`;
 }
 
-// =========================================================
-// 2. CLASSE PALLINA
-// =========================================================
 class Ball {
   constructor(elementId, x, y, vx, vy, diametro) {
     this.element = document.getElementById(elementId);
@@ -45,7 +40,7 @@ class Ball {
     this.render();
   }
 
-  updateFisica(areaWidth, areaHeight, dt) {
+  updateFisica(areaWidth, areaHeight, dt) { //dt è il delta time in secondi - delta time è il tempo utilizzato epr evitare problemi di frame rate
     this.x += (this.vx * dt) / SUBSTEPS;
     this.y += (this.vy * dt) / SUBSTEPS;
 
@@ -53,10 +48,10 @@ class Ball {
   }
 
   controllaRimbalzoBordi(w, h) {
-    const tolleranza = 0.001;
+    const tolleranza = 0.001; //tolleranza per evitare problemi matematici
 
     if (this.x > tolleranza && this.x + this.diametro < w - tolleranza)
-      this.puoContareX = true;
+      this.puoContareX = true; // Se la palla è completamente all'interno dei bordi, può contare i rimbalzi
     if (this.y > tolleranza && this.y + this.diametro < h - tolleranza)
       this.puoContareY = true;
 
@@ -99,9 +94,7 @@ class Ball {
   }
 }
 
-// =========================================================
-// 3. CLASSE OSTACOLO
-// =========================================================
+
 class Obstacle {
   constructor(areaContainer, x, y, width, height, vx, vy, isMoving = true) {
     this.element = document.createElement("div");
@@ -154,43 +147,39 @@ class Obstacle {
   }
 }
 
-// =========================================================
-// 4. LOGICA DI COLLISIONE
-// =========================================================
 function resolveCollision(ball, rect) {
   const ballCenterX = ball.x + ball.radius;
   const ballCenterY = ball.y + ball.radius;
 
-  const closestX = Math.max(rect.x, Math.min(ballCenterX, rect.x + rect.width));
+  const closestX = Math.max(rect.x, Math.min(ballCenterX, rect.x + rect.width)); // Calcola il punto più vicino del rettangolo al centro della palla
   const closestY = Math.max(rect.y, Math.min(ballCenterY, rect.y + rect.height));
 
   const dx = ballCenterX - closestX;
   const dy = ballCenterY - closestY;
 
-  const dist2 = dx * dx + dy * dy;
-  const radius2 = ball.radius * ball.radius;
+  const dist2 = dx * dx + dy * dy; // Calcola la distanza al quadrato tra il centro della palla e il punto più vicino del rettangolo
+  const radius2 = ball.radius * ball.radius; // Calcola il raggio al quadrato della palla - utilizzato per evitare di utilizzare la radice quadrata in pitagora
 
-  if (dist2 > radius2) return;
+  if (dist2 > radius2) return; // Se la distanza al quadrato è maggiore del raggio al quadrato, non c'è collisione
 
-  const angle = Math.atan2(dy, dx);
+  const angle = Math.atan2(dy, dx); // Calcola l'angolo della collisione tra la palla e il rettangolo
   const nx = Math.cos(angle);
-  const ny = Math.sin(angle);
+  const ny = Math.sin(angle); // Calcola la normale della collisione -> normale è un vettore che punta verso l'esterno della superficie di collisione
 
-  const dot = ball.vx * nx + ball.vy * ny;
+  const dot = ball.vx * nx + ball.vy * ny; // Calcola il prodotto scalare tra la velocità della palla e la normale della collisione
 
   if (dot < 0) {
     ball.vx = ball.vx - 2 * dot * nx;
     ball.vy = ball.vy - 2 * dot * ny;
     ball.element.style.background = coloreCasuale();
+    var audio = new Audio('audio_boing.mp3');
+    audio.play();
   }
 
   ball.x = closestX + nx * ball.radius - ball.radius;
   ball.y = closestY + ny * ball.radius - ball.radius;
 }
 
-// =========================================================
-// 5. INIZIALIZZAZIONE E GAME LOOP
-// =========================================================
 const pallina = new Ball("pallina", 50, 50, 300, 240, 30);
 
 const ostacoli = [
@@ -199,13 +188,14 @@ const ostacoli = [
   new Obstacle(area, 100, 300, 150, 20, 89, 89, false),
 ];
 
-let lastTime = 0;
-function loop(timestamp) {
+let lastTime = 0; // Variabile per memorizzare il timestamp dell'ultimo frame - utilizzato per calcolare il delta time tra i frame
+function loop(timestamp) { 
   if (!running) {
     lastTime = timestamp;
     requestAnimationFrame(loop);
     return;
   }
+
 
   let dt = 0;
   if (lastTime !== 0) {
@@ -246,8 +236,9 @@ bottone.addEventListener("click", () => {
 
 let selectedElement = null;
 let tempoInizio = 0;
-const SOGLIA_MS = 250;
+const SOGLIA_MS = 250; // Soglia in millisecondi per distinguere tra click e drag
 
+//Eventi per la gestione del drag and drop degli ostacoli
 area.addEventListener("mousedown", (e) => {
   tempoInizio = Date.now();
 
@@ -292,6 +283,7 @@ area.addEventListener("mousedown", (e) => {
   }
 });
 
+// Gestione del movimento del mouse per il drag
 area.addEventListener("mousemove", (e) => {
   if (!isDragging || !selectedElement) return;
 
