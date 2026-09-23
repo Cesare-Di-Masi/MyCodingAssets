@@ -1,0 +1,7 @@
+numpy
+pandas
+trimesh
+pyglet<2
+osmnx
+requests
+shapely
