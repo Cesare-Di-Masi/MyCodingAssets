@@ -5,3 +5,8 @@ pyglet<2
 osmnx
 requests
 shapely
+pyproj 
+pillow 
+manifold3d 
+fast-simplification
+scipy
