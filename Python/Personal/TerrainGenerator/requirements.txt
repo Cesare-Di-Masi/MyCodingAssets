@@ -10,3 +10,7 @@ pillow
 manifold3d 
 fast-simplification
 scipy
+pyproj
+manifold3d
+fast-simplification
+

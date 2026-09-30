@@ -17,7 +17,7 @@ Esempi
   python terrain_generator_v2.py                                   # interattivo
   python terrain_generator_v2.py --place Fuerteventura --mode isola --res 300
   python terrain_generator_v2.py --place Italia --mode stato --plate 220x220
-  python terrain_generator_v2.py --place Tenerife --bathy 0.2 --simplify 0.4
+  python terrain_generator_v2.py --place Tenerife --simplify 0.4
   python terrain_generator_v2.py --bbox -14.6 28.0 -13.7 28.8 --res 250
   python terrain_generator_v2.py --config mio.json                 # opzioni da file
 """
@@ -42,7 +42,8 @@ import numpy as np
 import requests
 import shapely
 import trimesh
-from shapely.geometry import shape
+from shapely.geometry import box, shape
+from shapely.ops import triangulate
 
 try:
     import pyproj
@@ -95,15 +96,15 @@ ENGRAVE_DEPTH = 0.6
 
 DEFAULTS = dict(
     mode=None, place=None, pick=None, bbox=None, name=None,
-    res=200, size=150.0,
+    res=400, size=150.0,
     vexag="auto", relief_mm=None, max_auto_vexag=25.0,
     base=5.0, land_min=0.4,
-    peaks=0.0, max_slope=0.8, smooth=0, ss=0,
-    source="auto", bathy=0.0, bathy_max_mm=10.0,
+    peaks=0.0, max_slope=0.35, smooth=2, ss=0,
+    source="auto",
     proj="auto", margin=0.03,
     simplify=0.0,
-    plate=None, split=None, pins=True, label=True,
-    out_dir=".", formats="stl,ply,obj",
+    plate=None, split=None, pins=True, label=False,
+    out_dir=".",
     view=False, yes=False,
 )
 
@@ -181,10 +182,35 @@ def slugify(text):
     return text or "terrain"
 
 
-def ask_yes(prompt, assume_yes=False):
+def prompt(text, cast=str, default=None, choices=None, validate=None, retries=6):
+    """Chiede un valore ripetendo la domanda se non è valido, invece di
+    interrompere lo script (com'era prima con un semplice input() + ValueError)."""
+    for _ in range(retries):
+        raw = input(text).strip()
+        if not raw and default is not None:
+            return default
+        try:
+            val = cast(raw)
+        except (TypeError, ValueError):
+            print(f"  Valore non valido: '{raw}'. Riprova.")
+            continue
+        if choices is not None and val not in choices:
+            print(f"  Scegli tra: {', '.join(map(str, choices))}.")
+            continue
+        if validate is not None and not validate(val):
+            print("  Valore fuori dai limiti consentiti. Riprova.")
+            continue
+        return val
+    raise ValueError(f"Troppi tentativi non validi per: {text.strip()}")
+
+
+def ask_yes(text, assume_yes=False, default=False):
     if assume_yes:
         return True
-    return input(prompt).strip().lower() in ("s", "si", "sì", "y", "yes")
+    raw = input(text).strip().lower()
+    if not raw:
+        return default
+    return raw in ("s", "si", "sì", "y", "yes")
 
 
 def atomic_write(path, data):
@@ -315,9 +341,7 @@ def choose_mode():
     print("\nModalità di ricerca:")
     for k, (_, label) in MODES.items():
         print(f"  [{k}] {label}")
-    choice = input("Seleziona (1-6) [default: 1]: ").strip() or "1"
-    if choice not in MODES:
-        raise ValueError("Modalità non valida.")
+    choice = prompt("Seleziona (1-6) [default: 1]: ", default="1", choices=list(MODES))
     return MODES[choice][0]
 
 
@@ -367,17 +391,14 @@ def territory_from_place(place, mode, pick, assume_yes):
 
     if pick is None:
         if len(results) > 1 and not assume_yes:
-            raw = input(
-                f"\nQuale risultato vuoi utilizzare? (0-{len(results)-1}) [0]: "
-            ).strip() or "0"
-            try:
-                pick = int(raw)
-            except ValueError:
-                raise ValueError("Scelta non valida.")
+            pick = prompt(
+                f"\nQuale risultato vuoi utilizzare? (0-{len(results)-1}) [0]: ",
+                cast=int, default=0, validate=lambda v: 0 <= v < len(results),
+            )
         else:
             pick = 0
     if pick < 0 or pick >= len(results):
-        raise ValueError("Indice fuori intervallo.")
+        raise ValueError("Indice fuori intervallo.")   # da --pick esplicito da CLI
 
     result = results[pick]
     polygon, wrapped = unwrap_antimeridian(result["geometry"])
@@ -412,18 +433,18 @@ def get_territory(cfg):
     if mode == "bbox":
         print("\nInserisci il bounding box in coordinate WGS84")
         print("(per attraversare l'antimeridiano: Max Lon < Min Lon, es. 176 e -178)")
-        try:
-            vals = [float(input(f"  {lbl}: ")) for lbl in
+        while True:
+            vals = [prompt(f"  {lbl}: ", cast=float) for lbl in
                     ("Min Lon", "Min Lat", "Max Lon", "Max Lat")]
-        except ValueError:
-            raise ValueError("Coordinate non valide.")
-        return territory_from_bbox(*vals, name=cfg.name)
+            try:
+                return territory_from_bbox(*vals, name=cfg.name)
+            except ValueError as e:
+                print(f"  {e} Riprova.")
 
-    place = input(
-        "\nInserisci il nome del territorio (es. Ischia, Italia):\n> "
-    ).strip()
-    if not place:
-        raise ValueError("Non hai inserito nessun nome.")
+    place = prompt(
+        "\nInserisci il nome del territorio (es. Ischia, Italia):\n> ",
+        validate=lambda v: len(v) > 0,
+    )
     return territory_from_place(place, mode, cfg.pick, cfg.yes)
 
 
@@ -557,13 +578,16 @@ def grid_lonlat_bounds(grid, proj, wrapped):
 
 
 def pick_supersampling(n_cells, requested):
+    """Sotto-campionamento automatico per cella. Le soglie sono state alzate
+    rispetto alla v2 originale (che era tarata su --res 200) in modo che il
+    nuovo default ad alta risoluzione non perda qualità di campionamento."""
     if requested and requested > 0:
         return int(requested)
-    if n_cells <= 300_000:
+    if n_cells <= 1_200_000:
         return 4
-    if n_cells <= 700_000:
+    if n_cells <= 2_800_000:
         return 3
-    if n_cells <= 2_000_000:
+    if n_cells <= 8_000_000:
         return 2
     return 1
 
@@ -879,19 +903,14 @@ def make_source(cfg, bounds, spacing_m):
     if src == "auto":
         n_srtm = len(srtm_tiles_for_bounds(bounds))
         lat_ok = max(abs(bounds[1]), abs(bounds[3])) < 59.9
-        if lat_ok and n_srtm <= MAX_SRTM_TILES_AUTO and cfg.bathy <= 0:
+        if lat_ok and n_srtm <= MAX_SRTM_TILES_AUTO:
             src = "srtm"
         else:
             src = "terrarium"
-            why = ("batimetria richiesta" if cfg.bathy > 0
-                   else "oltre ±60°" if not lat_ok
-                   else f"{n_srtm} tile SRTM sarebbero troppi")
+            why = "oltre ±60°" if not lat_ok else f"{n_srtm} tile SRTM sarebbero troppi"
             print(f"  Sorgente auto -> Terrarium ({why})")
 
     if src == "srtm":
-        if cfg.bathy > 0:
-            print("  --bathy ignorato: SRTM non contiene batimetria (usa --source terrarium)")
-            cfg.bathy = 0.0
         n_srtm = len(srtm_tiles_for_bounds(bounds))
         if n_srtm > MAX_SRTM_TILES_WARN:
             print(f"\nATTENZIONE: {n_srtm} tile SRTM (~10 MB ciascuno in cache).")
@@ -911,7 +930,7 @@ def make_source(cfg, bounds, spacing_m):
 class Fields:
     land: np.ndarray      # quota media (m) della sola terraferma (con blend picchi)
     cov: np.ndarray       # copertura terra [0,1] per vertice
-    sea: np.ndarray       # profondità media (m, <= 0) dei sub-campioni marini
+    # Il mare è sempre piatto a 0 m (nessuna batimetria/estrapolazione del fondale).
 
 
 def smooth_field(field, weight, passes):
@@ -942,8 +961,8 @@ def compute_fields(grid, terr, proj, source, ss, peaks, max_slope):
       - quota media della terraferma (robusta: i sotto-campioni che superano la
         mediana della cella di più di max_slope * cella vengono riportati al limite,
         perché entro una cella il dislivello reale non può essere maggiore)
-      - copertura terra per vertice (costa anti-alias)
-      - profondità media del mare."""
+      - copertura terra per vertice (costa anti-alias).
+    Il mare resta sempre piatto a 0 m: non viene stimata nessuna profondità."""
     H, W = grid.H, grid.W
     offs = ((np.arange(ss) + 0.5) / ss) - 0.5
     xs = (grid.x[:, None] + offs[None, :] * grid.dx).ravel()
@@ -951,7 +970,6 @@ def compute_fields(grid, terr, proj, source, ss, peaks, max_slope):
 
     land = np.zeros((H, W), dtype=np.float32)
     cov = np.zeros((H, W), dtype=np.float32)
-    sea = np.zeros((H, W), dtype=np.float32)
 
     if terr.polygon is not None:
         shapely.prepare(terr.polygon)
@@ -968,7 +986,7 @@ def compute_fields(grid, terr, proj, source, ss, peaks, max_slope):
         lon, lat = proj.inverse(X.ravel(), Y.ravel())
         lonf = frame_lon(lon, terr.wrapped)
 
-        vm, vx = source.sample(lonf, lat)
+        vm, vx = source.sample(lonf, lat)   # vx: massimo di cella (usato solo per la terra)
 
         if terr.polygon is not None:
             inland = shapely.contains_xy(terr.polygon, lonf, lat)
@@ -999,13 +1017,8 @@ def compute_fields(grid, terr, proj, source, ss, peaks, max_slope):
             mxv = np.nan_to_num(np.nanmax(np.where(np.isnan(mxs), -1.0, mxs), axis=2), nan=0.0)
             mxv = np.maximum(mxv, mean)
 
-        n_sea = np.maximum(ss * ss - cnt, 1.0)
-        neg = np.minimum(vm, 0.0)
-        sea_mean = (neg * (~inl)).sum(axis=(1, 3)) / n_sea
-
         land[j0:j1] = mean + peaks * (mxv - mean)
         cov[j0:j1] = cnt / float(ss * ss)
-        sea[j0:j1] = sea_mean
 
         progress_bar(k + 1, total, prefix="Campi")
 
@@ -1014,7 +1027,7 @@ def compute_fields(grid, terr, proj, source, ss, peaks, max_slope):
             "Il territorio non copre nessuna cella: prova ad aumentare --res."
         )
 
-    return Fields(land=land, cov=cov, sea=sea)
+    return Fields(land=land, cov=cov)
 
 
 def despike_field(land, cov, cell_m, max_slope, passes=2):
@@ -1055,25 +1068,21 @@ def despike_field(land, cov, cell_m, max_slope, passes=2):
 # ALTEZZE E MESH
 # ============================================================
 
-def build_heights(fields, scale, vexag, land_min_mm, bathy, bathy_max_mm):
-    """Quota Z (mm) per vertice. La costa è una rampa di una cella pesata dalla
-    copertura, quindi il contorno segue il poligono con precisione sub-cella."""
+def build_heights(fields, scale, vexag, land_min_mm):
+    """Quota Z (mm) per vertice. Il mare è sempre piatto a 0 mm (nessuna
+    batimetria stimata): l'altezza parte da 0 m sul livello del mare. La costa
+    è una rampa di una cella pesata dalla copertura, quindi il contorno segue
+    il poligono con precisione sub-cella."""
     z_scale = scale * vexag
     land_z = np.maximum(fields.land * z_scale, land_min_mm)
-
-    if bathy > 0:
-        raw = -fields.sea * z_scale * bathy                    # mm positivi
-        sea_z = -bathy_max_mm * np.tanh(raw / bathy_max_mm)   # compressione dolce
-    else:
-        sea_z = np.zeros_like(land_z)
-
-    c = fields.cov
-    return (c * land_z + (1.0 - c) * sea_z).astype(np.float64)
+    return (fields.cov * land_z).astype(np.float64)
 
 
-def build_piece(X, Y, Z, z_bottom):
-    """Solido chiuso: superficie a griglia + pareti perimetrali + fondo a ventaglio
-    (niente griglia sul fondo: meno della metà delle facce rispetto alla v1)."""
+def build_piece(X, Y, Z, z_bottom, footprint=None):
+    """Build a closed terrain solid, clipped to the land polygon when available."""
+    if footprint is not None:
+        return build_footprint_piece(X, Y, Z, z_bottom, footprint)
+
     h, w = Z.shape
     nTop = h * w
 
@@ -1116,6 +1125,147 @@ def build_piece(X, Y, Z, z_bottom):
         faces=np.vstack(faces).astype(np.int64),
         process=False,
     )
+
+
+def build_footprint_piece(X, Y, Z, z_bottom, footprint):
+    """Build a watertight terrain solid whose outline follows the land polygon."""
+    h, w = Z.shape
+    footprint = shapely.intersection(footprint, box(X[0], Y[0], X[-1], Y[-1]))
+    if footprint.is_empty:
+        raise ValueError("Il pezzo non interseca il poligono di terra.")
+
+    vertices = []
+    faces = []
+    vertex_index = {}
+
+    def add_vertex(x, y, z):
+        key = (round(float(x), 7), round(float(y), 7))
+        index = vertex_index.get(key)
+        if index is None:
+            index = len(vertices)
+            vertex_index[key] = index
+            vertices.append((key[0], key[1], float(z)))
+        return index
+
+    def add_triangle(xy, heights):
+        face = [add_vertex(x, y, z) for (x, y), z in zip(xy, heights)]
+        if len(set(face)) == 3:
+            faces.append(face)
+
+    for island in shapely.get_parts(footprint):
+        if island.geom_type != "Polygon" or island.area <= 1e-10:
+            continue
+        min_x, min_y, max_x, max_y = island.bounds
+        col_start = max(0, int(np.searchsorted(X, min_x, side="left")) - 1)
+        col_stop = min(w - 1, int(np.searchsorted(X, max_x, side="right")))
+        row_start = max(0, int(np.searchsorted(Y, min_y, side="left")) - 1)
+        row_stop = min(h - 1, int(np.searchsorted(Y, max_y, side="right")))
+
+        for row in range(row_start, row_stop):
+            for col in range(col_start, col_stop):
+                corners = (
+                    (col, row), (col + 1, row),
+                    (col + 1, row + 1), (col, row + 1),
+                )
+                for corner_ids in ((0, 1, 2), (0, 2, 3)):
+                    points = np.asarray([corners[i] for i in corner_ids])
+                    xy = np.column_stack((X[points[:, 0]], Y[points[:, 1]]))
+                    heights = Z[points[:, 1], points[:, 0]]
+                    source_tri = shapely.Polygon(xy)
+
+                    if island.covers(source_tri):
+                        add_triangle(xy, heights)
+                        continue
+                    if not island.intersects(source_tri):
+                        continue
+
+                    clipped = shapely.intersection(source_tri, island)
+                    if clipped.is_empty:
+                        continue
+
+                    x0, y0 = xy[0]
+                    x1, y1 = xy[1]
+                    x2, y2 = xy[2]
+                    denominator = (y1 - y2) * (x0 - x2) + (x2 - x1) * (y0 - y2)
+                    z0, z1, z2 = heights
+                    a = (z0 * (y1 - y2) + z1 * (y2 - y0) + z2 * (y0 - y1)) / denominator
+                    b = (z0 * (x2 - x1) + z1 * (x0 - x2) + z2 * (x1 - x0)) / denominator
+                    c = z0 - a * x0 - b * y0
+
+                    for polygon in shapely.get_parts(clipped):
+                        if polygon.geom_type != "Polygon" or polygon.area <= 1e-10:
+                            continue
+                        for candidate in triangulate(polygon):
+                            if not polygon.covers(candidate):
+                                continue
+                            tri_xy = np.asarray(candidate.exterior.coords[:3])
+                            edge_a = tri_xy[1] - tri_xy[0]
+                            edge_b = tri_xy[2] - tri_xy[0]
+                            area2 = edge_a[0] * edge_b[1] - edge_a[1] * edge_b[0]
+                            if area2 < 0:
+                                tri_xy[[1, 2]] = tri_xy[[2, 1]]
+                            tri_z = a * tri_xy[:, 0] + b * tri_xy[:, 1] + c
+                            add_triangle(tri_xy, tri_z)
+
+    if not faces:
+        raise ValueError("Il poligono di terra non copre la griglia: aumenta --res.")
+
+    top_vertices = np.asarray(vertices, dtype=np.float64)
+    top_faces = np.asarray(faces, dtype=np.int64)
+    edge_uses = {}
+    for face in top_faces:
+        for start, end in ((face[0], face[1]), (face[1], face[2]), (face[2], face[0])):
+            key = (min(start, end), max(start, end))
+            if key in edge_uses:
+                edge_uses[key][0] += 1
+            else:
+                edge_uses[key] = [1, start, end]
+
+    count = len(top_vertices)
+    bottom_vertices = top_vertices.copy()
+    bottom_vertices[:, 2] = z_bottom
+    side_faces = []
+    for uses, start, end in edge_uses.values():
+        if uses == 1:
+            bottom_start, bottom_end = start + count, end + count
+            side_faces.extend(((start, bottom_start, bottom_end),
+                               (start, bottom_end, end)))
+
+    bottom_faces = top_faces[:, ::-1] + count
+    all_faces = np.vstack((top_faces, np.asarray(side_faces, dtype=np.int64), bottom_faces))
+    return trimesh.Trimesh(
+        vertices=np.vstack((top_vertices, bottom_vertices)),
+        faces=all_faces,
+        process=False,
+    )
+
+
+def project_footprint(geometry, proj):
+    def project(coords):
+        x, y = proj.forward(coords[:, 0], coords[:, 1])
+        return np.column_stack((x, y))
+
+    projected = shapely.transform(geometry, project)
+    return projected if projected.is_valid else projected.buffer(0)
+
+
+def footprint_from_coverage(Xmm, Ymm, cov, threshold=0.5):
+    """Sagoma di sola terra ricavata dalla maschera di copertura per vertice
+    (fields.cov), per i territori senza poligono OSM (es. --bbox). Ogni cella
+    di griglia il cui bordo è coperto da terra oltre `threshold` viene inclusa;
+    il resto (oceano, laghi, qualunque corpo d'acqua) resta fuori dal modello,
+    esattamente come già avviene per i territori con poligono OSM."""
+    cell_cov = 0.25 * (cov[:-1, :-1] + cov[1:, :-1] + cov[:-1, 1:] + cov[1:, 1:])
+    rows, cols = np.nonzero(cell_cov > threshold)
+    if len(rows) == 0:
+        raise ValueError(
+            "Nessuna cella di terra sopra la soglia di copertura: l'area "
+            "selezionata sembra essere interamente mare/acqua. Prova un'altra "
+            "area oppure abbassa la soglia in footprint_from_coverage()."
+        )
+    boxes = [box(Xmm[c], Ymm[r], Xmm[c + 1], Ymm[r + 1]) for r, c in zip(rows, cols)]
+    merged = shapely.union_all(boxes)
+    return merged if merged.is_valid else merged.buffer(0)
 
 
 def simplify_mesh(mesh, keep):
@@ -1367,70 +1517,6 @@ def engrave_bottom(mesh, lines, scale_bar, cx, cy, z_bottom, piece_w, piece_h):
 
 
 # ============================================================
-# COLORI (ipsometrici + ombreggiatura + batimetria)
-# ============================================================
-
-PAL_M = np.array([0, 150, 400, 800, 1500, 2500, 3500], dtype=float)
-PAL_RGB = np.array([
-    [0.16, 0.45, 0.20],
-    [0.42, 0.62, 0.25],
-    [0.72, 0.72, 0.35],
-    [0.66, 0.52, 0.30],
-    [0.52, 0.40, 0.32],
-    [0.62, 0.60, 0.58],
-    [0.97, 0.97, 0.98],
-])
-LIGHT = np.array([-0.5, 0.5, 0.7071])       # da nord-ovest, 45° di elevazione
-LIGHT = LIGHT / np.linalg.norm(LIGHT)
-
-
-def hypsometric(elev_m):
-    return np.column_stack(
-        [np.interp(elev_m, PAL_M, PAL_RGB[:, c]) for c in range(3)]
-    )
-
-
-def apply_colors(mesh, z_bottom, base_mm, z_scale, land_min_mm):
-    z = mesh.vertices[:, 2]
-    colors = np.zeros((len(z), 4), dtype=np.float32)
-    colors[:, 3] = 1.0
-
-    base = z < z_bottom + 0.999 * base_mm
-    top = ~base
-    sea = top & (z <= 0.5 * land_min_mm)
-    land = top & ~sea
-
-    colors[base, :3] = [0.30, 0.30, 0.30]
-
-    try:
-        vn = np.asarray(mesh.vertex_normals)
-        ndl = np.clip(vn @ LIGHT, 0.0, 1.0)
-        shade = (0.45 + 0.55 * ndl) / (0.45 + 0.55 * LIGHT[2])
-    except Exception:
-        shade = np.ones(len(z))
-    shade = np.clip(shade, 0.55, 1.3)
-
-    if sea.any():
-        zs = z[sea]
-        zmin = float(zs.min())
-        if zmin < -0.05:
-            t = np.clip(zs / zmin, 0, 1).reshape(-1, 1)      # 0 = costa, 1 = fondo
-            shallow = np.array([0.32, 0.65, 0.92])
-            deep = np.array([0.04, 0.18, 0.48])
-            rgb = shallow * (1 - t) + deep * t
-        else:
-            rgb = np.tile([0.15, 0.45, 0.85], (int(sea.sum()), 1))
-        colors[sea, :3] = np.clip(rgb * (0.8 + 0.2 * shade[sea, None]), 0, 1)
-
-    if land.any():
-        elev_m = z[land] / max(z_scale, 1e-12)
-        rgb = hypsometric(elev_m) * shade[land, None]
-        colors[land, :3] = np.clip(rgb, 0, 1)
-
-    mesh.visual.vertex_colors = (colors * 255).astype(np.uint8)
-
-
-# ============================================================
 # EXPORT / VIEWER
 # ============================================================
 
@@ -1440,9 +1526,8 @@ def export_meshes(pieces_meshes, name, cfg):
     print("==========================================")
 
     os.makedirs(cfg.out_dir, exist_ok=True)
-    formats = [f.strip().lower() for f in cfg.formats.split(",") if f.strip()]
-    notes = {"stl": "stampa 3D", "ply": "colori vertici", "obj": "editing 3D",
-             "3mf": "slicer moderni", "glb": "web/AR"}
+    formats = ("stl", "obj")
+    notes = {"stl": "stampa 3D", "obj": "modello 3D generico (per Blender/altri strumenti)"}
 
     written = []
     for tag, mesh in pieces_meshes:
@@ -1485,6 +1570,7 @@ def run(cfg, terr):
 
     # ---- proiezione e griglia ---------------------------------------------------
     proj = make_projection(cfg.proj, terr)
+    raw_footprint = project_footprint(terr.polygon, proj) if terr.polygon is not None else None
     margin = 0.0 if terr.polygon is None else cfg.margin
     extent = territory_extent(terr, proj, margin)
     grid = make_grid(extent, cfg.res)
@@ -1536,11 +1622,27 @@ def run(cfg, terr):
 
     # ---- altezze e pezzi ---------------------------------------------------------
     print("\n[3/4] Generazione mesh 3D...")
-    Z = build_heights(fields, scale, vexag, cfg.land_min, cfg.bathy, cfg.bathy_max_mm)
+    Z = build_heights(fields, scale, vexag, cfg.land_min)
     z_bottom = min(float(Z.min()), 0.0) - cfg.base
 
     Xmm = (grid.x - grid.x[0]) * scale
     Ymm = (grid.y - grid.y[0]) * scale
+
+    # ---- sagoma di terra (esclude sempre il mare/i corpi d'acqua) --------------
+    # raw_footprint (se presente) è in metri di proiezione: va riportato nello
+    # stesso sistema mm/offset di Xmm/Ymm prima di poterlo intersecare con i pezzi.
+    if raw_footprint is not None:
+        origin = np.array([grid.x[0], grid.y[0]])
+        footprint = shapely.transform(raw_footprint, lambda c: (np.asarray(c) - origin) * scale)
+        if not footprint.is_valid:
+            footprint = footprint.buffer(0)
+    else:
+        # Nessun poligono OSM (es. --bbox): la sagoma di terra viene ricavata
+        # direttamente dalla copertura terra per vertice (fields.cov), così il
+        # mare/i laghi restano fuori dal modello anche in modalità bbox.
+        footprint = footprint_from_coverage(Xmm, Ymm, fields.cov)
+        print("  Sagoma di terra ricavata dalla copertura DEM "
+              "(bbox: nessun poligono OSM disponibile).")
 
     plate = parse_wxh(cfg.plate, "--plate") if cfg.plate else None
     split = tuple(int(v) for v in parse_wxh(cfg.split, "--split")) if cfg.split else None
@@ -1567,7 +1669,16 @@ def run(cfg, terr):
         is_ = slice(pc["i0"], pc["i1"] + 1)
         Xp, Yp, Zp = Xmm[is_], Ymm[js], Z[js, is_]
 
-        mesh = build_piece(Xp, Yp, Zp, z_bottom)
+        piece_footprint = None
+        if footprint is not None:
+            piece_footprint = shapely.intersection(
+                footprint, box(Xp[0], Yp[0], Xp[-1], Yp[-1])
+            )
+            if piece_footprint.is_empty or piece_footprint.area <= 1e-10:
+                progress_bar(n, len(pieces), prefix="Pezzi")
+                continue
+
+        mesh = build_piece(Xp, Yp, Zp, z_bottom, piece_footprint)
 
         # decimazione quadrica: il mare piatto collassa per primo
         if cfg.simplify and 0 < cfg.simplify < 1.0 and fast_simplification is not None:
@@ -1608,12 +1719,13 @@ def run(cfg, terr):
             except Exception as e:
                 print(f"  Booleani falliti sul pezzo {n} ({e}): pezzo lasciato semplice.")
 
-        apply_colors(mesh, z_bottom, cfg.base, z_scale, cfg.land_min)
-
         tag = f"_r{pc['row'] + 1}c{pc['col'] + 1}" if multi else ""
         results.append((tag, mesh))
 
         progress_bar(n, len(pieces), prefix="Pezzi")
+
+    if not results:
+        raise ValueError("Nessun pezzo di stampa interseca il territorio selezionato.")
 
     # ---- report ------------------------------------------------------------------
     print("\n[4/4] Verifica...")
@@ -1654,7 +1766,7 @@ def build_parser():
     g.add_argument("--name", help="nome per file e incisione")
 
     g = p.add_argument_group("modello")
-    g.add_argument("--res", type=int, help="vertici sul lato lungo (default 200)")
+    g.add_argument("--res", type=int, help="vertici sul lato lungo (default 400, alta qualità)")
     g.add_argument("--size", type=float, help="lato lungo in mm (default 150)")
     g.add_argument("--vexag", help="'auto' oppure un numero (default auto)")
     g.add_argument("--relief-mm", type=float, help="rilievo massimo voluto con vexag auto")
@@ -1666,16 +1778,13 @@ def build_parser():
                         "più aguzze ma anche più rumorose (valori tipici 0.1-0.3)")
     g.add_argument("--max-slope", type=float,
                    help="pendenza massima (rise/run) per eliminare i picchi anomali; "
-                        "0 = disattivato (default 0.8, cioè ~39°)")
-    g.add_argument("--smooth", type=int, help="passate di lisciatura del rilievo (0)")
+                        "0 = disattivato (default 0.35, cioè ~19°)")
+    g.add_argument("--smooth", type=int, help="passate di lisciatura del rilievo (default 2)")
     g.add_argument("--ss", type=int, help="sotto-campioni per lato di cella (0 = auto)")
     g.add_argument("--margin", type=float, help="cornice di mare attorno al territorio (0.03)")
 
     g = p.add_argument_group("dati")
     g.add_argument("--source", choices=["auto", "srtm", "terrarium"])
-    g.add_argument("--bathy", type=float,
-                   help="fondale marino: fattore rispetto alla scala verticale (es. 0.2)")
-    g.add_argument("--bathy-max-mm", type=float, help="profondità massima in mm (10)")
     g.add_argument("--proj", choices=["auto", "laea", "equirect"])
 
     g = p.add_argument_group("stampa")
@@ -1690,7 +1799,6 @@ def build_parser():
 
     g = p.add_argument_group("output")
     g.add_argument("--out-dir", help="cartella di output")
-    g.add_argument("--formats", help="es. stl,ply,obj,3mf (default stl,ply,obj)")
     g.add_argument("--view", action="store_true", default=None, help="apri il viewer")
     g.add_argument("--yes", "-y", action="store_true", default=None,
                    help="non chiedere conferme")
@@ -1719,7 +1827,6 @@ def parse_args(argv=None):
     if args.yes is None:
         args.yes = defaults["yes"]
 
-    args.formats = str(args.formats)
     return args
 
 
