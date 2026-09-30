@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/FleetManagement/" />
+  <Folder Name="/FleetManagement/doc/">
+    <File Path="FleetManagement/doc/readme.md" />
+  </Folder>
+  <Folder Name="/FleetManagement/src/">
+    <Project Path="FleetManagement/src/Lessons3Y.FleetManagement.Domain/Lessons3Y.FleetManagement.Domain.csproj" />
+  </Folder>
+  <Folder Name="/FleetManagement/tests/" />
+</Solution>
