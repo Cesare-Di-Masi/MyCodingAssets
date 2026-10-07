@@ -8,7 +8,7 @@ class Program
     static int buffer;
     static int min = 1; //valore minimo generato dal random
     static int max = 100; //valore massimo generato dal random
-    static Dictionary<int , bool>exist = new Dictionary<int, bool>(); //dizionario per memorizzare i numeri già generati
+    static HashSet<int> exist = new HashSet<int>(); //dizionario per memorizzare i numeri già generati
 
     static SemaphoreSlim bufferVuoto = new SemaphoreSlim(0); //s1
     static SemaphoreSlim bufferPieno = new SemaphoreSlim(0); //s2
@@ -22,8 +22,8 @@ class Program
             do //ciclo di controllo generazione numero casuale, se il numero è già presente continua a generare un nuovo numero finché non ne trova uno che non è presente nel dizionario
             {
                 numeroS = Random.Shared.Next(min, max)*2; // generiamo numeri SOLO pari
-            } while (exist.ContainsKey(numeroS));
-                exist.Add(numeroS, true ); //aggiungiamo il numero generato al dizionario per evitare duplicati
+            } while (exist.Contains(numeroS));
+                exist.Add(numeroS); //aggiungiamo il numero generato al dizionario per evitare duplicati
 
             Console.WriteLine("Inserito: " + numeroS);
             buffer = numeroS; //inseriamo il numero generato nel buffer
