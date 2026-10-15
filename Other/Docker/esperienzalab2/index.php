@@ -1,17 +1,16 @@
 <?php
-$jsonPath ='./data/requests.json'; //__DIR__ torniamo alla route del progetto
+require_once './src/Domain/RequestRepositoryInterface.php';
+require_once './src/Infrastructure/JsonRequestRepository.php';
+require_once './src/Application/GetRequestList.php';
+require_once './src/Domain/Request.php';
 
-if(!file_exists($jsonPath)) {
-    die("Il file requests.json non esiste. Assicurati che il percorso sia corretto."); // Controllo se il file esiste
-    //die --> interrompe l'esecuzione dello script se il file non esiste
-}
+use App\Infrastructure\JsonRequestRepository;
+use App\Application\GetRequestList;
 
-$jsondata = file_get_contents($jsonPath);
-$data = json_decode($jsondata, true); // Decodifica il JSON in un array
-
-if($data === null) {
-    die("Errore nella decodifica del JSON. Controlla il formato del file requests.json."); // Controllo se la decodifica è avvenuta correttamente
-}
+$dataPath = './data/requests.json';
+$repository = new JsonRequestRepository($dataPath);
+$getRequestList = new GetRequestList($repository);
+$data = $getRequestList->execute();
 
 ?>
 
@@ -70,11 +69,11 @@ if($data === null) {
         <?php else: ?>
             <?php foreach ($data as $request): ?>
                 <div class="card">
-                    <h3><?php echo htmlspecialchars($request['titolo']); ?></h3>
-                    <p><?php echo nl2br(htmlspecialchars($request['descrizione'])); ?></p>
+                    <h3><?php echo htmlspecialchars($request -> titolo); ?></h3>
+                    <p><?php echo nl2br(htmlspecialchars($request->descrizione)); ?></p>
                     <div class="meta">
-                        <strong>Data:</strong> <?php echo htmlspecialchars($request['data']); ?><br>
-                        <strong>Autore:</strong> <?php echo htmlspecialchars($request['autore']); ?>
+                        <strong>Data:</strong> <?php echo htmlspecialchars($request->data); ?><br>
+                        <strong>Autore:</strong> <?php echo htmlspecialchars($request->autore); ?>
                     </div>
                 </div>
             <?php endforeach; ?>
