@@ -1,8 +1,7 @@
 node_modules/
 .rcc-index/
-data/auth.json
-data/repos.json
-data/active.json
+# Legacy in-tree runtime state from older versions.
+/backend/data/
 .DS_Store
 Thumbs.db
 *.log

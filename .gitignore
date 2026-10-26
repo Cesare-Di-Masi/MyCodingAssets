@@ -512,3 +512,13 @@ CMakeCache.txt
 
 # Added by Repo Command Center
 .rcc-index/
+
+# Additional generated artifacts for JVM, CMake, and Python test tools
+*.class
+.kotlin/
+cmake-build-*/
+.tox/
+.nox/
+.coverage.*
+htmlcov/
+.coverage

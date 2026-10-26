@@ -12,7 +12,8 @@ function detect(repoRoot, ignoreDirs) {
       if (ignoreDirs.includes(name)) continue;
       const full = path.join(dir, name);
       let st;
-      try { st = fs.statSync(full); } catch (e) { continue; }
+      try { st = fs.lstatSync(full); } catch (e) { continue; }
+      if (st.isSymbolicLink()) continue;
       if (st.isDirectory()) { walk(full, depth + 1); continue; }
       if (['package.json', 'requirements.txt', 'pyproject.toml', 'go.mod',
            'Cargo.toml', 'Gemfile', 'composer.json', 'pom.xml', 'build.gradle'].includes(name)) {

@@ -18,7 +18,7 @@ function isPathInside(repoRoot, candidate) {
     resolved = path.join(parent, path.basename(candidate));
   }
   const rel = path.relative(rootReal, resolved);
-  return !!rel && !rel.startsWith('..') && !path.isAbsolute(rel);
+  return rel === '' || (rel !== '..' && !rel.startsWith(`..${path.sep}`) && !path.isAbsolute(rel));
 }
 
 function listDir(repoRoot, relPath, ignoreDirs) {
@@ -54,20 +54,25 @@ function walkRepo(repoRoot, ignoreDirs, cap = 200000) {
     totalFiles: 0, totalDirs: 0, totalSize: 0,
     languages: {}, largestFiles: [], extCounts: {}
   };
+  const visitedDirs = new Set();
   const extOf = (name) => (path.extname(name).replace('.', '').toLowerCase() || 'no-ext');
 
   function walk(dir) {
     if (stats.totalFiles > cap) return;
+    let realDir;
+    try { realDir = fs.realpathSync(dir); } catch (e) { return; }
+    if (visitedDirs.has(realDir)) return;
+    visitedDirs.add(realDir);
     let entries;
     try { entries = fs.readdirSync(dir); } catch (e) { return; }
     for (const name of entries) {
       if (shouldIgnore(name, ignoreDirs)) continue;
       const full = path.join(dir, name);
-      if (!isPathInside(repoRoot, full)) continue;
       let st;
-      try { st = fs.statSync(full); } catch (e) { continue; }
+      try { st = fs.lstatSync(full); } catch (e) { continue; }
+      if (st.isSymbolicLink() || !isPathInside(repoRoot, full)) continue;
       if (st.isDirectory()) { stats.totalDirs++; walk(full); }
-      else {
+      else if (st.isFile()) {
         stats.totalFiles++;
         stats.totalSize += st.size;
         const ext = extOf(name);

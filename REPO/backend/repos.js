@@ -1,23 +1,24 @@
 const fs = require('fs');
 const path = require('path');
 const simpleGit = require('simple-git');
+const { ensureStateDirectory, stateFile } = require('./state-dir');
 
-const STORE = path.join(__dirname, '..', 'data', 'repos.json');
-const ACTIVE_STORE = path.join(__dirname, '..', 'data', 'active.json');
+const STORE = stateFile('repos.json');
+const ACTIVE_STORE = stateFile('active.json');
 
 function load() {
   if (!fs.existsSync(STORE)) return [];
   try { return JSON.parse(fs.readFileSync(STORE, 'utf8')); } catch (e) { return []; }
 }
 function save(list) {
-  fs.mkdirSync(path.dirname(STORE), { recursive: true });
+  ensureStateDirectory();
   fs.writeFileSync(STORE, JSON.stringify(list, null, 2));
 }
 function loadActive() {
   try { return JSON.parse(fs.readFileSync(ACTIVE_STORE, 'utf8')).path || null; } catch (e) { return null; }
 }
 function saveActive(repoPath) {
-  fs.mkdirSync(path.dirname(ACTIVE_STORE), { recursive: true });
+  ensureStateDirectory();
   fs.writeFileSync(ACTIVE_STORE, JSON.stringify({ path: path.resolve(repoPath) }, null, 2));
 }
 function list() { return load(); }

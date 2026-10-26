@@ -48,11 +48,12 @@ const APP_DIR = path.resolve(__dirname, '..');
 const REPO_ROOT = path.resolve(APP_DIR, config.repoPath || '.');
 const IGNORE_DIRS = config.ignoreDirs || ['node_modules', '.git'];
 const PORT = process.env.PORT || config.port || 4747;
+const HOST = config.host || '127.0.0.1';
 const GRAPH_LIMIT = config.graphCommitLimit || 400;
 const GITHUB_TOKEN = config.githubToken || process.env.GITHUB_TOKEN || '';
 const GITHUB_REPO = config.githubRepo || '';
-const OLLAMA_URL = config.ollamaUrl || 'http://localhost:11434';
-const OLLAMA_MODEL = config.ollamaModel || 'llama3.2';
+let OLLAMA_URL = config.ollamaUrl || 'http://localhost:11434';
+let OLLAMA_MODEL = config.ollamaModel || 'llama3.2';
 
 if (!fs.existsSync(path.join(REPO_ROOT, '.git'))) {
   console.warn(`WARNING: ${REPO_ROOT} does not look like a Git repository.`);
@@ -90,12 +91,31 @@ const app = express();
 const RUNNER_ALLOWLIST = new Set(['npm', 'npx', 'pnpm', 'yarn', 'pytest', 'python', 'python3', 'cargo', 'go', 'make', 'docker', 'git']);
 const runSessions = new Map();
 const authConfig = { enabled: false, token: '', allowLocalhostWithoutToken: true, ...(config.auth || {}) };
-config.auth = authConfig;
+authConfig.token = typeof authConfig.token === 'string' ? authConfig.token.trim() : '';
+if (authConfig.enabled && !authConfig.token) {
+  const envToken = (process.env.REPO_ACCESS_TOKEN || '').trim();
+  const storedToken = authStore.getAccessToken();
+  authConfig.token = envToken || storedToken || crypto.randomBytes(32).toString('hex');
+  if (!envToken && !storedToken) {
+    authStore.setAccessToken(authConfig.token);
+    console.log('[auth] Generated bearer token stored in the private user data directory.');
+  }
+}
+function isLoopbackAddress(address) {
+  if (typeof address !== 'string') return false;
+  const normalized = address.toLowerCase();
+  if (normalized === 'localhost' || normalized === '::1') return true;
+  const ipv4 = normalized.startsWith('::ffff:') ? normalized.slice(7) : normalized;
+  const octets = ipv4.split('.');
+  return octets.length === 4 && Number(octets[0]) === 127 && octets.every((part) => /^\d{1,3}$/.test(part) && Number(part) <= 255);
+}
 
 function isLoopbackRequest(req) {
-  const host = req.hostname || '';
-  const ip = req.ip || req.socket?.remoteAddress || '';
-  return host === 'localhost' || host === '127.0.0.1' || host === '::1' || ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  return isLoopbackAddress(req.socket?.remoteAddress || '');
+}
+
+if (!isLoopbackAddress(HOST) && HOST !== 'localhost' && !authConfig.enabled) {
+  throw new Error('Set auth.enabled to true before binding Repo Command Center to a non-loopback host.');
 }
 
 function authMiddleware(req, res, next) {
@@ -467,6 +487,9 @@ app.post('/api/settings', handle(async (req, res) => {
   const next = { ...config };
   allowed.forEach((key) => { if (typeof req.body[key] === 'string') next[key] = req.body[key]; });
   fs.writeFileSync(path.join(__dirname, '..', 'config.json'), JSON.stringify(next, null, 2) + '\n');
+  Object.assign(config, next);
+  OLLAMA_URL = config.ollamaUrl || 'http://localhost:11434';
+  OLLAMA_MODEL = config.ollamaModel || 'llama3.2';
   res.json({ ok: true });
 }));
 
@@ -676,33 +699,9 @@ app.get('/api/run/stream/:runId', handle(async (req, res) => {
   req.on('close', () => clearInterval(interval));
 }));
 
-app.listen(PORT, () => {
-  if (authConfig.enabled && !authConfig.token) {
-    authConfig.token = crypto.randomBytes(32).toString('hex');
-    config.auth = authConfig;
-    fs.writeFileSync(path.join(__dirname, '..', 'config.json'), JSON.stringify(config, null, 2) + '\n');
-    console.log('');
-    console.log('═══════════════════════════════════════════');
-    console.log('  ACCESS TOKEN (save this; shown only once)');
-    console.log(`  ${authConfig.token}`);
-    console.log('═══════════════════════════════════════════');
-    console.log('');
-  }
-  console.log('');
-  console.log('  ██████╗ ███████╗██████╗  ██████╗');
-  console.log('  ██╔══██╗██╔════╝██╔══██╗██╔═══██╗');
-  console.log('  ██████╔╝█████╗  ██████╔╝██║   ██║');
-  console.log('  ██╔══██╗██╔══╝  ██╔═══╝ ██║   ██║');
-  console.log('  ██║  ██║███████╗██║     ╚██████╔╝');
-  console.log('  ╚═╝  ╚═╝╚══════╝╚═╝      ╚═════╝');
-  console.log('  REPO COMMAND CENTER v2 · full');
-  console.log('  --------------------');
-  console.log(`  Repo:   ${REPO_ROOT}`);
-  console.log(`  Server: http://localhost:${PORT}`);
-  console.log(`  Auth:   ${authConfig.enabled ? 'enabled' : 'disabled'}`);
-  console.log(`  GitHub: ${GITHUB_TOKEN ? 'configured' : 'not configured'}`);
-  console.log(`  Ollama: ${OLLAMA_URL}`);
-  console.log('');
+app.listen(PORT, HOST, () => {
+  console.log(`Repo Command Center listening on ${HOST}:${PORT}`);
+  console.log(`Auth: ${authConfig.enabled ? 'enabled' : 'disabled'}`);
   setTimeout(() => indexer.indexIncremental(REPO_ROOT, IGNORE_DIRS, git, false).catch((e) => console.error('[index]', e.message)), 2000);
   setInterval(() => indexer.indexIncremental(REPO_ROOT, IGNORE_DIRS, git, false).catch((e) => console.error('[index]', e.message)), 5 * 60 * 1000);
 });

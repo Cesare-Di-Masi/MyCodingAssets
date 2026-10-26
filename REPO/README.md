@@ -23,7 +23,7 @@ comments, obvious hardcoded secrets, and duplicate files.
 ## Setup
 
 ```bash
-cd repo-manager
+cd REPO
 npm install
 ```
 
@@ -35,6 +35,7 @@ Edit `config.json` and point `repoPath` at the Git repository you want to manage
 ```json
 {
   "repoPath": "/path/to/your/giant/repo",
+  "host": "127.0.0.1",
   "port": 4747
 }
 ```
@@ -48,7 +49,13 @@ Then:
 npm start
 ```
 
-Open **http://localhost:4747**.
+To regenerate this repository's directory tree and file counts without
+installing additional packages, run `npm run tree` from `REPO/`. The reports are
+written under `Docs/RepoStructure/` at the repository root.
+
+Open **http://127.0.0.1:4747**. The server binds to loopback by default.
+
+For LAN access, set `host` to the desired interface (for example `0.0.0.0`) and enable `auth` in `config.json`. If authentication is enabled without a configured token, the app creates one in the private user data file `RepoCommandCenter/auth.json` under the `accessToken` field (`%LOCALAPPDATA%` on Windows, `$XDG_DATA_HOME` on Linux when set). You can also provide `REPO_ACCESS_TOKEN` through the environment. Never put bearer tokens in the tracked `config.json` file.
 
 ## Notes on the architecture
 

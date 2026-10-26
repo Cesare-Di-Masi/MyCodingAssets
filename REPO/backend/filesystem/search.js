@@ -25,7 +25,8 @@ function search(repoRoot, ignoreDirs, query, mode, maxResults) {
       if (ignoreDirs.includes(name)) continue;
       const full = path.join(dir, name);
       let st;
-      try { st = fs.statSync(full); } catch (e) { continue; }
+      try { st = fs.lstatSync(full); } catch (e) { continue; }
+      if (st.isSymbolicLink()) continue;
       const relPath = path.relative(repoRoot, full).split(path.sep).join('/');
 
       if (st.isDirectory()) { walk(full); continue; }

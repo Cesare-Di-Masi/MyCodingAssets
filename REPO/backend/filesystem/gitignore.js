@@ -9,6 +9,31 @@ function readRules(repoRoot) {
   return { exists: true, rules, path: gi, text };
 }
 
+function countFiles(root, ignoreDirs, cap = 5000) {
+  let count = 0;
+  const pending = [root];
+  const visited = new Set();
+  while (pending.length && count < cap) {
+    const dir = pending.pop();
+    let realDir;
+    try { realDir = fs.realpathSync(dir); } catch (e) { continue; }
+    if (visited.has(realDir)) continue;
+    visited.add(realDir);
+    let entries;
+    try { entries = fs.readdirSync(dir); } catch (e) { continue; }
+    for (const name of entries) {
+      if (ignoreDirs.includes(name)) continue;
+      let st;
+      try { st = fs.lstatSync(path.join(dir, name)); } catch (e) { continue; }
+      if (st.isSymbolicLink()) continue;
+      if (st.isDirectory()) pending.push(path.join(dir, name));
+      else if (st.isFile()) count++;
+      if (count >= cap) break;
+    }
+  }
+  return count;
+}
+
 function analyze(repoRoot, ignoreDirs) {
   const info = readRules(repoRoot);
   const counts = {};
@@ -17,22 +42,10 @@ function analyze(repoRoot, ignoreDirs) {
     if (!clean || clean.startsWith('#')) continue;
     const base = clean.split('/')[0];
     const full = path.join(repoRoot, base);
-    if (fs.existsSync(full) && fs.statSync(full).isDirectory()) {
-      let n = 0;
-      (function walk(dir) {
-        let entries;
-        try { entries = fs.readdirSync(dir); } catch (e) { return; }
-        for (const e of entries) {
-          const f = path.join(dir, e);
-          try {
-            const st = fs.statSync(f);
-            if (st.isDirectory()) walk(f);
-            else { n++; if (n > 5000) return; }
-          } catch (_) {}
-        }
-      })(full);
-      counts[rule] = n;
-    }
+    try {
+      const st = fs.lstatSync(full);
+      if (st.isDirectory() && !st.isSymbolicLink()) counts[rule] = countFiles(full, ignoreDirs);
+    } catch (e) {}
   }
 
   // Suspicious: sensitive-looking files not ignored
@@ -56,9 +69,18 @@ function analyze(repoRoot, ignoreDirs) {
 }
 
 function append(repoRoot, rules) {
+  if (!Array.isArray(rules)) throw new Error('rules must be an array');
+  if (rules.length > 200) throw new Error('Too many ignore rules');
   const gi = path.join(repoRoot, '.gitignore');
   const existing = fs.existsSync(gi) ? fs.readFileSync(gi, 'utf8') : '';
-  const toAdd = rules.filter((r) => r && !existing.includes(r));
+  const existingRules = new Set(existing.split(/\r?\n/).map((rule) => rule.trim()).filter(Boolean));
+  const candidates = rules.map((rule) => {
+    if (typeof rule !== 'string') throw new Error('Each ignore rule must be a string');
+    const clean = rule.trim();
+    if (clean.length > 500 || /[\r\n\0]/.test(clean)) throw new Error('Invalid ignore rule');
+    return clean;
+  }).filter(Boolean);
+  const toAdd = [...new Set(candidates)].filter((rule) => !existingRules.has(rule));
   if (!toAdd.length) return;
   const prefix = existing.endsWith('\n') || !existing ? '' : '\n';
   fs.appendFileSync(gi, `${prefix}\n# Added by Repo Command Center\n${toAdd.join('\n')}\n`);

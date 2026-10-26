@@ -46,7 +46,8 @@ function indexFile(repoRoot, filePath) {
   }); tx();
 }
 function walk(repoRoot, ignoreDirs, onFile) {
-  function visit(dir) { let entries; try { entries = fs.readdirSync(dir); } catch (e) { return; } for (const name of entries) { if (ignoreDirs.includes(name)) continue; const full = path.join(dir, name); let st; try { st = fs.statSync(full); } catch (e) { continue; } if (st.isDirectory()) { dbMod.get(repoRoot).prepare('INSERT OR REPLACE INTO dirs(path,mtime) VALUES(?,?)').run(rel(repoRoot, full), Math.floor(st.mtimeMs)); visit(full); } else onFile(full); } }
+  const visitedDirs = new Set();
+  function visit(dir) { let realDir; try { realDir = fs.realpathSync(dir); } catch (e) { return; } if (visitedDirs.has(realDir)) return; visitedDirs.add(realDir); let entries; try { entries = fs.readdirSync(dir); } catch (e) { return; } for (const name of entries) { if (ignoreDirs.includes(name)) continue; const full = path.join(dir, name); let st; try { st = fs.lstatSync(full); } catch (e) { continue; } if (st.isSymbolicLink()) continue; if (st.isDirectory()) { dbMod.get(repoRoot).prepare('INSERT OR REPLACE INTO dirs(path,mtime) VALUES(?,?)').run(rel(repoRoot, full), Math.floor(st.mtimeMs)); visit(full); } else if (st.isFile()) onFile(full); } }
   visit(repoRoot);
 }
 async function indexCommits(repoRoot, git) {

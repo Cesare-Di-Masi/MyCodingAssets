@@ -23,7 +23,8 @@ function scanRepoForTodosAndSecrets(repoRoot, ignoreDirs, maxFileSize = 1024 * 1
       if (ignoreDirs.includes(name)) continue;
       const full = path.join(dir, name);
       let st;
-      try { st = fs.statSync(full); } catch (e) { continue; }
+      try { st = fs.lstatSync(full); } catch (e) { continue; }
+      if (st.isSymbolicLink()) continue;
       if (st.isDirectory()) { walk(full); continue; }
       if (st.size > maxFileSize) continue;
 
@@ -60,7 +61,8 @@ function findDuplicates(largestFilesLike, repoRoot, ignoreDirs) {
       if (ignoreDirs.includes(name)) continue;
       const full = path.join(dir, name);
       let st;
-      try { st = fs.statSync(full); } catch (e) { continue; }
+      try { st = fs.lstatSync(full); } catch (e) { continue; }
+      if (st.isSymbolicLink()) continue;
       if (st.isDirectory()) { walk(full); continue; }
       if (st.size === 0) continue;
       (bySize[st.size] = bySize[st.size] || []).push(full);

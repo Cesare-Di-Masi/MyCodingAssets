@@ -23,8 +23,8 @@ class RepoWatcher extends EventEmitter {
     for (const name of entries) {
       if (this.ignoreDirs.has(name)) continue;
       const full = path.join(dir, name);
-      let st; try { st = fs.statSync(full); } catch (e) { continue; }
-      if (st.isDirectory()) this.watchDir(full);
+      let st; try { st = fs.lstatSync(full); } catch (e) { continue; }
+      if (!st.isSymbolicLink() && st.isDirectory()) this.watchDir(full);
     }
   }
   onEvent(dir, name) {
