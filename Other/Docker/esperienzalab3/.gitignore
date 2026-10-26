@@ -1,0 +1,9 @@
+/vendor/
+*.log
+*.pem
+*.key
+# Dati generati da Docker (es. se monti cartelle per il database)
+.docker/
+/db_data/
+.DS_Store
+.vscode/

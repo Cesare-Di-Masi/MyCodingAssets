@@ -1,22 +1,13 @@
 services:
-    web:
-        image: php:8.2-apache
-        ports:
-            - "8080:80"
-        volumes:
-            - ./:/var/www/html
-        depends_on:
-            - db
-
-    db:
-        image: mysql:8.0
-        environment:
-            MYSQL_ROOT_PASSWORD: rootpass
-            MYSQL_DATABASE: my_database
-            MYSQL_USER: user
-            MYSQL_PASSWORD: password_segreta
-        volumes:
-            - db_data:/var/lib/mysql
-
-volumes:
-    db_data:
+  web:
+    image: php:8.2-apache
+    container_name: bacheca_app_step1
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/src
+    command: >
+      bash -c "sed -i -e 's/html/html\\/src/g' /etc/apache2/sites-available/000-default.conf && apache2-foreground"
+    restart: unless-stopped
