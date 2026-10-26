@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Bogus" Version="35.6.5" />
-    <PackageReference Include="DockerNames" Version="0.1.0" />
-    <PackageReference Include="Moniker" Version="2.1.0" />
+    <PackageReference Include="RandomFriendlyNameGenerator" Version="1.0.9" />
   </ItemGroup>
 
 </Project>

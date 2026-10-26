@@ -34,7 +34,7 @@ public class UseServer
             var message = Console.ReadLine();
             if (!string.IsNullOrEmpty(message))
             {
-                bool sent = server.TrySendMessage(message);
+                bool sent = server.TrySendMessageBroadcast(message);
                 if (sent)
                 {
                     Console.ForegroundColor = ConsoleColor.Green;

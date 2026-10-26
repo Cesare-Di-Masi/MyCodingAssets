@@ -6,8 +6,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
-
-using Bogus;
+using System.Linq;
+using RandomFriendlyNameGenerator;
 
 public class Server
 {
@@ -15,17 +15,17 @@ public class Server
     private const int BUFFER_SIZE = 1024;
     private const int MAX_CONNECTIONS = 10;
 
-    private List<string> ClientsName = new();
-    Faker faker = new Faker("it");
+    private List<string> clientsName = new();
     private Socket listener;
-    private readonly List<Socket> clientHandlers = new();
+    private readonly Dictionary<string,Socket> clientHandlers = new();
     private readonly List<byte[]> buffers = new();
     private Action<string> messageCallback;
 
     public int Port { get; init; }
     public string HostName { get; init; }
-    public bool IsClientConnected => clientHandlers.Exists(client => client.Connected);
-
+    
+    public bool IsClientConnected =>
+    clientHandlers.Values.Any(client => client.Connected);
     public Server(int port, string hostName)
     {
         this.Port = port;
@@ -70,7 +70,30 @@ public class Server
         });
     }
 
-    public bool TrySendMessage(string msg)
+    public bool TrySendMessageSingle(string msg, string hostName)
+    {
+        bool sent = false;
+
+        byte[] raw = Encoding.UTF8.GetBytes(msg);
+
+        try
+            {
+                int sentdata = clientHandlers[hostName].Send(raw);
+                if (sentdata != raw.Length)
+                {
+                    sent= false;
+                }
+            }
+            catch (SocketException)
+            {
+                sent = false;
+                RemoveClient(clientHandlers[hostName]);
+            }
+
+        return sent;
+    }
+
+    public bool TrySendMessageBroadcast(string msg)
     {
         if (clientHandlers.Count == 0)
         {
@@ -79,17 +102,18 @@ public class Server
 
         byte[] raw = Encoding.UTF8.GetBytes(msg);
         bool sentToAll = true;
-        foreach (Socket clientHandler in clientHandlers.ToArray())
+        foreach (Socket clientHandler in clientHandlers.Values.ToArray())
         {
-        try{
-            int sent = clientHandler.Send(raw);
-            if (sent != raw.Length)
+            try
             {
-                sentToAll = false;
+                int sent = clientHandler.Send(raw);
+                if (sent != raw.Length)
+                {
+                    sentToAll = false;
+                }
             }
-        }
-        catch (SocketException)
-        {
+            catch (SocketException)
+            {
                 sentToAll = false;
                 RemoveClient(clientHandler);
             }
@@ -104,20 +128,21 @@ public class Server
         messageCallback = onMessageReceived;
         for (int i = 0; i < clientHandlers.Count; i++)
         {
-            StartListening(clientHandlers[i], buffers[i]);
+            StartListening(clientHandlers.Values.ToArray()[i], buffers[i]);
         }
     }
 
     private void AddClient(Socket clientHandler)
     {
-        clientHandlers.Add(clientHandler);
+        string generatedName = NameGenerator.Identifiers.Get(IdentifierTemplate.AnyTwoComponents, separator:"_", forceSingleLetter:true);
+        clientsName.Add(generatedName);
+        clientHandlers.Add(generatedName, clientHandler);
         buffers.Add(ClearBuffer());
-        ClientsName.Add(faker.Name.FullName());
         if (messageCallback is not null)
         {
             StartListening(clientHandler, buffers[buffers.Count - 1]);
         }
-        TrySendMessage($"{ClientsName[clientHandlers.Count - 1]} si è connesso al server!");
+        TrySendMessageSingle($"Nome assegnato: {clientsName[clientHandlers.Count - 1]} ", generatedName);
     }
 
     private void StartListening(Socket clientHandler, byte[] buffer)
@@ -152,7 +177,7 @@ public class Server
     private void ForwardMessage(string message, Socket sender)
     {
         byte[] raw = Encoding.UTF8.GetBytes(message);
-        foreach (Socket client in clientHandlers.ToArray())
+        foreach (Socket client in clientHandlers.Values.ToArray())
         {
             if (client == sender)
             {
@@ -172,11 +197,13 @@ public class Server
 
     private void RemoveClient(Socket clientHandler)
     {
-        int index = clientHandlers.IndexOf(clientHandler);
+        int index = clientHandlers.Values.ToArray().IndexOf(clientHandler);
+        string key = clientHandlers.First(x => x.Value == clientHandler).Key;
         if (index >= 0)
         {
-            clientHandlers.RemoveAt(index);
+            clientHandlers.Remove(key);
             buffers.RemoveAt(index);
+            clientsName.RemoveAt(index);
         }
 
         clientHandler.Close();
@@ -184,7 +211,7 @@ public class Server
 
     public void Close()
     {
-        foreach (Socket clientHandler in clientHandlers.ToArray())
+        foreach (Socket clientHandler in clientHandlers.Values.ToArray())
         {
             clientHandler.Close();
         }
