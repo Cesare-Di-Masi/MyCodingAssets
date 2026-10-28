@@ -15,29 +15,47 @@ public class Server
     private const int BUFFER_SIZE = 1024;
     private const int MAX_CONNECTIONS = 10;
 
-    private List<string> clientsName = new();
+    //Classe interna
+    private sealed class ClientSession
+    {
+        public ClientSession(string name, Socket socket)
+        {
+            Name = name;
+            Socket = socket;
+        }
+
+        public string Name { get; }
+        public Socket Socket { get; }
+        public byte[] Buffer { get; } = new byte[BUFFER_SIZE];
+        public object SendLock { get; } = new();
+    }
+
+    private readonly object sync = new();
+    private readonly List<ClientSession> sessions = new();
     private Socket listener;
-    private readonly Dictionary<string,Socket> clientHandlers = new();
-    private readonly List<byte[]> buffers = new();
     private Action<string> messageCallback;
 
     public int Port { get; init; }
     public string HostName { get; init; }
-    
-    public bool IsClientConnected =>
-    clientHandlers.Values.Any(client => client.Connected);
+
+    public bool IsClientConnected
+    {
+        get
+        {
+            lock (sync)
+            {
+                return sessions.Any(s => s.Socket.Connected);
+            }
+        }
+    }
+
     public Server(int port, string hostName)
     {
         this.Port = port;
         this.HostName = hostName ?? DEFAULT_HOST_NAME;
     }
 
-    private byte[] ClearBuffer()
-    {
-        return new byte[BUFFER_SIZE];
-    }
-
-    // Configura l'ascolto e attende l'arrivo di un client
+    // Configura l'ascolto e avvia subito l'accettazione dei client in background
     public void Start()
     {
         var hostIP = Dns.GetHostEntry(HostName).AddressList[0];
@@ -47,12 +65,9 @@ public class Server
         listener.Bind(localEndpoint);
         listener.Listen(MAX_CONNECTIONS);
 
-        // Blocca finché un client non si connette
-        AddClient(listener.Accept());
-
         Task.Run(() =>
         {
-            while (true) //Loop infinito per accettare nuovi client
+            while (true) // Loop infinito per accettare nuovi client
             {
                 try
                 {
@@ -72,79 +87,40 @@ public class Server
 
     public bool TrySendMessageSingle(string msg, string hostName)
     {
-        bool sent = false;
-
-        byte[] raw = Encoding.UTF8.GetBytes(msg);
-
-        try
+        ClientSession session;
+        lock (sync)
         {
-            int sentdata = clientHandlers[hostName].Send(raw);
-            if (sentdata != raw.Length)
-            {
-                sent = false;
-            }
-        }
-        catch (SocketException)
-        {
-            sent = false;
-            Socket client = clientHandlers[hostName];
-            RemoveClient(client);
-            TrySendMessageBroadcast($"{hostName} Disconnected from the session");
+            session = sessions.FirstOrDefault(s => s.Name == hostName);
         }
 
-        return sent;
+        return session is not null && TrySend(session, msg);
     }
 
     public bool TrySendMessageSingle(string msg, Socket client)
     {
-        bool sent = false;
-
-        byte[] raw = Encoding.UTF8.GetBytes(msg);
-
-        try
+        ClientSession session;
+        lock (sync)
         {
-            int sentdata = client.Send(raw);
-            if (sentdata != raw.Length)
-            {
-                sent = false;
-            }
-        }
-        catch (SocketException)
-        {
-            sent = false;
-            string clientName = getClientName(client);
-            RemoveClient(client);
-            TrySendMessageBroadcast($"{clientName} Disconnected from the session");
+            session = sessions.FirstOrDefault(s => s.Socket == client);
         }
 
-        return sent;
+        return session is not null && TrySend(session, msg);
     }
 
     public bool TrySendMessageBroadcast(string msg)
     {
-        if (clientHandlers.Count == 0)
+        ClientSession[] snapshot = Snapshot();
+        if (snapshot.Length == 0)
         {
             return false;
         }
 
-        byte[] raw = Encoding.UTF8.GetBytes(msg);
         bool sentToAll = true;
-        foreach (Socket client in clientHandlers.Values.ToArray())
+        foreach (ClientSession session in snapshot)
         {
-            try
-            {
-                int sent = client.Send(raw);
-                if (sent != raw.Length)
-                {
-                    sentToAll = false;
-                }
-            }
-            catch (SocketException)
+            if (!TrySend(session, msg))
             {
                 sentToAll = false;
-                string clientName = getClientName(client);
-                RemoveClient(client);
-                TrySendMessageBroadcast($"{clientName} Disconnected from the session");
             }
         }
 
@@ -154,126 +130,207 @@ public class Server
     // Ascolto in background speculare a quello del Client
     public void StartListening(Action<string> onMessageReceived)
     {
-        messageCallback = onMessageReceived;
-        for (int i = 0; i < clientHandlers.Count; i++)
+        ClientSession[] snapshot;
+        lock (sync)
         {
-            StartListening(clientHandlers.Values.ToArray()[i], buffers[i]);
+            messageCallback = onMessageReceived;
+            snapshot = sessions.ToArray();
+        }
+
+        // I client aggiunti da ora in poi vengono ascoltati direttamente da AddClient
+        foreach (ClientSession session in snapshot)
+        {
+            Listen(session);
+        }
+    }
+
+    private ClientSession[] Snapshot()
+    {
+        lock (sync)
+        {
+            return sessions.ToArray();
         }
     }
 
     private void AddClient(Socket client)
     {
-        buffers.Add(ClearBuffer());
-        if (messageCallback is not null)
+        ClientSession session;
+        bool listenNow;
+
+        lock (sync)
         {
-            StartListening(client, buffers[buffers.Count - 1]);
+            // Il nome generato deve essere unico, altrimenti ci sarebbero collisioni
+            string name;
+            do
+            {
+                name = NameGenerator.Identifiers.Get(IdentifierTemplate.AnyTwoComponents, separator: "_", forceSingleLetter: true);
+            }
+            while (sessions.Any(s => s.Name == name));
+
+            session = new ClientSession(name, client);
+            sessions.Add(session);
+            listenNow = messageCallback is not null;
         }
-        AssignClientName(client);
+
+        TrySend(session, $"assign_identity: {session.Name}");
+
+        if (listenNow)
+        {
+            Listen(session);
+        }
     }
 
-    private void StartListening(Socket client, byte[] buffer)
+    private void Listen(ClientSession session)
     {
         Task.Run(() =>
         {
-            while (client.Connected)
+            try
             {
-                try
+                while (session.Socket.Connected)
                 {
-                    int receivedBytes = client.Receive(buffer);
+                    int receivedBytes = session.Socket.Receive(session.Buffer);
                     if (receivedBytes == 0)
                     {
-                        // Il client si è disconnesso
+                        // Il client si e' disconnesso
                         break;
                     }
 
-                    string decodedMessage = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
-                    
-                    if(decodedMessage == "exit")
+                    string decodedMessage = Encoding.UTF8.GetString(session.Buffer, 0, receivedBytes);
+
+                    // Il client antepone "[nome]" al testo: i controlli vanno fatti sul testo senza il prefisso
+                    string text = decodedMessage;
+                    if (decodedMessage.StartsWith("["))
                     {
-                        string clientName = getClientName(client);
-                        RemoveClient(client);
-                        TrySendMessageBroadcast($"{clientName} left from the session");
-                        return;
-                    }
-                    
-                    if(decodedMessage.EndsWith("!"))
-                    {
-                        decodedMessage = decodedMessage[..^1]; //toglie l'ultimo carattere della stringa cha sarà !
-                        ForwardMessage(decodedMessage, client);
+                        int closeBracketIndex = decodedMessage.IndexOf(']');
+                        if (closeBracketIndex != -1)
+                        {
+                            text = decodedMessage.Substring(closeBracketIndex + 1);
+                        }
                     }
 
-                    messageCallback(decodedMessage);
-                }
-                catch (SocketException)
-                {
-                    // Connessione interrotta o socket chiuso
-                    break;
+                    if (text == "exit")
+                    {
+                        if (RemoveSession(session))
+                        {
+                            TrySendMessageBroadcast($"{session.Name} left from the session");
+                        }
+                        return;
+                    }
+
+                    if (text.EndsWith("!"))
+                    {
+                        decodedMessage = decodedMessage[..^1]; // toglie il "!" finale
+                        ForwardMessage(decodedMessage, session);
+                    }
+
+                    messageCallback?.Invoke(decodedMessage);
                 }
             }
-            string disconnectedClientName = getClientName(client);
-            RemoveClient(client);
-            TrySendMessageBroadcast($"{disconnectedClientName} Disconnected from the session");
+            catch (SocketException)
+            {
+                // Connessione interrotta o socket chiuso
+            }
+            catch (ObjectDisposedException)
+            {
+                // Socket chiuso da un altro thread
+            }
+
+            DropClient(session);
         });
     }
 
-    private void ForwardMessage(string message, Socket sender)
+    private void ForwardMessage(string message, ClientSession sender)
     {
-        byte[] raw = Encoding.UTF8.GetBytes(message);
-        foreach (Socket client in clientHandlers.Values.ToArray())
+        foreach (ClientSession session in Snapshot())
         {
-            if (client == sender)
+            if (session == sender)
             {
                 continue;
             }
 
-            try
-            {
-                TrySendMessageSingle(message, client);
-            }
-            catch (SocketException)
-            {
-                string clientName = getClientName(client);
-                RemoveClient(client);
-                TrySendMessageBroadcast($"{clientName} Disconnected from the session");
-            }
+            TrySend(session, message);
         }
     }
 
-    private void RemoveClient(Socket client)
+    // Invio con lock per-client; in caso di errore il client viene rimosso
+    private bool TrySend(ClientSession session, string msg)
     {
-        int index = clientHandlers.Values.ToArray().IndexOf(client);
+        byte[] raw = Encoding.UTF8.GetBytes(msg);
 
-        string key = clientHandlers.FirstOrDefault(x => x.Value == client).Key;
-
-        if (index >= 0 && key != null)
+        try
         {
-            clientHandlers.Remove(key);
-            buffers.RemoveAt(index);
-            clientsName.RemoveAt(index);
+            int sent;
+            lock (session.SendLock)
+            {
+                sent = session.Socket.Send(raw);
+            }
+            return sent == raw.Length;
+        }
+        catch (SocketException)
+        {
+            DropClient(session);
+            return false;
+        }
+        catch (ObjectDisposedException)
+        {
+            DropClient(session);
+            return false;
+        }
+    }
+
+    // Rimuove il client e annuncia la disconnessione solo se era ancora presente:
+    // evita messaggi duplicati e cascate di broadcast
+    private void DropClient(ClientSession session)
+    {
+        if (RemoveSession(session))
+        {
+            TrySendMessageBroadcast($"{session.Name} Disconnected from the session");
+        }
+    }
+
+    private bool RemoveSession(ClientSession session)
+    {
+        bool removed;
+        lock (sync)
+        {
+            removed = sessions.Remove(session);
         }
 
-        client.Close();
-    }
+        try
+        {
+            session.Socket.Close();
+        }
+        catch (SocketException)
+        {
+        }
+        catch (ObjectDisposedException)
+        {
+        }
 
-    private void AssignClientName(Socket client)
-    {
-        string generatedName = NameGenerator.Identifiers.Get(IdentifierTemplate.AnyTwoComponents, separator:"_", forceSingleLetter:true);
-        clientsName.Add(generatedName);
-        clientHandlers.Add(generatedName, client);
-        TrySendMessageSingle($"assign_identity: {generatedName}", client);
-    }
-
-    private string getClientName(Socket client)
-    {
-        string name = clientHandlers.FirstOrDefault(x => x.Value == client).Key ?? "Unknown";
-        return name;
+        return removed;
     }
 
     public void Close()
     {
-        foreach (Socket client in clientHandlers.Values.ToArray())
+        ClientSession[] snapshot;
+        lock (sync)
         {
-            client.Close();
+            snapshot = sessions.ToArray();
+            sessions.Clear();
+        }
+
+        foreach (ClientSession session in snapshot)
+        {
+            try
+            {
+                session.Socket.Close();
+            }
+            catch (SocketException)
+            {
+            }
+            catch (ObjectDisposedException)
+            {
+            }
         }
 
         listener?.Close();

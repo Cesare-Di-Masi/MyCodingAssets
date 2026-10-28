@@ -7,6 +7,7 @@ using System.Text;
 public class Client
 {
     private const string DEFAULT_HOST_NAME = "localhost";
+    private const string IDENTITY_PREFIX = "assign_identity: ";
     private const int MAX_RECONNECTION_ATTEMPTS = 10;
     private readonly int BUFFER_SIZE = 1024;
     private Socket communicationChannel;
@@ -36,20 +37,24 @@ public class Client
             .AddressList
             .First();
         var remoteEndpoint = new IPEndPoint(hostIP, Port);
-        
-        this.communicationChannel = new Socket(
-            hostIP.AddressFamily, 
-            SocketType.Stream, 
-            ProtocolType.Tcp
-        );
 
         for (int attempts = 0; attempts < MAX_RECONNECTION_ATTEMPTS && !IsConnected; attempts++)
         {
+            // Un socket dopo un Connect fallito non e' affidabile: ne creo uno nuovo a ogni tentativo
+            var socket = new Socket(
+                hostIP.AddressFamily,
+                SocketType.Stream,
+                ProtocolType.Tcp
+            );
+
             try
             {
-                communicationChannel.Connect(remoteEndpoint);
-            } catch (Exception)
+                socket.Connect(remoteEndpoint);
+                this.communicationChannel = socket;
+            }
+            catch (Exception)
             {
+                socket.Dispose();
                 Thread.Sleep(500);
             }
         }
@@ -64,29 +69,56 @@ public class Client
         msg = $"[{AssignedName}]" + msg;
 
         byte[] raw = Encoding.UTF8.GetBytes(msg);
-        int sent = communicationChannel.Send(raw);
-        return sent == raw.Length;
+
+        try
+        {
+            int sent = communicationChannel.Send(raw);
+            return sent == raw.Length;
+        }
+        catch (SocketException)
+        {
+            return false;
+        }
+        catch (ObjectDisposedException)
+        {
+            return false;
+        }
     }
 
     public void StartListening(Action<string> onMessageReceived)
     {
-        bool firstMsg = true;
         Task.Run(() =>
         {
             ClearBuffer();
             while (IsConnected)
             {
-                int receivedBytes = this.communicationChannel.Receive(this.buffer);
+                int receivedBytes;
+                try
+                {
+                    receivedBytes = this.communicationChannel.Receive(this.buffer);
+                }
+                catch (SocketException)
+                {
+                    // Connessione interrotta
+                    return;
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Socket chiuso localmente
+                    return;
+                }
+
                 if (receivedBytes == 0)
                 {
                     // Server just disconnected
                     return;
                 }
                 string decodedMessage = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
-                if(firstMsg)
+
+                // Il nome si assegna solo se il messaggio e' davvero quello di identita'
+                if (AssignedName is null && decodedMessage.StartsWith(IDENTITY_PREFIX))
                 {
-                    AssignName(decodedMessage.Split(": ")[1]);
-                    firstMsg = false;
+                    AssignName(decodedMessage.Substring(IDENTITY_PREFIX.Length));
                 }
                 onMessageReceived(decodedMessage);
             }
@@ -100,7 +132,23 @@ public class Client
 
     public void Close()
     {
-        communicationChannel.Shutdown(SocketShutdown.Both);
+        if (communicationChannel is null)
+        {
+            return;
+        }
+
+        try
+        {
+            communicationChannel.Shutdown(SocketShutdown.Both);
+        }
+        catch (SocketException)
+        {
+            // Socket gia' disconnesso
+        }
+        catch (ObjectDisposedException)
+        {
+        }
+
         communicationChannel.Close();
     }
 }

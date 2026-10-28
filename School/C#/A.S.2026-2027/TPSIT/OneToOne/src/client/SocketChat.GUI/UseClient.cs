@@ -12,14 +12,18 @@ public class UseClient
 
     public static void Main(string[] args)
     {
-        var host = args[0] ?? "localhost";
-        var port = int.Parse(args[1] ?? "11000");
+        var host = args.ElementAtOrDefault(0) ?? "localhost";
+        if (!int.TryParse(args.ElementAtOrDefault(1) ?? "11000", out int port))
+        {
+            Fatal($"Invalid port: {args[1]}");
+        }
+
         var client = new Client(port, host); 
         client.Connect();
 
         if (!client.IsConnected)
         {
-            Fatal("Could not connect to ${host}:${port}");
+            Fatal($"Could not connect to {host}:{port}");
         }
 
         client.StartListening(message =>
@@ -48,5 +52,7 @@ public class UseClient
             }
             keepGoing = message != "exit";
         }
+
+        client.Close();
     }
 }

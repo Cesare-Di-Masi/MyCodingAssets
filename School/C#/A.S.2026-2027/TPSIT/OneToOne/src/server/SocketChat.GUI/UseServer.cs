@@ -6,16 +6,28 @@ public class UseServer
 {
     private static void Fatal(string message)
     {
-        Console.Error.WriteLine("Could not connect to ${host}:${port}");
+        Console.Error.WriteLine(message);
         Environment.Exit(1);
     }
 
     public static void Main(string[] args)
     {
-        var host = args[0] ?? "localhost";
-        var port = int.Parse(args[1] ?? "11000");
+        var host = args.ElementAtOrDefault(0) ?? "localhost";
+        if (!int.TryParse(args.ElementAtOrDefault(1) ?? "11000", out int port))
+        {
+            Fatal($"Invalid port: {args[1]}");
+        }
+
         var server = new Server(port, host);
-        server.Start();
+
+        try
+        {
+            server.Start();
+        }
+        catch (Exception ex) when (ex is System.Net.Sockets.SocketException)
+        {
+            Fatal($"Could not start the server on {host}:{port}");
+        }
 
         server.StartListening(message =>
         {
@@ -44,7 +56,8 @@ public class UseServer
 
         bool keepGoing = true;
         Console.WriteLine("Type here your message and press ENTER to send it!");
-        while (keepGoing && server.IsClientConnected)
+        // Start() non blocca piu' in attesa del primo client, quindi il ciclo non dipende da IsClientConnected
+        while (keepGoing)
         {
             var message = Console.ReadLine();
             if (!string.IsNullOrEmpty(message))
@@ -60,5 +73,7 @@ public class UseServer
             }
             keepGoing = message != "exit";
         }
+
+        server.Close();
     }
 }
