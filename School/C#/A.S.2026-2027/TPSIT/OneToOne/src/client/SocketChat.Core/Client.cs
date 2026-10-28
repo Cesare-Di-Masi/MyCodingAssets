@@ -12,6 +12,8 @@ public class Client
     private Socket communicationChannel;
     public int Port { get; init; }
     public string HostName { get; init; }
+
+    public string AssignedName {get; private set;}
     public bool IsConnected => communicationChannel is not null && communicationChannel.Connected;
     private byte[] buffer;
     
@@ -59,6 +61,7 @@ public class Client
         {
             return false;
         }
+        msg = $"[{AssignedName}]" + msg;
 
         byte[] raw = Encoding.UTF8.GetBytes(msg);
         int sent = communicationChannel.Send(raw);
@@ -67,10 +70,10 @@ public class Client
 
     public void StartListening(Action<string> onMessageReceived)
     {
+        bool firstMsg = true;
         Task.Run(() =>
         {
             ClearBuffer();
-
             while (IsConnected)
             {
                 int receivedBytes = this.communicationChannel.Receive(this.buffer);
@@ -80,9 +83,19 @@ public class Client
                     return;
                 }
                 string decodedMessage = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                if(firstMsg)
+                {
+                    AssignName(decodedMessage.Split(": ")[1]);
+                    firstMsg = false;
+                }
                 onMessageReceived(decodedMessage);
             }
         });
+    }
+
+    public void AssignName(string name)
+    {
+        AssignedName = name;
     }
 
     public void Close()

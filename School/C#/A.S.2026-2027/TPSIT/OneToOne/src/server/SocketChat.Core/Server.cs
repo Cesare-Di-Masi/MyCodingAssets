@@ -93,6 +93,29 @@ public class Server
         return sent;
     }
 
+    public bool TrySendMessageSingle(string msg, Socket client)
+    {
+        bool sent = false;
+
+        byte[] raw = Encoding.UTF8.GetBytes(msg);
+
+        try
+            {
+                int sentdata = client.Send(raw);
+                if (sentdata != raw.Length)
+                {
+                    sent= false;
+                }
+            }
+            catch (SocketException)
+            {
+                sent = false;
+                RemoveClient(client);
+            }
+
+        return sent;
+    }
+
     public bool TrySendMessageBroadcast(string msg)
     {
         if (clientHandlers.Count == 0)
@@ -102,11 +125,11 @@ public class Server
 
         byte[] raw = Encoding.UTF8.GetBytes(msg);
         bool sentToAll = true;
-        foreach (Socket clientHandler in clientHandlers.Values.ToArray())
+        foreach (Socket client in clientHandlers.Values.ToArray())
         {
             try
             {
-                int sent = clientHandler.Send(raw);
+                int sent = client.Send(raw);
                 if (sent != raw.Length)
                 {
                     sentToAll = false;
@@ -115,7 +138,7 @@ public class Server
             catch (SocketException)
             {
                 sentToAll = false;
-                RemoveClient(clientHandler);
+                RemoveClient(client);
             }
         }
 
@@ -132,28 +155,28 @@ public class Server
         }
     }
 
-    private void AddClient(Socket clientHandler)
+    private void AddClient(Socket client)
     {
-        string generatedName = NameGenerator.Identifiers.Get(IdentifierTemplate.AnyTwoComponents, separator:"_", forceSingleLetter:true);
-        clientsName.Add(generatedName);
-        clientHandlers.Add(generatedName, clientHandler);
+       
         buffers.Add(ClearBuffer());
         if (messageCallback is not null)
         {
-            StartListening(clientHandler, buffers[buffers.Count - 1]);
+            StartListening(client, buffers[buffers.Count - 1]);
         }
-        TrySendMessageSingle($"Nome assegnato: {clientsName[clientHandlers.Count - 1]} ", generatedName);
+        AssignClientName(client);
+
+    
     }
 
-    private void StartListening(Socket clientHandler, byte[] buffer)
+    private void StartListening(Socket client, byte[] buffer)
     {
         Task.Run(() =>
         {
-            while (clientHandler.Connected)
+            while (client.Connected)
             {
                 try
                 {
-                    int receivedBytes = clientHandler.Receive(buffer);
+                    int receivedBytes = client.Receive(buffer);
                     if (receivedBytes == 0)
                     {
                         // Il client si è disconnesso
@@ -161,6 +184,11 @@ public class Server
                     }
 
                     string decodedMessage = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                    if(decodedMessage.EndsWith("!"))
+                    {
+                        decodedMessage = decodedMessage[..^1]; //toglie l'ultimo carattere della stringa cha sarà !
+                        ForwardMessage(decodedMessage, client);
+                    }
                     messageCallback(decodedMessage);
                 }
                 catch (SocketException)
@@ -170,7 +198,7 @@ public class Server
                 }
             }
 
-            RemoveClient(clientHandler);
+            RemoveClient(client);
         });
     }
 
@@ -186,7 +214,7 @@ public class Server
 
             try
             {
-                client.Send(raw);
+                TrySendMessageSingle(message, client);
             }
             catch (SocketException)
             {
@@ -195,25 +223,36 @@ public class Server
         }
     }
 
-    private void RemoveClient(Socket clientHandler)
+    private void RemoveClient(Socket client)
     {
-        int index = clientHandlers.Values.ToArray().IndexOf(clientHandler);
-        string key = clientHandlers.First(x => x.Value == clientHandler).Key;
+        int index = clientHandlers.Values.ToArray().IndexOf(client);
+
+        string key = clientHandlers.First(x => x.Value == client).Key;
+
         if (index >= 0)
         {
             clientHandlers.Remove(key);
             buffers.RemoveAt(index);
+            
             clientsName.RemoveAt(index);
         }
 
-        clientHandler.Close();
+        client.Close();
+    }
+
+    private void AssignClientName(Socket client)
+    {
+        string generatedName = NameGenerator.Identifiers.Get(IdentifierTemplate.AnyTwoComponents, separator:"_", forceSingleLetter:true);
+        clientsName.Add(generatedName);
+        clientHandlers.Add(generatedName, client);
+        TrySendMessageSingle($"assign_identity: {generatedName}", client);
     }
 
     public void Close()
     {
-        foreach (Socket clientHandler in clientHandlers.Values.ToArray())
+        foreach (Socket client in clientHandlers.Values.ToArray())
         {
-            clientHandler.Close();
+            client.Close();
         }
 
         listener?.Close();

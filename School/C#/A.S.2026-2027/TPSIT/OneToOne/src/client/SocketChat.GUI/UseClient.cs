@@ -34,7 +34,10 @@ public class UseClient
                 bool sent = client.TrySendMessage(message);
                 if (sent)
                 {
-                    Console.WriteLine("[Client] " + message);
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write($"[{client.AssignedName}] ");
+                    Console.ResetColor();
+                    Console.WriteLine(message);
                 }
             }
             keepGoing = message != "exit";

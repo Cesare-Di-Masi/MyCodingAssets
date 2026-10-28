@@ -14,16 +14,31 @@ public class UseServer
     {
         var host = args[0] ?? "localhost";
         var port = int.Parse(args[1] ?? "11000");
-        var server = new Server(port, host); 
+        var server = new Server(port, host);
         server.Start();
 
-        server.StartListening(message => 
+        server.StartListening(message =>
         {
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.Write("[Client]");
-            Console.ResetColor();
-            Console.WriteLine(message);
+            int closeBracketIndex = message.IndexOf(']');
 
+            if (closeBracketIndex != -1)
+            {
+                // Estrae "[nome client]"
+                string clientTag = message.Substring(0, closeBracketIndex + 1);
+
+                // Estrae il resto del messaggio " mesg"
+                string textMessage = message.Substring(closeBracketIndex + 1);
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write(clientTag+ " ");
+                Console.ResetColor();
+                Console.WriteLine(textMessage);
+            }
+            else
+            {
+                // Fallback se il messaggio non segue il formato atteso
+                Console.WriteLine(message);
+            }
         });
 
 
