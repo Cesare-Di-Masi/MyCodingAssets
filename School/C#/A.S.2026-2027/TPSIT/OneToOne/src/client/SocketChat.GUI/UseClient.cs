@@ -22,7 +22,13 @@ public class UseClient
             Fatal("Could not connect to ${host}:${port}");
         }
 
-        client.StartListening(message => Console.WriteLine("[Server] " + message));
+        client.StartListening(message =>
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write($"[Server] ");
+            Console.ResetColor();
+            Console.WriteLine(message);
+        });
 
         bool keepGoing = true;
         Console.WriteLine("Type here your messages and press ENTER to send them!");

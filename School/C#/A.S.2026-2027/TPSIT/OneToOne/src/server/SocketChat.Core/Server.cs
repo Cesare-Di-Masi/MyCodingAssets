@@ -77,18 +77,20 @@ public class Server
         byte[] raw = Encoding.UTF8.GetBytes(msg);
 
         try
-            {
-                int sentdata = clientHandlers[hostName].Send(raw);
-                if (sentdata != raw.Length)
-                {
-                    sent= false;
-                }
-            }
-            catch (SocketException)
+        {
+            int sentdata = clientHandlers[hostName].Send(raw);
+            if (sentdata != raw.Length)
             {
                 sent = false;
-                RemoveClient(clientHandlers[hostName]);
             }
+        }
+        catch (SocketException)
+        {
+            sent = false;
+            Socket client = clientHandlers[hostName];
+            RemoveClient(client);
+            TrySendMessageBroadcast($"{hostName} Disconnected from the session");
+        }
 
         return sent;
     }
@@ -100,18 +102,20 @@ public class Server
         byte[] raw = Encoding.UTF8.GetBytes(msg);
 
         try
-            {
-                int sentdata = client.Send(raw);
-                if (sentdata != raw.Length)
-                {
-                    sent= false;
-                }
-            }
-            catch (SocketException)
+        {
+            int sentdata = client.Send(raw);
+            if (sentdata != raw.Length)
             {
                 sent = false;
-                RemoveClient(client);
             }
+        }
+        catch (SocketException)
+        {
+            sent = false;
+            string clientName = getClientName(client);
+            RemoveClient(client);
+            TrySendMessageBroadcast($"{clientName} Disconnected from the session");
+        }
 
         return sent;
     }
@@ -138,7 +142,9 @@ public class Server
             catch (SocketException)
             {
                 sentToAll = false;
+                string clientName = getClientName(client);
                 RemoveClient(client);
+                TrySendMessageBroadcast($"{clientName} Disconnected from the session");
             }
         }
 
@@ -157,15 +163,12 @@ public class Server
 
     private void AddClient(Socket client)
     {
-       
         buffers.Add(ClearBuffer());
         if (messageCallback is not null)
         {
             StartListening(client, buffers[buffers.Count - 1]);
         }
         AssignClientName(client);
-
-    
     }
 
     private void StartListening(Socket client, byte[] buffer)
@@ -184,11 +187,21 @@ public class Server
                     }
 
                     string decodedMessage = Encoding.UTF8.GetString(buffer, 0, receivedBytes);
+                    
+                    if(decodedMessage == "exit")
+                    {
+                        string clientName = getClientName(client);
+                        RemoveClient(client);
+                        TrySendMessageBroadcast($"{clientName} left from the session");
+                        return;
+                    }
+                    
                     if(decodedMessage.EndsWith("!"))
                     {
                         decodedMessage = decodedMessage[..^1]; //toglie l'ultimo carattere della stringa cha sarà !
                         ForwardMessage(decodedMessage, client);
                     }
+
                     messageCallback(decodedMessage);
                 }
                 catch (SocketException)
@@ -197,8 +210,9 @@ public class Server
                     break;
                 }
             }
-
+            string disconnectedClientName = getClientName(client);
             RemoveClient(client);
+            TrySendMessageBroadcast($"{disconnectedClientName} Disconnected from the session");
         });
     }
 
@@ -218,7 +232,9 @@ public class Server
             }
             catch (SocketException)
             {
+                string clientName = getClientName(client);
                 RemoveClient(client);
+                TrySendMessageBroadcast($"{clientName} Disconnected from the session");
             }
         }
     }
@@ -227,13 +243,12 @@ public class Server
     {
         int index = clientHandlers.Values.ToArray().IndexOf(client);
 
-        string key = clientHandlers.First(x => x.Value == client).Key;
+        string key = clientHandlers.FirstOrDefault(x => x.Value == client).Key;
 
-        if (index >= 0)
+        if (index >= 0 && key != null)
         {
             clientHandlers.Remove(key);
             buffers.RemoveAt(index);
-            
             clientsName.RemoveAt(index);
         }
 
@@ -246,6 +261,12 @@ public class Server
         clientsName.Add(generatedName);
         clientHandlers.Add(generatedName, client);
         TrySendMessageSingle($"assign_identity: {generatedName}", client);
+    }
+
+    private string getClientName(Socket client)
+    {
+        string name = clientHandlers.FirstOrDefault(x => x.Value == client).Key ?? "Unknown";
+        return name;
     }
 
     public void Close()
