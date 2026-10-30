@@ -522,5 +522,8 @@ cmake-build-*/
 .coverage.*
 htmlcov/
 .coverage
-* : Z o n e . I d e n t i f i e r  
- 
+
+# Visual Studio / .NET generated files
+**/.vs/
+**/bin/
+**/obj/
