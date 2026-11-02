@@ -1,10 +1,12 @@
 <Solution>
   <Folder Name="/src/" />
   <Folder Name="/src/client/">
-    <Project Path="Core/Core.csproj" />
+    <Project Path="client/Core/Core.csproj" Id="d1c4d12c-cf78-421d-9740-1cb9f117b519" />
   </Folder>
   <Folder Name="/src/Protocol/">
     <Project Path="ProtocolSystem/ProtocolSystem.csproj" Id="5c02db28-6913-43ee-9999-c057bc623d4d" />
   </Folder>
-  <Folder Name="/src/server/" />
+  <Folder Name="/src/server/">
+    <Project Path="server/Core/Core.csproj" Id="a8b0bb00-8dbf-4776-9821-197831aeb1f7" />
+  </Folder>
 </Solution>
