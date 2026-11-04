@@ -15,7 +15,7 @@ public class Server
     private const int BUFFER_SIZE = 1024;
     private const int MAX_CONNECTIONS = 10;
 
-    //Classe interna
+    //Classe interna, la utilizziamo per mantenere staccato gli elementi e il lock
     private sealed class ClientSession
     {
         public ClientSession(string name, Socket socket)
@@ -30,7 +30,7 @@ public class Server
         public object SendLock { get; } = new();
     }
 
-    private readonly object sync = new();
+    private readonly object sync = new(); //oggetto per il lock --> lo chiamiamo quando eseguiamo operazioni con concorrenza (nel caso più client facciano una operazione che possa causare problemi)
     private readonly List<ClientSession> sessions = new();
     private Socket listener;
     private Action<string> messageCallback;
@@ -127,7 +127,7 @@ public class Server
         return sentToAll;
     }
 
-    // Ascolto in background speculare a quello del Client
+    // Ascolto in background speculare a quello del Client --> 
     public void StartListening(Action<string> onMessageReceived)
     {
         ClientSession[] snapshot;
@@ -163,7 +163,15 @@ public class Server
             string name;
             do
             {
-                name = NameGenerator.Identifiers.Get(IdentifierTemplate.AnyTwoComponents, separator: "_", forceSingleLetter: true);
+                name = "";
+                var generatedName = NameGenerator.Identifiers.Get(IdentifierTemplate.AnyTwoComponents, separator: "_", forceSingleLetter: true);
+                var chars = generatedName.ToCharArray();
+
+                for(int i = 0; i<chars.Count(); i++)
+                {
+                    name += System.Char.ToLower(chars[i]); //METTO IL NOME IN LOWER CASE SEMPRE
+                }
+
             }
             while (sessions.Any(s => s.Name == name));
 
@@ -172,7 +180,7 @@ public class Server
             listenNow = messageCallback is not null;
         }
 
-        TrySend(session, $"assign_identity: {session.Name}");
+        TrySend(session, $"assign_identity: {session.Name}"); //messaggio che ha il compito di assegnare il nominativo al client
 
         if (listenNow)
         {
@@ -199,28 +207,32 @@ public class Server
 
                     // Il client antepone "[nome]" al testo: i controlli vanno fatti sul testo senza il prefisso
                     string text = decodedMessage;
+                    int closeBracketIndex = -1;
                     if (decodedMessage.StartsWith("["))
                     {
-                        int closeBracketIndex = decodedMessage.IndexOf(']');
+                        closeBracketIndex = decodedMessage.IndexOf(']');
                         if (closeBracketIndex != -1)
                         {
                             text = decodedMessage.Substring(closeBracketIndex + 1);
                         }
                     }
-
                     if (text == "exit")
                     {
                         if (RemoveSession(session))
                         {
                             TrySendMessageBroadcast($"{session.Name} left from the session");
                         }
-                        return;
                     }
 
-                    if (text.EndsWith("!"))
+                    if (text.StartsWith("!") && text.Length > 1) //se il messaggio inizia con ! il client richiede che il messaggio venga scritto in broadcast
                     {
-                        decodedMessage = decodedMessage[..^1]; // toglie il "!" finale
+                        decodedMessage = decodedMessage[(closeBracketIndex + 2)..]; // toglie il "!" iniziale ed il nome del client che ha deciso di inviare il msg in broadcast
                         ForwardMessage(decodedMessage, session);
+                    }
+
+                    if (text.StartsWith("/w")) //il client sta decidendo di mandare un messaggio privato verso un client singolo
+                    {
+                        Console.WriteLine("UN CLIENT HA TENTATO DI MANDARE MESSAGGI PRIVATI, BISOGNA IMPLEMENTARE CIO'");
                     }
 
                     messageCallback?.Invoke(decodedMessage);
