@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualBasic;
 using RandomFriendlyNameGenerator;
 
 namespace SocketChat.Core;
@@ -17,11 +18,11 @@ public class Server
     private const int MAX_CONNECTIONS = 10;
 
     // Comandi inviati dal client dopo il prefisso "[nome]"
-    private static readonly string[] EXIT_COMMAND = { "exit", "quit", "close" };
+    private static readonly string[] EXIT_COMMAND = { "exit" };
     private static readonly string[] BROADCAST_PREFIX = { "!", "/broadcast", "/b" };
     private static readonly string[] PrivateCommands = { "/w", "/t", "/msg", "/whisper", "/tell", "/private" };
     private static readonly string[] GroupCommands = { "/g", "/group" };
-    private static readonly string[] SnapshotCommands = { "/list", "/who", "/snapshot", "/all"};
+    private static readonly string[] SnapshotCommands = { "/list", "/who", "/snapshot", "/all" };
 
     // Raggruppa socket, buffer e lock di invio di un singolo client
     private sealed class ClientSession
@@ -254,11 +255,12 @@ public class Server
 
                     string messageForCallback = rawMessage;
 
-                    if (IsBroadcast(text))
+
+                    if (TryGetBroadcastBody(text, out string broadcastBody))
                     {
-                        // Tolgo "!" e il prefisso "[nome]" prima di inoltrare
-                        messageForCallback = text[BROADCAST_PREFIX.Max(p => p.Length)..];
-                        ForwardMessage(messageForCallback, session);
+                        string msg = $"[{session.Name}] {broadcastBody}";
+                        messageForCallback = msg;
+                        ForwardMessage(msg, session);
                     }
                     else if (IsPrivateCommand(text))
                     {
@@ -268,6 +270,7 @@ public class Server
                     {
                         HandleSnapshotCommand(session, text);
                     }
+
 
                     messageCallback?.Invoke(messageForCallback);
                 }
@@ -288,16 +291,49 @@ public class Server
     private static string StripClientPrefix(string message)
     {
         if (!message.StartsWith('['))
-        {
-            return message;
-        }
+            return message.TrimStart();
 
         int closeBracketIndex = message.IndexOf(']');
-        return closeBracketIndex == -1 ? message : message[(closeBracketIndex + 1)..];
+
+        return closeBracketIndex == -1
+            ? message.TrimStart()
+            : message[(closeBracketIndex + 1)..].TrimStart();
     }
 
-    private static bool IsBroadcast(string text) =>
-        BROADCAST_PREFIX.Any(prefix => text.StartsWith(prefix)) && text.Length > BROADCAST_PREFIX.Max(p => p.Length);
+    private static bool TryGetBroadcastBody(string text, out string body)
+    {
+        body = string.Empty;
+        text = text.TrimStart();
+
+        foreach (string prefix in BROADCAST_PREFIX.OrderByDescending(p => p.Length))
+        {
+            if (!text.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            // I comandi /broadcast e /b richiedono uno spazio
+            // per evitare di riconoscere parole come /broadcasting.
+            if (prefix != "!" &&
+                text.Length > prefix.Length &&
+                !char.IsWhiteSpace(text[prefix.Length]))
+            {
+                continue;
+            }
+
+            int start = prefix.Length;
+
+            while (start < text.Length && char.IsWhiteSpace(text[start]))
+                start++;
+
+            if (start >= text.Length)
+                return false;
+
+            body = text[start..];
+            return true;
+        }
+
+        return false;
+    }
+
 
     private static bool IsPrivateCommand(string text) =>
         PrivateCommands.Any(cmd => text == cmd || text.StartsWith(cmd + " "));
@@ -323,7 +359,7 @@ public class Server
             return;
         }
 
-        Log($"Messaggio privato da {sender.Name} a {receiverName}: {body}");
+        Log($"Messaggio privato da [{sender.Name}] a {receiverName}: {body}");
 
         ClientSession target = FindSession(s =>
             string.Equals(s.Name, receiverName, StringComparison.OrdinalIgnoreCase));
@@ -335,7 +371,7 @@ public class Server
         }
         else
         {
-            TrySend(target, $"{sender.Name} {body}");
+            TrySend(target, $"[{sender.Name}] {body}");
         }
     }
 
@@ -360,7 +396,7 @@ public class Server
 
     private static bool TryParsePrivateMessage(string text, out string receiverName, out string body)
     {
-        receiverName = body = string.Empty;
+        receiverName = body = string.Empty;// Inizializzo le variabili di output a stringhe vuote
 
         // Salto il comando ("/w ") e cerco lo spazio che separa destinatario e testo
         int nameStart = text.IndexOf(' ') + 1;
@@ -375,8 +411,8 @@ public class Server
             return false;
         }
 
-        receiverName = text[nameStart..nameEnd];
-        body = text[(nameEnd + 1)..];
+        receiverName = text[nameStart..nameEnd]; // Il nome del destinatario
+        body = text[(nameEnd + 1)..]; // Il messaggio privato vero e proprio
         return true;
     }
 
@@ -399,12 +435,27 @@ public class Server
 
         try
         {
-            int sent;
             lock (session.SendLock)
             {
-                sent = session.Socket.Send(raw);
+                int offset = 0;
+
+                while (offset < raw.Length)
+                {
+                    int sent = session.Socket.Send(
+                        raw,
+                        offset,
+                        raw.Length - offset,
+                        SocketFlags.None
+                    );
+
+                    if (sent <= 0)
+                        throw new SocketException((int)SocketError.ConnectionReset);
+
+                    offset += sent;
+                }
             }
-            return sent == raw.Length;
+
+            return true;
         }
         catch (Exception ex) when (IsSocketClosed(ex))
         {

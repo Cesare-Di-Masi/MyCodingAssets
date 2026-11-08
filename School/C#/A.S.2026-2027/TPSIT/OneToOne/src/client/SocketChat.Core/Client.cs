@@ -66,7 +66,7 @@ public class Client
         {
             return false;
         }
-        msg = $"[{AssignedName}]" + msg; //ripulisco il sistema di messaggi in questo modo
+        msg = $"[{AssignedName}] " + msg; //ripulisco il sistema di messaggi in questo modo
 
         byte[] raw = Encoding.UTF8.GetBytes(msg);
 
